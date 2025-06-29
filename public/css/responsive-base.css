@@ -237,6 +237,30 @@ img[data-src].loaded {
     }
 }
 
+/* Fullscreen viewport fixes */
+html, body {
+    scroll-behavior: auto !important;
+    overflow-anchor: none !important;
+}
+
+/* Fix for fullscreen mode scroll issues */
+@media (display-mode: fullscreen) {
+    html, body {
+        height: 100dvh !important;
+        max-height: 100vh !important;
+        overflow: hidden !important;
+        position: fixed !important;
+        width: 100% !important;
+    }
+    
+    .game-container {
+        height: 100dvh !important;
+        max-height: 100vh !important;
+        overflow: hidden !important;
+        position: relative !important;
+    }
+}
+
 /* Font loading optimization */
 @font-face {
     font-family: 'Inter';
@@ -490,10 +514,12 @@ img[data-src].loaded {
             "header"
             "main"
             "chat" !important;
-        height: 100vh !important;
+        height: 100dvh !important; /* Use dynamic viewport height */
+        max-height: 100vh !important;
         overflow: hidden !important;
         padding: 5px !important;
         gap: 5px !important;
+        position: relative !important;
     }
     
     .header {

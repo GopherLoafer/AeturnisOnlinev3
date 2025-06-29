@@ -44,12 +44,14 @@
                 radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
                 linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #0f1419 100%);
             color: var(--text-primary);
-            height: 100vh;
+            height: 100dvh; /* Use dynamic viewport height */
+            max-height: 100vh;
             overflow: hidden;
             font-size: var(--font-base);
             line-height: 1.6;
             text-rendering: optimizeLegibility;
             font-weight: 400;
+            position: relative;
         }
 
         /* Responsive headings */
@@ -124,11 +126,13 @@
                 "chat-panel";
             grid-template-columns: 1fr;
             grid-template-rows: 60px 1fr 150px;
-            height: 100vh;
+            height: 100dvh; /* Use dynamic viewport height */
+            max-height: 100vh;
             gap: 10px;
             background: transparent;
             padding: 10px;
             overflow: hidden;
+            position: relative;
         }
 
         /* Tablet layout */
@@ -2622,15 +2626,56 @@
     <script src="/js/game.js"></script>
 
     <script>
-        // Force mobile initialization
+        // Prevent auto-scroll and fix viewport issues
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, screen width:', window.innerWidth);
+            
+            // Prevent auto-scroll to bottom
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            
+            // Force scroll to top and prevent default scroll behavior
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+            }, 100);
+            
             if (window.innerWidth < 1024) {
                 console.log('Mobile screen detected, ensuring mobile features are active');
                 // Add mobile class to body for debugging
                 document.body.classList.add('mobile-device');
             }
+            
+            // Prevent focus-based scrolling
+            const inputs = document.querySelectorAll('input, textarea, button');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function(e) {
+                    // Prevent scroll on focus for most elements
+                    if (!this.closest('.chat-input-container')) {
+                        e.preventDefault();
+                        setTimeout(() => {
+                            window.scrollTo(0, 0);
+                        }, 10);
+                    }
+                });
+            });
         });
+        
+        // Handle fullscreen changes
+        document.addEventListener('fullscreenchange', function() {
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+            }, 100);
+        });
+        
+        // Prevent scroll restoration
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
     </script>
 </body>
 </html>
