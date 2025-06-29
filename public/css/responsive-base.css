@@ -362,3 +362,155 @@ img[data-src].loaded {
         font-size: 16px !important; /* Prevents zoom on iOS */
     }
 }
+
+/* Universal Chat System - Works on all screen sizes */
+.chat-panel {
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
+}
+
+/* Chat header with expand button */
+.chat-header {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 15;
+    padding: 8px;
+}
+
+.chat-expand-btn {
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    color: #3b82f6;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.chat-expand-btn:hover {
+    background: rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile-specific chat expansion */
+@media (max-width: 768px) {
+    .chat-panel.expanded {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60vh !important;
+        max-height: 400px;
+        z-index: 1100;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+        animation: slideUp 0.3s ease;
+    }
+    
+    .expand-text {
+        display: none;
+    }
+    
+    @media (min-width: 480px) {
+        .expand-text {
+            display: inline;
+            margin-left: 4px;
+        }
+    }
+    
+    .main-panel.chat-expanded {
+        margin-bottom: 60vh;
+    }
+    
+    body.chat-modal-open {
+        overflow: hidden;
+    }
+}
+
+/* Tablet chat expansion */
+@media (min-width: 769px) and (max-width: 1023px) {
+    .chat-panel.expanded {
+        height: 350px !important;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    .game-container {
+        grid-template-rows: 60px minmax(200px, 1fr) auto !important;
+    }
+}
+
+/* Desktop chat expansion */
+@media (min-width: 1024px) {
+    .chat-panel.expanded {
+        height: 400px !important;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    .chat-expand-btn .expand-text {
+        display: inline;
+    }
+    
+    /* Smooth transition for main panel */
+    .main-panel {
+        transition: margin-bottom 0.3s ease;
+    }
+    
+    .main-panel.chat-expanded {
+        margin-bottom: 200px;
+    }
+}
+
+/* Animation for chat expansion */
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* Collapsed state improvements */
+.chat-panel:not(.expanded) {
+    .chat-messages {
+        opacity: 0.8;
+    }
+    
+    .chat-input-container {
+        background: rgba(10, 10, 10, 0.9);
+    }
+}
+
+/* Focus styles for accessibility */
+.chat-expand-btn:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Dark overlay for mobile when chat is expanded */
+@media (max-width: 768px) {
+    .chat-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1099;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .chat-panel.expanded ~ .chat-overlay,
+    body.chat-modal-open .chat-overlay {
+        display: block;
+        opacity: 1;
+    }
+}
