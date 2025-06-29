@@ -6,7 +6,7 @@
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<body class="game-dashboard">
+<body class="game-dashboard" data-character-id="<%= character.id %>">
     <!-- Top Status Bar -->
     <div class="status-bar">
         <div class="status-left">
@@ -117,6 +117,11 @@
                 
                 <div id="skills" class="tab-content">
                     <div class="skills-section">
+                        <h4>Race Abilities</h4>
+                        <div class="race-abilities-list" id="race-abilities">
+                            <div class="loading">Loading abilities...</div>
+                        </div>
+                        
                         <h4>Weapon Affinities</h4>
                         <% weaponAffinities.forEach(affinity => { %>
                         <div class="skill-row">

@@ -66,7 +66,18 @@ router.get('/dashboard', async (req, res) => {
 // Character creation
 router.get('/character-creation', async (req, res) => {
   try {
-    const races = await db.query('SELECT * FROM races ORDER BY name');
+    const races = await db.query(`
+      SELECT r.*, 
+             COALESCE(array_agg(ra.ability_name) FILTER (WHERE ra.ability_name IS NOT NULL), '{}') as abilities
+      FROM races r
+      LEFT JOIN race_abilities ra ON r.id = ra.race_id
+      GROUP BY r.id, r.name, r.description, r.str_modifier, r.int_modifier, r.vit_modifier, 
+               r.dex_modifier, r.wis_modifier, r.starting_zone, r.experience_bonus, 
+               r.magic_affinity_bonus, r.weapon_affinity_bonus, r.special_ability, 
+               r.equipment_restrictions, r.regeneration_modifier, r.created_at
+      ORDER BY r.name
+    `);
+    
     res.render('game/character-creation', {
       title: 'Create Character - Aeturnis Online',
       races: races.rows,
@@ -128,7 +139,7 @@ router.post('/character-creation', async (req, res) => {
 
     const raceData = race.rows[0];
 
-    // Calculate starting stats
+    // Calculate starting stats with race modifiers
     const baseStats = {
       str: 10 + raceData.str_modifier,
       int: 10 + raceData.int_modifier,

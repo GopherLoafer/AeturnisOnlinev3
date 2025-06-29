@@ -18,6 +18,9 @@ function initializeGame() {
     
     // Auto-scroll chat to bottom
     scrollChatToBottom();
+    
+    // Load race abilities when skills tab is opened
+    loadRaceAbilities();
 }
 
 function updateServerTime() {
@@ -189,6 +192,113 @@ document.addEventListener('DOMContentLoaded', function() {
         chatForm.addEventListener('submit', submitChatMessage);
     }
 });
+
+// Load race abilities for the current character
+async function loadRaceAbilities() {
+    const abilitiesContainer = document.getElementById('race-abilities');
+    if (!abilitiesContainer) return;
+
+    try {
+        // Get character ID from the page
+        const characterId = document.body.dataset.characterId;
+        if (!characterId) {
+            abilitiesContainer.innerHTML = '<div class="error">Character not found</div>';
+            return;
+        }
+
+        const response = await fetch(`/api/abilities/race-abilities/${characterId}`);
+        const data = await response.json();
+
+        if (data.success) {
+            displayRaceAbilities(data.abilities);
+        } else {
+            abilitiesContainer.innerHTML = '<div class="error">Failed to load abilities</div>';
+        }
+    } catch (error) {
+        console.error('Error loading race abilities:', error);
+        abilitiesContainer.innerHTML = '<div class="error">Connection error</div>';
+    }
+}
+
+// Display race abilities in the UI
+function displayRaceAbilities(abilities) {
+    const container = document.getElementById('race-abilities');
+    if (!container) return;
+
+    if (abilities.length === 0) {
+        container.innerHTML = '<div class="no-abilities">No special abilities</div>';
+        return;
+    }
+
+    let html = '';
+    abilities.forEach(ability => {
+        const isOnCooldown = ability.cooldown_remaining > 0;
+        const isActive = ability.ability_type === 'active';
+        
+        html += `
+            <div class="ability-item ${ability.ability_type}">
+                <div class="ability-header">
+                    <span class="ability-name">${ability.ability_name.replace(/_/g, ' ').toUpperCase()}</span>
+                    ${isActive ? '<span class="ability-type">Active</span>' : '<span class="ability-type">Passive</span>'}
+                </div>
+                <div class="ability-description">${ability.description}</div>
+                ${ability.mana_cost > 0 ? `<div class="ability-cost">Mana: ${ability.mana_cost}</div>` : ''}
+                ${ability.cooldown_seconds > 0 ? `<div class="ability-cooldown">Cooldown: ${ability.cooldown_seconds}s</div>` : ''}
+                ${isActive && !isOnCooldown ? `<button onclick="useAbility('${ability.ability_name}')" class="use-ability-btn">Use</button>` : ''}
+                ${isOnCooldown ? `<div class="cooldown-timer">${ability.cooldown_remaining}s remaining</div>` : ''}
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+// Use a race ability
+async function useAbility(abilityName) {
+    try {
+        const response = await fetch('/api/abilities/use-ability', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ abilityName })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Show success message in game output
+            addToGameOutput(data.message, 'ability-success');
+            
+            // Reload abilities to show cooldown
+            loadRaceAbilities();
+            
+            // Refresh character stats if needed
+            if (data.effects && data.effects.length > 0) {
+                refreshGameState();
+            }
+        } else {
+            addToGameOutput(data.error, 'ability-error');
+        }
+    } catch (error) {
+        console.error('Error using ability:', error);
+        addToGameOutput('Failed to use ability', 'ability-error');
+    }
+}
+
+// Add message to game output
+function addToGameOutput(message, className = '') {
+    const gameOutput = document.getElementById('game-output');
+    if (gameOutput) {
+        const messageElement = document.createElement('p');
+        messageElement.textContent = message;
+        if (className) {
+            messageElement.className = className;
+        }
+        gameOutput.appendChild(messageElement);
+        gameOutput.scrollTop = gameOutput.scrollHeight;
+    }
+}
 
 // Keyboard shortcuts
 document.addEventListener('keydown', function(event) {

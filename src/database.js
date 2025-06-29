@@ -49,6 +49,12 @@ class Database {
         dex_modifier INTEGER DEFAULT 0,
         wis_modifier INTEGER DEFAULT 0,
         starting_zone VARCHAR(100),
+        experience_bonus DECIMAL(3,2) DEFAULT 0.00,
+        magic_affinity_bonus DECIMAL(3,2) DEFAULT 0.00,
+        weapon_affinity_bonus DECIMAL(3,2) DEFAULT 0.00,
+        special_ability VARCHAR(50),
+        equipment_restrictions TEXT,
+        regeneration_modifier DECIMAL(3,2) DEFAULT 1.00,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
 
@@ -127,6 +133,38 @@ class Database {
         target_character_id INTEGER REFERENCES characters(id),
         description TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+
+      // Race abilities table
+      `CREATE TABLE IF NOT EXISTS race_abilities (
+        id SERIAL PRIMARY KEY,
+        race_id INTEGER REFERENCES races(id),
+        ability_name VARCHAR(50) NOT NULL,
+        description TEXT,
+        cooldown_seconds INTEGER DEFAULT 0,
+        mana_cost INTEGER DEFAULT 0,
+        level_requirement INTEGER DEFAULT 1,
+        ability_type VARCHAR(20) DEFAULT 'active',
+        effect_data JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+
+      // Character race ability cooldowns
+      `CREATE TABLE IF NOT EXISTS character_ability_cooldowns (
+        id SERIAL PRIMARY KEY,
+        character_id INTEGER REFERENCES characters(id) ON DELETE CASCADE,
+        ability_name VARCHAR(50) NOT NULL,
+        cooldown_expires TIMESTAMP,
+        UNIQUE(character_id, ability_name)
+      )`,
+
+      // Equipment restrictions by race
+      `CREATE TABLE IF NOT EXISTS race_equipment_restrictions (
+        id SERIAL PRIMARY KEY,
+        race_id INTEGER REFERENCES races(id),
+        item_type VARCHAR(50) NOT NULL,
+        restriction_type VARCHAR(20) DEFAULT 'forbidden',
+        description TEXT
       )`
     ];
 
@@ -136,70 +174,178 @@ class Database {
 
     // Insert default races if they don't exist
     await this.insertDefaultRaces();
+    
+    // Insert default race abilities
+    await this.insertDefaultRaceAbilities();
   }
 
   async insertDefaultRaces() {
     const defaultRaces = [
       {
         name: 'Human',
-        description: 'Balanced race with no particular strengths or weaknesses. Versatile and adaptable.',
+        description: 'Balanced stats, +10% experience gain. Versatile and adaptable survivors.',
         str_modifier: 0, int_modifier: 0, vit_modifier: 0, dex_modifier: 0, wis_modifier: 0,
-        starting_zone: 'human_village'
+        starting_zone: 'human_village',
+        experience_bonus: 0.10,
+        magic_affinity_bonus: 0.0,
+        weapon_affinity_bonus: 0.0,
+        special_ability: 'adaptive_learning',
+        equipment_restrictions: null,
+        regeneration_modifier: 1.0
       },
       {
         name: 'Elf',
-        description: 'Graceful and intelligent, with natural magical affinity but physically frail.',
-        str_modifier: -2, int_modifier: 3, vit_modifier: -1, dex_modifier: 2, wis_modifier: 3,
-        starting_zone: 'elven_forest'
+        description: '+15 INT/WIS, -10 STR, +20% magic affinity gain. Masters of arcane arts.',
+        str_modifier: -10, int_modifier: 15, vit_modifier: 0, dex_modifier: 0, wis_modifier: 15,
+        starting_zone: 'elven_forest',
+        experience_bonus: 0.0,
+        magic_affinity_bonus: 0.20,
+        weapon_affinity_bonus: 0.0,
+        special_ability: 'magic_mastery',
+        equipment_restrictions: null,
+        regeneration_modifier: 1.0
       },
       {
         name: 'Dwarf',
-        description: 'Hardy mountain folk with great strength and constitution but lacking in agility.',
-        str_modifier: 3, int_modifier: 1, vit_modifier: 4, dex_modifier: -2, wis_modifier: 1,
-        starting_zone: 'dwarven_halls'
+        description: '+20 STR/VIT, -15 INT, +20% weapon affinity gain. Sturdy mountain warriors.',
+        str_modifier: 20, int_modifier: -15, vit_modifier: 20, dex_modifier: 0, wis_modifier: 0,
+        starting_zone: 'dwarven_halls',
+        experience_bonus: 0.0,
+        magic_affinity_bonus: 0.0,
+        weapon_affinity_bonus: 0.20,
+        special_ability: 'weapon_mastery',
+        equipment_restrictions: null,
+        regeneration_modifier: 1.0
       },
       {
         name: 'Orc',
-        description: 'Powerful warriors with incredible strength but limited intelligence and wisdom.',
-        str_modifier: 4, int_modifier: -2, vit_modifier: 3, dex_modifier: 0, wis_modifier: -2,
-        starting_zone: 'orc_stronghold'
-      },
-      {
-        name: 'Halfling',
-        description: 'Small but nimble folk with keen senses and natural luck.',
-        str_modifier: -2, int_modifier: 1, vit_modifier: 1, dex_modifier: 4, wis_modifier: 2,
-        starting_zone: 'halfling_shire'
-      },
-      {
-        name: 'Gnome',
-        description: 'Tiny but brilliant, masters of both magic and mechanical contraptions.',
-        str_modifier: -3, int_modifier: 4, vit_modifier: -1, dex_modifier: 1, wis_modifier: 4,
-        starting_zone: 'gnome_workshop'
+        description: '+25 STR, -20 INT/WIS, +50% rage generation. Brutal berserker warriors.',
+        str_modifier: 25, int_modifier: -20, vit_modifier: 0, dex_modifier: 0, wis_modifier: -20,
+        starting_zone: 'orc_stronghold',
+        experience_bonus: 0.0,
+        magic_affinity_bonus: 0.0,
+        weapon_affinity_bonus: 0.0,
+        special_ability: 'berserker_rage',
+        equipment_restrictions: null,
+        regeneration_modifier: 1.0
       },
       {
         name: 'Dark Elf',
-        description: 'Mysterious underground dwellers with dark magic affinity and deadly precision.',
-        str_modifier: 1, int_modifier: 2, vit_modifier: 0, dex_modifier: 3, wis_modifier: 1,
-        starting_zone: 'dark_caverns'
+        description: '+20 DEX/INT, -15 VIT, +30% critical chance. Shadowy assassins.',
+        str_modifier: 0, int_modifier: 20, vit_modifier: -15, dex_modifier: 20, wis_modifier: 0,
+        starting_zone: 'dark_caverns',
+        experience_bonus: 0.0,
+        magic_affinity_bonus: 0.0,
+        weapon_affinity_bonus: 0.0,
+        special_ability: 'shadow_strike',
+        equipment_restrictions: null,
+        regeneration_modifier: 1.0
+      },
+      {
+        name: 'Halfling',
+        description: '+25 DEX, -20 STR, +40% dodge chance. Quick and nimble scouts.',
+        str_modifier: -20, int_modifier: 0, vit_modifier: 0, dex_modifier: 25, wis_modifier: 0,
+        starting_zone: 'halfling_shire',
+        experience_bonus: 0.0,
+        magic_affinity_bonus: 0.0,
+        weapon_affinity_bonus: 0.0,
+        special_ability: 'evasion',
+        equipment_restrictions: null,
+        regeneration_modifier: 1.0
       },
       {
         name: 'Dragonborn',
-        description: 'Descendants of dragons with balanced abilities and natural magical resistance.',
-        str_modifier: 2, int_modifier: 2, vit_modifier: 2, dex_modifier: 1, wis_modifier: 2,
-        starting_zone: 'dragon_peaks'
+        description: '+10 all stats, -25% experience gain, breath weapon. Descendants of dragons.',
+        str_modifier: 10, int_modifier: 10, vit_modifier: 10, dex_modifier: 10, wis_modifier: 10,
+        starting_zone: 'dragon_peaks',
+        experience_bonus: -0.25,
+        magic_affinity_bonus: 0.0,
+        weapon_affinity_bonus: 0.0,
+        special_ability: 'dragon_breath',
+        equipment_restrictions: null,
+        regeneration_modifier: 1.0
+      },
+      {
+        name: 'Undead',
+        description: 'No VIT regen, +50% dark magic affinity, immune to poison. Cursed beings.',
+        str_modifier: 0, int_modifier: 0, vit_modifier: 0, dex_modifier: 0, wis_modifier: 0,
+        starting_zone: 'cursed_graveyard',
+        experience_bonus: 0.0,
+        magic_affinity_bonus: 0.0,
+        weapon_affinity_bonus: 0.0,
+        special_ability: 'undeath',
+        equipment_restrictions: null,
+        regeneration_modifier: 0.0
       }
     ];
 
     for (const race of defaultRaces) {
       try {
         await this.pool.query(
-          `INSERT INTO races (name, description, str_modifier, int_modifier, vit_modifier, dex_modifier, wis_modifier, starting_zone)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (name) DO NOTHING`,
+          `INSERT INTO races (name, description, str_modifier, int_modifier, vit_modifier, dex_modifier, wis_modifier, starting_zone, experience_bonus, magic_affinity_bonus, weapon_affinity_bonus, special_ability, equipment_restrictions, regeneration_modifier)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) ON CONFLICT (name) DO NOTHING`,
           [race.name, race.description, race.str_modifier, race.int_modifier, 
-           race.vit_modifier, race.dex_modifier, race.wis_modifier, race.starting_zone]
+           race.vit_modifier, race.dex_modifier, race.wis_modifier, race.starting_zone,
+           race.experience_bonus, race.magic_affinity_bonus, race.weapon_affinity_bonus,
+           race.special_ability, race.equipment_restrictions, race.regeneration_modifier]
         );
       } catch (error) {
         console.error(`Error inserting race ${race.name}:`, error);
+      }
+    }
+  }
+
+  async insertDefaultRaceAbilities() {
+    const abilities = [
+      // Human abilities
+      { race_name: 'Human', ability_name: 'adaptive_learning', description: 'Gains 10% extra experience from all sources', ability_type: 'passive', effect_data: { experience_multiplier: 1.10 } },
+      
+      // Elf abilities
+      { race_name: 'Elf', ability_name: 'magic_mastery', description: 'Magic affinity increases 20% faster', ability_type: 'passive', effect_data: { magic_affinity_multiplier: 1.20 } },
+      { race_name: 'Elf', ability_name: 'elven_sight', description: 'See hidden magical auras and detect illusions', ability_type: 'passive', effect_data: { magic_detection: true } },
+      
+      // Dwarf abilities
+      { race_name: 'Dwarf', ability_name: 'weapon_mastery', description: 'Weapon affinity increases 20% faster', ability_type: 'passive', effect_data: { weapon_affinity_multiplier: 1.20 } },
+      { race_name: 'Dwarf', ability_name: 'dwarven_resilience', description: 'Resistance to poison and disease', ability_type: 'passive', effect_data: { poison_resistance: 0.5, disease_resistance: 0.5 } },
+      
+      // Orc abilities
+      { race_name: 'Orc', ability_name: 'berserker_rage', description: 'Enter rage state: +50% damage, -25% defense for 30 seconds', cooldown_seconds: 300, ability_type: 'active', effect_data: { damage_bonus: 0.5, defense_penalty: 0.25, duration: 30 } },
+      { race_name: 'Orc', ability_name: 'intimidation', description: 'Chance to cause fear in enemies during combat', ability_type: 'passive', effect_data: { fear_chance: 0.15 } },
+      
+      // Dark Elf abilities
+      { race_name: 'Dark Elf', ability_name: 'shadow_strike', description: 'Next attack has 30% higher critical chance', cooldown_seconds: 60, ability_type: 'active', effect_data: { critical_bonus: 0.30 } },
+      { race_name: 'Dark Elf', ability_name: 'darkvision', description: 'See perfectly in darkness and detect hidden enemies', ability_type: 'passive', effect_data: { darkness_immunity: true, detect_hidden: true } },
+      
+      // Halfling abilities
+      { race_name: 'Halfling', ability_name: 'evasion', description: '40% chance to dodge physical attacks', ability_type: 'passive', effect_data: { dodge_chance: 0.40 } },
+      { race_name: 'Halfling', ability_name: 'lucky_strike', description: 'Random chance for extraordinary success in any action', ability_type: 'passive', effect_data: { luck_factor: 0.05 } },
+      
+      // Dragonborn abilities
+      { race_name: 'Dragonborn', ability_name: 'dragon_breath', description: 'Breathe elemental energy dealing area damage', cooldown_seconds: 120, mana_cost: 25, ability_type: 'active', effect_data: { damage_multiplier: 2.0, area_effect: true } },
+      { race_name: 'Dragonborn', ability_name: 'draconic_heritage', description: 'Resistance to elemental damage and magic', ability_type: 'passive', effect_data: { elemental_resistance: 0.25, magic_resistance: 0.15 } },
+      
+      // Undead abilities
+      { race_name: 'Undead', ability_name: 'undeath', description: 'Immune to poison, disease, and fear. No vitality regeneration.', ability_type: 'passive', effect_data: { poison_immunity: true, disease_immunity: true, fear_immunity: true, no_vit_regen: true } },
+      { race_name: 'Undead', ability_name: 'dark_affinity', description: '50% bonus to dark magic affinity gain', ability_type: 'passive', effect_data: { dark_magic_bonus: 0.50 } },
+      { race_name: 'Undead', ability_name: 'life_drain', description: 'Absorb health from enemies during combat', cooldown_seconds: 90, ability_type: 'active', effect_data: { drain_percentage: 0.25 } }
+    ];
+
+    for (const ability of abilities) {
+      try {
+        // Get race ID
+        const raceResult = await this.pool.query('SELECT id FROM races WHERE name = $1', [ability.race_name]);
+        if (raceResult.rows.length > 0) {
+          const raceId = raceResult.rows[0].id;
+          
+          await this.pool.query(
+            `INSERT INTO race_abilities (race_id, ability_name, description, cooldown_seconds, mana_cost, ability_type, effect_data)
+             VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT DO NOTHING`,
+            [raceId, ability.ability_name, ability.description, ability.cooldown_seconds || 0, 
+             ability.mana_cost || 0, ability.ability_type, JSON.stringify(ability.effect_data)]
+          );
+        }
+      } catch (error) {
+        console.error(`Error inserting ability ${ability.ability_name}:`, error);
       }
     }
   }

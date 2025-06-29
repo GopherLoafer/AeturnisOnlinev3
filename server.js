@@ -11,6 +11,7 @@ const db = require('./src/database');
 const authRoutes = require('./src/routes/auth');
 const gameRoutes = require('./src/routes/game');
 const adminRoutes = require('./src/routes/admin');
+const abilitiesRoutes = require('./src/routes/abilities');
 const { requireAuth, requireAdmin } = require('./src/middleware/auth');
 
 const app = express();
@@ -71,6 +72,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/auth', authRoutes);
 app.use('/game', requireAuth, gameRoutes);
 app.use('/admin', requireAdmin, adminRoutes);
+app.use('/api/abilities', requireAuth, abilitiesRoutes);
 
 // Home route
 app.get('/', (req, res) => {

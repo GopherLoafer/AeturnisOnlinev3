@@ -287,18 +287,133 @@ body {
 }
 
 .race-stats {
+    margin-bottom: 1rem;
+}
+
+.race-stats h4, .race-bonuses h4, .race-abilities h4 {
+    color: #00ff41;
+    font-size: 0.9rem;
+    margin: 0.5rem 0 0.25rem 0;
+    border-bottom: 1px solid #333;
+    padding-bottom: 0.25rem;
+}
+
+.race-stats > div, .race-bonuses, .race-abilities {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
     margin-bottom: 0.5rem;
 }
 
-.stat-modifier {
+.stat-modifier, .bonus-item, .ability-item {
     background: rgba(0, 0, 0, 0.5);
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
     font-size: 0.8rem;
     color: #00ff41;
+    border: 1px solid #333;
+}
+
+.bonus-item {
+    background: rgba(0, 50, 100, 0.3);
+    color: #66ccff;
+}
+
+.ability-item {
+    background: rgba(100, 0, 50, 0.3);
+    color: #ff6699;
+    font-weight: bold;
+}
+
+/* Race abilities in game interface */
+.race-abilities-list {
+    margin-bottom: 1rem;
+}
+
+.race-abilities-list .ability-item {
+    background: rgba(0, 50, 0, 0.3);
+    border: 1px solid #333;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    color: #cccccc;
+    font-weight: normal;
+}
+
+.ability-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.ability-name {
+    color: #00ff41;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.ability-type {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    color: #666;
+}
+
+.ability-type.active {
+    color: #ffff00;
+}
+
+.ability-description {
+    font-size: 0.8rem;
+    color: #cccccc;
+    margin-bottom: 0.25rem;
+}
+
+.ability-cost, .ability-cooldown {
+    font-size: 0.7rem;
+    color: #999;
+    margin-bottom: 0.25rem;
+}
+
+.use-ability-btn {
+    background: #333;
+    border: 1px solid #00ff41;
+    color: #00ff41;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    font-family: inherit;
+}
+
+.use-ability-btn:hover {
+    background: rgba(0, 255, 65, 0.1);
+    box-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
+}
+
+.cooldown-timer {
+    color: #ff6666;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.ability-success {
+    color: #00ff41;
+    font-weight: bold;
+}
+
+.ability-error {
+    color: #ff6666;
+    font-weight: bold;
+}
+
+.loading, .error, .no-abilities {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 1rem;
 }
 
 .starting-zone {
