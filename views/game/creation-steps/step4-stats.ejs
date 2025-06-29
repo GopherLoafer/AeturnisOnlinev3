@@ -116,7 +116,7 @@
       <h3>Final Character Stats</h3>
       <div class="final-character-display">
         <div class="character-header">
-          <span class="name"><%= sessionData.name || 'Your Character' %></span>
+          <span class="name"><%= (sessionData || {}).name || 'Your Character' %></span>
           <span class="details">
             <span id="final-race">Race</span> 
             <span id="final-background">Background</span>
@@ -143,8 +143,8 @@
 </div>
 
 <script>
-const raceData = <%- JSON.stringify(races.find(r => r.id == sessionData.raceId) || {}) %>;
-const backgroundData = <%- JSON.stringify(backgrounds.find(b => b.id == sessionData.backgroundId) || {}) %>;
+const raceData = <%- JSON.stringify((races || []).find(r => r.id == (sessionData || {}).raceId) || {}) %>;
+const backgroundData = <%- JSON.stringify((backgrounds || []).find(b => b.id == (sessionData || {}).backgroundId) || {}) %>;
 
 let baseStats = {};
 let allocatedStats = { str: 0, int: 0, vit: 0, dex: 0, wis: 0 };
@@ -164,7 +164,7 @@ function initializeStats() {
   };
   
   // Load existing allocation if any
-  const sessionStats = <%= JSON.stringify(sessionData.statAllocation || {}) %>;
+  const sessionStats = <%= JSON.stringify((sessionData || {}).statAllocation || {}) %>;
   if (Object.keys(sessionStats).length > 0) {
     allocatedStats = sessionStats;
     usedPoints = Object.values(allocatedStats).reduce((sum, val) => sum + val, 0);
