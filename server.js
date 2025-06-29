@@ -29,7 +29,7 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", "data:", "https:"],
-      baseSrc: ["'self'"],
+      baseUri: ["'self'"],
       fontSrc: ["'self'", "https:", "data:"],
       formAction: ["'self'"],
       frameAncestors: ["'self'"],

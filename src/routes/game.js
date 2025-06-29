@@ -285,4 +285,67 @@ router.get('/api/game/state', requireCharacter, async (req, res) => {
   }
 });
 
+// API endpoint for movement
+router.post('/api/game/move', requireCharacter, async (req, res) => {
+  try {
+    const { direction } = req.body;
+    // Basic movement response - can be expanded later
+    res.json({
+      success: true,
+      message: `You move ${direction}.`,
+      location: 'Current Zone'
+    });
+  } catch (error) {
+    console.error('Movement API error:', error);
+    res.status(500).json({ success: false, error: 'Movement failed' });
+  }
+});
+
+// API endpoint for actions
+router.post('/api/game/action', requireCharacter, async (req, res) => {
+  try {
+    const { action } = req.body;
+    let message = `You attempt to ${action}.`;
+    
+    // Basic action responses - can be expanded later
+    switch(action) {
+      case 'fight':
+        message = 'You engage in combat!';
+        break;
+      case 'rest':
+        message = 'You rest and recover some health and mana.';
+        break;
+      case 'cast':
+        message = 'You cast a spell!';
+        break;
+      case 'map':
+        message = 'You check your map.';
+        break;
+    }
+    
+    res.json({
+      success: true,
+      message: message
+    });
+  } catch (error) {
+    console.error('Action API error:', error);
+    res.status(500).json({ success: false, error: 'Action failed' });
+  }
+});
+
+// API endpoint for chat
+router.post('/api/game/chat', requireCharacter, async (req, res) => {
+  try {
+    const { message, channel } = req.body;
+    // Basic chat response - can be expanded later
+    res.json({
+      success: true,
+      message: 'Message sent successfully'
+    });
+  } catch (error) {
+    console.error('Chat API error:', error);
+    res.status(500).json({ success: false, error: 'Chat failed' });
+  }
+});
+
 module.exports = router;
