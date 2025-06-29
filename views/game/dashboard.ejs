@@ -3,256 +3,409 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aeturnis Online - Game Dashboard</title>
+    <title>Aeturnis Online - <%= character.name %></title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<body class="game-dashboard">
-    <!-- Top Navigation -->
-    <div class="top-nav">
-        <div class="nav-left">
-            <span class="logo">⚔️ AETURNIS ONLINE</span>
+<body class="mmorpg-ui">
+    <!-- Top Status Bar -->
+    <div class="status-bar">
+        <div class="status-left">
+            <div class="stats-display">
+                <span class="level-display">Level <%= character.level %></span>
+                <div class="health-mana-bars">
+                    <div class="bar-container">
+                        <div class="health-bar">
+                            <div class="bar-fill health" style="width: <%= (character.health_current / character.health_max * 100) %>%"></div>
+                            <span class="bar-text"><%= character.health_current %>/<%= character.health_max %></span>
+                        </div>
+                    </div>
+                    <div class="bar-container">
+                        <div class="mana-bar">
+                            <div class="bar-fill mana" style="width: <%= (character.mana_current / character.mana_max * 100) %>%"></div>
+                            <span class="bar-text"><%= character.mana_current %>/<%= character.mana_max %></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="nav-center">
-            <span class="server-time" id="server-time">Loading...</span>
+        <div class="status-center">
+            <div class="experience-bar-container">
+                <div class="experience-bar">
+                    <div class="exp-fill" style="width: <%= progression.progressPercentage %>%"></div>
+                    <span class="exp-text">
+                        <%= progression.currentLevelProgress.toLocaleString() %> / <%= progression.expNeededForNext.toLocaleString() %>
+                    </span>
+                </div>
+            </div>
         </div>
-        <div class="nav-right">
-            <span class="gold">💰 <%= character.gold.toLocaleString() %></span>
-            <span class="health">❤️ <%= character.health_current %>/<%= character.health_max %></span>
-            <span class="mana">🔮 <%= character.mana_current %>/<%= character.mana_max %></span>
+        <div class="status-right">
+            <div class="character-info">
+                <span class="character-name">
+                    <%= character.name %>
+                    <% if (character.prestige_marker) { %>
+                        <span class="prestige-marker prestige-<%= character.prestige_marker %>">
+                            <% if (character.prestige_marker === 'bronze') { %>🥉<% } %>
+                            <% if (character.prestige_marker === 'silver') { %>🥈<% } %>
+                            <% if (character.prestige_marker === 'gold') { %>🥇<% } %>
+                            <% if (character.prestige_marker === 'platinum') { %>💎<% } %>
+                            <% if (character.prestige_marker === 'diamond') { %>💠<% } %>
+                            <% if (character.prestige_marker === 'legendary') { %>⭐<% } %>
+                        </span>
+                    <% } %>
+                </span>
+                <span class="character-race"><%= character.race_name %></span>
+                <span class="gold-display">Gold: <%= character.gold.toLocaleString() %></span>
+            </div>
             <% if (user.is_admin) { %>
-                <a href="/admin" class="admin-link">ADMIN PANEL</a>
+                <a href="/admin" class="admin-btn">ADMIN</a>
             <% } %>
-            <button class="menu-toggle" onclick="toggleMenu()">MENU</button>
         </div>
     </div>
 
-    <div class="game-container">
-        <!-- Left Sidebar - Dynamic Content -->
-        <div class="panel left-sidebar">
-            <div class="sidebar-content">
-                <!-- Character Stats Tab Content (Default) -->
-                <div id="character-stats" class="tab-content active">
-                    <div class="character-info">
-                        <h3><%= character.name %> 
-                            <% if (character.prestige_marker) { %>
-                                <span class="prestige-marker prestige-<%= character.prestige_marker %>">
-                                    <% if (character.prestige_marker === 'bronze') { %>🥉<% } %>
-                                    <% if (character.prestige_marker === 'silver') { %>🥈<% } %>
-                                    <% if (character.prestige_marker === 'gold') { %>🥇<% } %>
-                                    <% if (character.prestige_marker === 'platinum') { %>💎<% } %>
-                                    <% if (character.prestige_marker === 'diamond') { %>💠<% } %>
-                                    <% if (character.prestige_marker === 'legendary') { %>⭐<% } %>
-                                </span>
-                            <% } %>
-                        </h3>
-                        <p class="character-race">Race: <%= character.race_name %></p>
-                        <p class="character-level">Level: <%= character.level %></p>
-                        <div class="experience-section">
-                            <p class="character-experience">Experience: <%= character.experience.toLocaleString() %></p>
-                            <div class="exp-progress">
-                                <div class="exp-bar">
-                                    <div class="exp-fill" style="width: <%= progression.progressPercentage %>%"></div>
+    <!-- Main Game Interface -->
+    <div class="game-interface">
+        <!-- Left Inventory Panel -->
+        <div class="left-panel">
+            <div class="inventory-section">
+                <h3 class="panel-title">Inventory</h3>
+                <div class="inventory-grid">
+                    <div class="inventory-slot filled" title="Iron Sword">⚔️</div>
+                    <div class="inventory-slot filled" title="Health Potion">🧪</div>
+                    <div class="inventory-slot filled" title="Fire Scroll">🔥</div>
+                    <div class="inventory-slot empty"></div>
+                    <div class="inventory-slot empty"></div>
+                    <div class="inventory-slot empty"></div>
+                    <div class="inventory-slot empty"></div>
+                    <div class="inventory-slot empty"></div>
+                    <div class="inventory-slot empty"></div>
+                    <div class="inventory-slot empty"></div>
+                    <div class="inventory-slot empty"></div>
+                    <div class="inventory-slot empty"></div>
+                </div>
+            </div>
+
+            <div class="equipment-section">
+                <h3 class="panel-title">Equipment</h3>
+                <div class="equipment-layout">
+                    <div class="equipment-slot helmet" title="Helmet">🎩</div>
+                    <div class="equipment-slot weapon" title="Main Hand">⚔️</div>
+                    <div class="equipment-slot armor" title="Chest">🛡️</div>
+                    <div class="equipment-slot shield" title="Off Hand">🛡️</div>
+                    <div class="equipment-slot boots" title="Boots">👢</div>
+                    <div class="equipment-slot gloves" title="Gloves">🧤</div>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <h3 class="panel-title">Stats</h3>
+                <div class="stats-list">
+                    <div class="stat-row">
+                        <span class="stat-name">STR</span>
+                        <span class="stat-value"><%= character.str_base %></span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">INT</span>
+                        <span class="stat-value"><%= character.int_base %></span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">VIT</span>
+                        <span class="stat-value"><%= character.vit_base %></span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">DEX</span>
+                        <span class="stat-value"><%= character.dex_base %></span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">WIS</span>
+                        <span class="stat-value"><%= character.wis_base %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Central Game Area -->
+        <div class="center-panel">
+            <!-- Tab Navigation -->
+            <div class="game-tabs">
+                <button class="tab-button active" data-tab="character">Character</button>
+                <button class="tab-button" data-tab="inventory">Inventory</button>
+                <button class="tab-button" data-tab="skills">Skills</button>
+                <button class="tab-button" data-tab="progress">Progress</button>
+            </div>
+
+            <!-- Game Content Area -->
+            <div class="game-content">
+                <!-- Character Tab -->
+                <div id="character-tab" class="tab-content active">
+                    <div class="location-header">
+                        <h2><%= character.location_zone.replace('_', ' ').toUpperCase() %> - Level <%= character.level %> Zone</h2>
+                    </div>
+                    <div class="game-text" id="game-text">
+                        <div class="text-line">You find yourself in the dark caverns, blocking out most of the sunlight. You hear strange noises in the distance.</div>
+                        <div class="text-line">You move north.</div>
+                        <div class="text-line">A Wild Dire Wolf (Level 42) appears!</div>
+                        <div class="text-line">You attack with your legendary Shadowfang blade!</div>
+                        <div class="text-line combat-success">The Dire Wolf strikes back with its claws!</div>
+                        <div class="text-line combat-damage">You take 158 damage!</div>
+                        <div class="text-line combat-success">You cast Fireball!</div>
+                        <div class="text-line combat-success">You deal 287 fire damage!</div>
+                        <div class="text-line combat-victory">You have defeated the Dire Wolf!</div>
+                        <div class="text-line loot">You gain 1,250 experience points!</div>
+                        <div class="text-line loot">You loot: 127 gold, Wolf Pelt (x2), Health Potion</div>
+                        <div class="text-line affinity">Your sword mastery increases! (47/100)</div>
+                    </div>
+                </div>
+
+                <!-- Inventory Tab -->
+                <div id="inventory-tab" class="tab-content">
+                    <div class="inventory-management">
+                        <h3>Inventory Management</h3>
+                        <div class="inventory-details">
+                            <div class="inventory-stats">
+                                <span>Weight: 45.2 / 120.0 kg</span>
+                                <span>Items: 12 / 50</span>
+                            </div>
+                            <div class="inventory-actions">
+                                <button class="action-btn">Sort</button>
+                                <button class="action-btn">Auto-loot</button>
+                                <button class="action-btn">Sell Junk</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills Tab -->
+                <div id="skills-tab" class="tab-content">
+                    <div class="skills-panel">
+                        <div class="abilities-section">
+                            <h3>Race Abilities</h3>
+                            <div class="abilities-list" id="race-abilities">
+                                <div class="loading">Loading abilities...</div>
+                            </div>
+                        </div>
+
+                        <div class="affinities-section">
+                            <h3>Weapon Affinities</h3>
+                            <div class="affinity-list">
+                                <% weaponAffinities.forEach(affinity => { %>
+                                <div class="affinity-row">
+                                    <span class="affinity-name"><%= affinity.weapon_type %></span>
+                                    <div class="affinity-bar">
+                                        <div class="affinity-fill" style="width: <%= affinity.affinity_percentage %>%"></div>
+                                        <span class="affinity-text"><%= parseFloat(affinity.affinity_percentage).toFixed(2) %>%</span>
+                                    </div>
                                 </div>
-                                <div class="exp-text">
-                                    <%= progression.currentLevelProgress.toLocaleString() %> / <%= progression.expNeededForNext.toLocaleString() %> (<%= progression.progressPercentage %>%)
+                                <% }); %>
+                            </div>
+
+                            <h3>Magic Affinities</h3>
+                            <div class="affinity-list">
+                                <% magicAffinities.forEach(affinity => { %>
+                                <div class="affinity-row">
+                                    <span class="affinity-name"><%= affinity.magic_school %></span>
+                                    <div class="affinity-bar">
+                                        <div class="affinity-fill magic" style="width: <%= affinity.affinity_percentage %>%"></div>
+                                        <span class="affinity-text"><%= parseFloat(affinity.affinity_percentage).toFixed(2) %>%</span>
+                                    </div>
+                                </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Tab -->
+                <div id="progress-tab" class="tab-content">
+                    <div class="progression-panel">
+                        <div class="level-info">
+                            <h3>Character Progression</h3>
+                            <div class="progression-stats">
+                                <div class="stat-display">
+                                    <span class="stat-label">Current Level</span>
+                                    <span class="stat-value large"><%= character.level %></span>
+                                </div>
+                                <div class="stat-display">
+                                    <span class="stat-label">Total Experience</span>
+                                    <span class="stat-value"><%= character.experience.toLocaleString() %></span>
                                 </div>
                             </div>
+                            
+                            <div class="progression-bar">
+                                <div class="prog-bar">
+                                    <div class="prog-fill" style="width: <%= progression.progressPercentage %>%"></div>
+                                    <span class="prog-text"><%= progression.progressPercentage %>% to next level</span>
+                                </div>
+                            </div>
+
                             <% if (progression.nextMilestone && progression.nextMilestone.levelsRemaining) { %>
-                                <div class="next-milestone">
-                                    <small>Next Milestone: Level <%= progression.nextMilestone.level %> (<%= progression.nextMilestone.levelsRemaining %> levels)</small>
-                                </div>
-                            <% } %>
-                        </div>
-                    </div>
-
-                    <div class="stats">
-                        <h4>Stats</h4>
-                        <div class="stat-row">
-                            <span class="stat-label">STR</span>
-                            <span class="stat-value"><%= character.str_base %></span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">INT</span>
-                            <span class="stat-value"><%= character.int_base %></span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">VIT</span>
-                            <span class="stat-value"><%= character.vit_base %></span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">DEX</span>
-                            <span class="stat-value"><%= character.dex_base %></span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">WIS</span>
-                            <span class="stat-value"><%= character.wis_base %></span>
-                        </div>
-                    </div>
-
-                    <!-- Equipment Grid -->
-                    <div class="equipment-section">
-                        <h4>Equipment</h4>
-                        <div class="equipment-grid">
-                            <div class="equipment-slot helmet">🎩</div>
-                            <div class="equipment-slot weapon">⚔️</div>
-                            <div class="equipment-slot armor">🛡️</div>
-                            <div class="equipment-slot shield">🛡️</div>
-                            <div class="equipment-slot boots">👢</div>
-                            <div class="equipment-slot gloves">🧤</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Inventory Tab Content -->
-                <div id="inventory" class="tab-content">
-                    <h4>Inventory</h4>
-                    <div class="inventory-grid">
-                        <div class="inventory-slot filled">⚔️</div>
-                        <div class="inventory-slot filled">🗡️</div>
-                        <div class="inventory-slot filled">🔥</div>
-                        <div class="inventory-slot filled">🧪</div>
-                        <div class="inventory-slot empty"></div>
-                        <div class="inventory-slot empty"></div>
-                        <div class="inventory-slot empty"></div>
-                        <div class="inventory-slot empty"></div>
-                        <div class="inventory-slot empty"></div>
-                    </div>
-                </div>
-
-                <!-- Skills Tab Content -->
-                <div id="skills" class="tab-content">
-                    <div class="skills-section">
-                        <h4>Race Abilities</h4>
-                        <div class="race-abilities-list" id="race-abilities">
-                            <div class="loading">Loading abilities...</div>
-                        </div>
-
-                        <h4>Weapon Affinities</h4>
-                        <% weaponAffinities.forEach(affinity => { %>
-                        <div class="skill-row">
-                            <span class="skill-name"><%= affinity.weapon_type %></span>
-                            <span class="skill-value"><%= parseFloat(affinity.affinity_percentage).toFixed(2) %>%</span>
-                        </div>
-                        <% }); %>
-
-                        <h4>Magic Affinities</h4>
-                        <% magicAffinities.forEach(affinity => { %>
-                        <div class="skill-row">
-                            <span class="skill-name"><%= affinity.magic_school %></span>
-                            <span class="skill-value"><%= parseFloat(affinity.affinity_percentage).toFixed(2) %>%</span>
-                        </div>
-                        <% }); %>
-                    </div>
-                </div>
-
-                <!-- Progress Tab Content -->
-                <div id="progression" class="tab-content">
-                    <div class="progression-section">
-                        <div class="progression-info">
-                            <div class="stat-row">
-                                <span class="stat-label">Level</span>
-                                <span class="stat-value level"><%= character.level %></span>
-                            </div>
-                            <div class="stat-row">
-                                <span class="stat-label">Experience</span>
-                                <span class="stat-value"><%= character.experience.toLocaleString() %></span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: <%= progression.progressPercentage %>%"></div>
-                                <span class="progress-text"><%= progression.progressPercentage %>%</span>
-                            </div>
-                            <% if (progression.nextMilestone && progression.nextMilestone.levelsRemaining) { %>
-                            <div class="milestone-info">
-                                <span class="milestone-label">Next Milestone:</span>
-                                <span class="milestone-value">Level <%= progression.nextMilestone.level %></span>
+                            <div class="milestone-display">
+                                <span class="milestone-label">Next Milestone: Level <%= progression.nextMilestone.level %></span>
+                                <span class="milestone-remaining">(<%= progression.nextMilestone.levelsRemaining %> levels remaining)</span>
                             </div>
                             <% } %>
                         </div>
 
                         <div class="progression-actions">
-                            <button id="gain-100-exp" class="progression-btn small">+100 EXP</button>
-                            <button id="gain-1000-exp" class="progression-btn small">+1K EXP</button>
-                            <button id="simulate-levelup" class="progression-btn">Level Test</button>
-                            <button id="view-leaderboard" class="progression-btn">Leaderboard</button>
+                            <h4>Testing Controls</h4>
+                            <div class="action-buttons">
+                                <button class="prog-btn" onclick="gainExperience(100)">+100 EXP</button>
+                                <button class="prog-btn" onclick="gainExperience(1000)">+1K EXP</button>
+                                <button class="prog-btn" onclick="gainExperience(10000)">+10K EXP</button>
+                            </div>
                         </div>
 
-                        <h4>Recent Rewards</h4>
-                        <div id="rewards-display" class="rewards-display">
-                            <div class="reward-message info">Start gaining experience to see rewards!</div>
+                        <div class="rewards-section">
+                            <h4>Recent Rewards</h4>
+                            <div id="progression-messages" class="progression-messages">
+                                <div class="progression-message info">Start gaining experience to see rewards!</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Main Content Area -->
-        <div class="panel main-content">
-            <!-- Tab Navigation -->
-            <div class="main-tabs">
-                <button class="main-tab-btn active" data-tab="character-stats">Character</button>
-                <button class="main-tab-btn" data-tab="inventory">Inventory</button>
-                <button class="main-tab-btn" data-tab="skills">Skills</button>
-                <button class="main-tab-btn" data-tab="progression">Progress</button>
-            </div>
-
-            <!-- Game Text Area -->
-            <div class="game-output" id="game-output">
-                <div class="location-header">
-                    <h3><%= character.location_zone.replace('_', ' ').toUpperCase() %> - Level <%= character.level %> Zone</h3>
-                </div>
-                <p>You find yourself in the <%= character.location_zone.replace('_', ' ') %>, blocking out most of the sunlight. You hear strange noises in the distance.</p>
-                <p>You move north.</p>
-                <p>A Wild Dire Wolf (Level 42) appears!</p>
-                <p>You attack with your legendary Shadowfang blade!</p>
-                <p class="combat-result success">The Dire Wolf strikes back with its claws!</p>
-                <p class="combat-result damage">You take 158 damage!</p>
-                <p class="combat-result success">You cast Fireball!</p>
-                <p class="combat-result success">You deal 287 fire damage!</p>
-                <p class="combat-result victory">You have defeated the Dire Wolf!</p>
-                <p class="loot">You gain 1,250 experience points!</p>
-                <p class="loot">You loot: 127 gold, Wolf Pelt (x2), Health Potion</p>
-                <p class="inventory-full">Your sword mastery increases! (47/100)</p>
-            </div>
-        </div>
     </div>
 
-    <!-- Movement Controls -->
-    <div class="movement-controls">
-        <button class="movement-btn" data-direction="north">NORTH</button>
-        <button class="movement-btn" data-direction="south">SOUTH</button>
-        <button class="movement-btn" data-direction="east">EAST</button>
-        <button class="movement-btn" data-direction="west">WEST</button>
-        <button class="movement-btn" data-direction="fight">FIGHT</button>
-        <button class="movement-btn" data-direction="cast">CAST</button>
-        <button class="movement-btn" data-direction="rest">REST</button>
-        <button class="movement-btn" data-direction="map">MAP</button>
+    <!-- Bottom Action Bar -->
+    <div class="action-bar">
+        <div class="movement-controls">
+            <button class="movement-btn" onclick="move('north')" title="Move North">NORTH</button>
+            <button class="movement-btn" onclick="move('south')" title="Move South">SOUTH</button>
+            <button class="movement-btn" onclick="move('east')" title="Move East">EAST</button>
+            <button class="movement-btn" onclick="move('west')" title="Move West">WEST</button>
+        </div>
+        
+        <div class="action-controls">
+            <button class="action-btn primary" onclick="performAction('fight')" title="Attack nearby enemies">FIGHT</button>
+            <button class="action-btn" onclick="performAction('cast')" title="Cast magic spell">CAST</button>
+            <button class="action-btn" onclick="performAction('rest')" title="Rest to recover">REST</button>
+            <button class="action-btn" onclick="performAction('map')" title="View area map">MAP</button>
+        </div>
     </div>
 
     <!-- Chat System -->
-    <div class="chat-container">
-        <div class="chat-tabs">
-            <button class="chat-tab active" data-channel="all">All</button>
-            <button class="chat-tab" data-channel="guild">Guild</button>
-            <button class="chat-tab" data-channel="party">Party</button>
-            <button class="chat-tab" data-channel="combat">Combat</button>
+    <div class="chat-panel">
+        <div class="chat-header">
+            <div class="chat-tabs">
+                <button class="chat-tab active" data-channel="all">All</button>
+                <button class="chat-tab" data-channel="guild">Guild</button>
+                <button class="chat-tab" data-channel="party">Party</button>
+                <button class="chat-tab" data-channel="system">System</button>
+            </div>
         </div>
         <div class="chat-messages" id="chat-messages">
-            <div class="chat-message system">Dragonslayer: Anyone want to group for Demon Tower?</div>
-            <div class="chat-message system">BlMage: Cold raid starts in 30 minutes!</div>
+            <div class="chat-message player">DragonSlayer: Anyone want to group for Demon Tower?</div>
+            <div class="chat-message player">IceMage: Cold raid starts in 30 minutes!</div>
             <div class="chat-message system">System: The mobile level 15 grue bought a 1000 Signups at any store!</div>
         </div>
-        <div class="chat-input-container">
+        <div class="chat-input-area">
             <input type="text" id="chat-input" placeholder="Enter command (type 'help' for commands)" maxlength="255">
-            <button id="send-btn">Send</button>
+            <button id="chat-send" onclick="sendChatMessage()">Send</button>
         </div>
     </div>
 
     <script src="/js/game.js"></script>
     <script>
-        // Initialize the game when the page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeGame();
+        // Initialize tab switching
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabName = this.dataset.tab;
+                switchGameTab(tabName);
+            });
         });
+
+        function switchGameTab(tabName) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Add active class to selected tab and content
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
+        // Initialize chat tabs
+        document.querySelectorAll('.chat-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.chat-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                switchChatChannel(this.dataset.channel);
+            });
+        });
+
+        // Initialize the game
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load race abilities
+            loadRaceAbilities();
+        });
+
+        async function loadRaceAbilities() {
+            try {
+                const response = await fetch('/api/abilities/race-abilities/<%= character.id %>');
+                const data = await response.json();
+                
+                const abilitiesContainer = document.getElementById('race-abilities');
+                if (data.success && data.abilities) {
+                    abilitiesContainer.innerHTML = data.abilities.map(ability => `
+                        <div class="ability-item" data-ability="${ability.ability_name}">
+                            <div class="ability-header">
+                                <span class="ability-name">${ability.ability_name}</span>
+                                <span class="ability-type">${ability.ability_type}</span>
+                            </div>
+                            <div class="ability-description">${ability.description}</div>
+                            ${ability.ability_type === 'active' ? `
+                                <button class="ability-btn" onclick="useAbility('${ability.ability_name}')" 
+                                        ${ability.on_cooldown ? 'disabled' : ''}>
+                                    ${ability.on_cooldown ? `Cooldown: ${ability.cooldown_remaining}s` : 'Use'}
+                                </button>
+                            ` : ''}
+                        </div>
+                    `).join('');
+                } else {
+                    abilitiesContainer.innerHTML = '<div class="no-abilities">No abilities available</div>';
+                }
+            } catch (error) {
+                console.error('Error loading abilities:', error);
+                document.getElementById('race-abilities').innerHTML = '<div class="error">Failed to load abilities</div>';
+            }
+        }
+
+        async function useAbility(abilityName) {
+            try {
+                const response = await fetch('/api/abilities/use-ability', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ability_name: abilityName })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    updateGameText(`Used ability: ${abilityName}. ${data.message}`);
+                    loadRaceAbilities(); // Reload to update cooldowns
+                } else {
+                    updateGameText(`Failed to use ${abilityName}: ${data.error}`);
+                }
+            } catch (error) {
+                console.error('Error using ability:', error);
+                updateGameText(`Error using ability: ${abilityName}`);
+            }
+        }
+
+        function updateGameText(message) {
+            const gameText = document.getElementById('game-text');
+            if (gameText) {
+                const messageElement = document.createElement('div');
+                messageElement.className = 'text-line';
+                messageElement.textContent = message;
+                gameText.appendChild(messageElement);
+                gameText.scrollTop = gameText.scrollHeight;
+                
+                // Keep only last 50 messages
+                while (gameText.children.length > 50) {
+                    gameText.removeChild(gameText.firstChild);
+                }
+            }
+        }
     </script>
 </body>
 </html>
