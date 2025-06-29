@@ -994,7 +994,8 @@ body {
     cursor: pointer;
     border-right: 1px solid #333;
     font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
+```text
+font-size: 0.9rem;
     transition: all 0.2s ease;
 }
 
@@ -1442,18 +1443,18 @@ body {
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr auto;
     }
-    
+
     .character-panel, .right-sidebar {
         border: 1px solid #333;
         border-left: none;
         border-right: none;
     }
-    
+
     .movement-controls {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .movement-form, .action-form {
         justify-content: center;
     }
@@ -1495,4 +1496,142 @@ body {
 
 .error-container a:hover {
     text-decoration: underline;
+}
+
+/* Character Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+/* Affinity System Styles */
+.affinity-display {
+  margin-bottom: 15px;
+}
+
+.affinity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.affinity-item {
+  background: rgba(0, 255, 0, 0.1);
+  border: 1px solid #00ff00;
+  border-radius: 4px;
+  padding: 10px;
+  text-align: center;
+}
+
+.affinity-item.novice {
+  border-color: #666;
+  background: rgba(102, 102, 102, 0.1);
+}
+
+.affinity-item.apprentice {
+  border-color: #00ff00;
+  background: rgba(0, 255, 0, 0.1);
+}
+
+.affinity-item.journeyman {
+  border-color: #ffff00;
+  background: rgba(255, 255, 0, 0.1);
+}
+
+.affinity-item.expert {
+  border-color: #ff8800;
+  background: rgba(255, 136, 0, 0.1);
+}
+
+.affinity-item.master {
+  border-color: #ff0088;
+  background: rgba(255, 0, 136, 0.1);
+}
+
+.affinity-name {
+  font-weight: bold;
+  color: #00ff00;
+  margin-bottom: 5px;
+}
+
+.affinity-value {
+  font-size: 1.2em;
+  color: #ffffff;
+  margin-bottom: 3px;
+}
+
+.affinity-tier {
+  font-size: 0.8em;
+  color: #cccccc;
+  margin-bottom: 8px;
+}
+
+.affinity-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.affinity-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff00, #ffff00, #ff8800);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.affinity-training {
+  margin-top: 20px;
+}
+
+.affinity-training h4 {
+  color: #00ff00;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 5px;
+}
+
+.training-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.affinity-loading {
+  text-align: center;
+  color: #cccccc;
+  padding: 20px;
+}
+
+.affinity-messages {
+  margin-top: 10px;
+  min-height: 30px;
+}
+
+.affinity-messages .message {
+  padding: 8px;
+  margin: 5px 0;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.affinity-messages .message.success {
+  background: rgba(0, 255, 0, 0.2);
+  border: 1px solid #00ff00;
+  color: #00ff00;
+}
+
+.affinity-messages .message.error {
+  background: rgba(255, 0, 0, 0.2);
+  border: 1px solid #ff0000;
+  color: #ff0000;
+}
+
+.affinity-messages .message.info {
+  background: rgba(0, 200, 255, 0.2);
+  border: 1px solid #00c8ff;
+  color: #00c8ff;
 }

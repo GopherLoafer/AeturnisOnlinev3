@@ -12,14 +12,14 @@ const levelService = new LevelService();
 router.post('/award-experience', requireCharacter, async (req, res) => {
     try {
         const { amount } = req.body;
-        
+
         if (!amount || amount <= 0) {
             return res.status(400).json({ 
                 success: false, 
                 error: 'Valid experience amount is required' 
             });
         }
-        
+
         // Cap experience awards to prevent overflow (max 100 million per award)
         const MAX_EXPERIENCE_AWARD = 100000000;
         if (amount > MAX_EXPERIENCE_AWARD) {
@@ -30,7 +30,7 @@ router.post('/award-experience', requireCharacter, async (req, res) => {
         }
 
         const results = await levelService.awardExperience(req.session.characterId, parseInt(amount));
-        
+
         res.json({
             success: true,
             ...results
@@ -48,7 +48,7 @@ router.post('/award-experience', requireCharacter, async (req, res) => {
 router.get('/info', requireCharacter, async (req, res) => {
     try {
         const progressInfo = await levelService.getProgressionInfo(req.session.characterId);
-        
+
         res.json({
             success: true,
             progression: progressInfo
@@ -67,7 +67,7 @@ router.get('/leaderboard', async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 50;
         const leaderboard = await levelService.getLeaderboard(limit);
-        
+
         res.json({
             success: true,
             leaderboard
@@ -85,7 +85,7 @@ router.get('/leaderboard', async (req, res) => {
 router.get('/milestones', requireCharacter, async (req, res) => {
     try {
         const milestones = await levelService.getMilestoneRewards(req.session.characterId);
-        
+
         res.json({
             success: true,
             milestones
@@ -104,7 +104,7 @@ router.post('/simulate-level-up', requireCharacter, async (req, res) => {
     try {
         // For testing purposes - award enough experience to level up
         const results = await levelService.awardExperience(req.session.characterId, 1000);
-        
+
         res.json({
             success: true,
             message: 'Level up simulated successfully',

@@ -75,6 +75,7 @@ app.use('/game', requireAuth, gameRoutes);
 app.use('/admin', requireAdmin, adminRoutes);
 app.use('/api/abilities', requireAuth, abilitiesRoutes);
 app.use('/api/progression', requireAuth, progressionRoutes);
+app.use('/api/affinity', requireAuth, require('./src/routes/affinity'));
 
 // Home route
 app.get('/', (req, res) => {
@@ -113,7 +114,7 @@ async function startServer() {
   try {
     await db.initialize();
     console.log('Database initialized successfully');
-    
+
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`Aeturnis Online server running on port ${PORT}`);
       console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
