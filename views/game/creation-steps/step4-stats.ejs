@@ -163,12 +163,10 @@ function initializeStats() {
     wis: 10 + (raceData.wis_modifier || 0) + (backgroundBonuses.wis || 0)
   };
   
-  // Load existing allocation if any
-  const sessionStats = <%- JSON.stringify((sessionData || {}).statAllocation || {}) %>;
-  if (Object.keys(sessionStats).length > 0) {
-    allocatedStats = sessionStats;
-    usedPoints = Object.values(allocatedStats).reduce((sum, val) => sum + val, 0);
-  }
+  // Always start fresh with 0 allocated points and 5 points to distribute
+  allocatedStats = { str: 0, int: 0, vit: 0, dex: 0, wis: 0 };
+  usedPoints = 0;
+  totalPoints = 5;
   
   updateDisplay();
 }
