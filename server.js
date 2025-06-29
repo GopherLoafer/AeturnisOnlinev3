@@ -76,6 +76,7 @@ app.use('/admin', requireAdmin, adminRoutes);
 app.use('/api/abilities', requireAuth, abilitiesRoutes);
 app.use('/api/progression', requireAuth, progressionRoutes);
 app.use('/api/affinity', requireAuth, require('./src/routes/affinity'));
+app.use('/api/game', requireAuth, gameRoutes);
 
 // Home route
 app.get('/', (req, res) => {

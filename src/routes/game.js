@@ -174,7 +174,7 @@ router.post('/character-creation', async (req, res) => {
     const characterId = result.rows[0].id;
 
     // Initialize weapon affinities
-    const weaponTypes = ['Sword', 'Axe', 'Mace', 'Dagger', 'Staff', 'Bow', 'Unarmed'];
+    const weaponTypes = ['sword', 'axe', 'mace', 'dagger', 'staff', 'bow', 'unarmed'];
     for (const weaponType of weaponTypes) {
       await db.query(
         'INSERT INTO weapon_affinities (character_id, weapon_type) VALUES ($1, $2)',
@@ -183,7 +183,7 @@ router.post('/character-creation', async (req, res) => {
     }
 
     // Initialize magic affinities
-    const magicSchools = ['Fire', 'Ice', 'Lightning', 'Earth', 'Holy', 'Dark', 'Arcane', 'Nature'];
+    const magicSchools = ['fire', 'ice', 'lightning', 'earth', 'holy', 'dark', 'arcane', 'nature'];
     for (const magicSchool of magicSchools) {
       await db.query(
         'INSERT INTO magic_affinities (character_id, magic_school) VALUES ($1, $2)',
