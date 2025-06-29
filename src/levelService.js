@@ -358,6 +358,11 @@ class LevelService {
 
             if (result.rows.length > 0) {
                 const char = result.rows[0];
+                
+                // Validate and sanitize numeric values to prevent NaN errors
+                const validatedLevel = isNaN(char.level) ? 1 : parseInt(char.level);
+                const validatedExperience = isNaN(char.experience) ? 0 : parseFloat(char.experience);
+                
                 await db.query(`
                     INSERT INTO leaderboard_cache (character_id, character_name, race_name, level, experience, prestige_marker, last_updated)
                     VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)
@@ -369,7 +374,7 @@ class LevelService {
                         experience = $5,
                         prestige_marker = $6,
                         last_updated = CURRENT_TIMESTAMP
-                `, [char.id, char.name, char.race_name, char.level, char.experience, char.prestige_marker]);
+                `, [char.id, char.name, char.race_name, validatedLevel, validatedExperience, char.prestige_marker]);
             }
         } catch (error) {
             console.error('Error updating leaderboard cache:', error);

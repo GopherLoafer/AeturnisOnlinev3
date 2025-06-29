@@ -574,7 +574,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Set default tab
-    switchTab('inventory');
+    switchTab('equipment');
     
     console.log('Aeturnis Online client initialized');
 });

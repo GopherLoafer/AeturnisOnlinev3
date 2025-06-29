@@ -840,37 +840,16 @@
                 </div>
             </div>
 
-            <div class="equipment-section">
-                <h3>Equipment</h3>
-                <div class="equipment-grid">
-                    <div class="equipment-slot equipped">⛑️</div>
-                    <div class="equipment-slot equipped">🛡️</div>
-                    <div class="equipment-slot equipped">👖</div>
-                    <div class="equipment-slot equipped">⚔️</div>
-                    <div class="equipment-slot">🛡️</div>
-                    <div class="equipment-slot equipped">👢</div>
-                    <div class="equipment-slot equipped">💍</div>
-                    <div class="equipment-slot equipped">💍</div>
-                    <div class="equipment-slot">📿</div>
+            <div class="progress-section">
+                <h4>Character Progression</h4>
+                <div class="progress-buttons">
+                    <button class="progress-btn" onclick="gainExperience(100)">+100 EXP</button>
+                    <button class="progress-btn" onclick="gainExperience(1000)">+1K EXP</button>
+                    <button class="progress-btn" onclick="gainExperience(10000)">+10K EXP</button>
                 </div>
-            </div>
-
-            <div class="affinity-section">
-                <h4>Weapon Affinities</h4>
-                <% weaponAffinities.forEach(function(affinity) { %>
-                <div class="affinity-item">
-                    <span class="affinity-name"><%= affinity.weapon_type %></span>
-                    <span class="affinity-value"><%= parseFloat(affinity.affinity_percentage).toFixed(1) %>%</span>
+                <div class="progress-messages" id="progression-messages">
+                    <div class="progression-message success">Start gaining experience to see rewards!</div>
                 </div>
-                <% }); %>
-                
-                <h4 style="margin-top: 15px;">Magic Affinities</h4>
-                <% magicAffinities.forEach(function(affinity) { %>
-                <div class="affinity-item">
-                    <span class="affinity-name"><%= affinity.magic_school %></span>
-                    <span class="affinity-value"><%= parseFloat(affinity.affinity_percentage).toFixed(1) %>%</span>
-                </div>
-                <% }); %>
             </div>
         </aside>
 
@@ -910,13 +889,32 @@
         <!-- Right Panel - Tabs -->
         <aside class="right-panel">
             <div class="panel-tabs">
-                <button class="tab-button active" onclick="switchTab('inventory')">Inventory</button>
+                <button class="tab-button active" onclick="switchTab('equipment')">Equipment</button>
+                <button class="tab-button" onclick="switchTab('inventory')">Inventory</button>
+                <button class="tab-button" onclick="switchTab('affinities')">Affinities</button>
                 <button class="tab-button" onclick="switchTab('abilities')">Abilities</button>
-                <button class="tab-button" onclick="switchTab('progress')">Progress</button>
+            </div>
+
+            <!-- Equipment Tab -->
+            <div id="equipment" class="tab-content active">
+                <div class="equipment-section">
+                    <h3>Equipment</h3>
+                    <div class="equipment-grid">
+                        <div class="equipment-slot equipped">⛑️</div>
+                        <div class="equipment-slot equipped">🛡️</div>
+                        <div class="equipment-slot equipped">👖</div>
+                        <div class="equipment-slot equipped">⚔️</div>
+                        <div class="equipment-slot">🛡️</div>
+                        <div class="equipment-slot equipped">👢</div>
+                        <div class="equipment-slot equipped">💍</div>
+                        <div class="equipment-slot equipped">💍</div>
+                        <div class="equipment-slot">📿</div>
+                    </div>
+                </div>
             </div>
 
             <!-- Inventory Tab -->
-            <div id="inventory" class="tab-content active">
+            <div id="inventory" class="tab-content">
                 <div class="inventory-grid">
                     <div class="inventory-slot filled">⚔️</div>
                     <div class="inventory-slot filled">🛡️</div>
@@ -941,26 +939,32 @@
                 </div>
             </div>
 
+            <!-- Affinities Tab -->
+            <div id="affinities" class="tab-content">
+                <div class="affinity-section">
+                    <h4>Weapon Affinities</h4>
+                    <% weaponAffinities.forEach(function(affinity) { %>
+                    <div class="affinity-item">
+                        <span class="affinity-name"><%= affinity.weapon_type %></span>
+                        <span class="affinity-value"><%= parseFloat(affinity.affinity_percentage).toFixed(1) %>%</span>
+                    </div>
+                    <% }); %>
+                    
+                    <h4 style="margin-top: 15px;">Magic Affinities</h4>
+                    <% magicAffinities.forEach(function(affinity) { %>
+                    <div class="affinity-item">
+                        <span class="affinity-name"><%= affinity.magic_school %></span>
+                        <span class="affinity-value"><%= parseFloat(affinity.affinity_percentage).toFixed(1) %>%</span>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
+
             <!-- Abilities Tab -->
             <div id="abilities" class="tab-content">
                 <h4 style="color: #FFD700; margin-bottom: 15px;">Race Abilities</h4>
                 <div id="race-abilities">
                     <div class="loading">Loading abilities...</div>
-                </div>
-            </div>
-
-            <!-- Progress Tab -->
-            <div id="progress" class="tab-content">
-                <div class="progress-section">
-                    <h4>Character Progression</h4>
-                    <div class="progress-buttons">
-                        <button class="progress-btn" onclick="gainExperience(100)">+100 EXP</button>
-                        <button class="progress-btn" onclick="gainExperience(1000)">+1K EXP</button>
-                        <button class="progress-btn" onclick="gainExperience(10000)">+10K EXP</button>
-                    </div>
-                    <div class="progress-messages" id="progression-messages">
-                        <div class="progression-message success">Start gaining experience to see rewards!</div>
-                    </div>
                 </div>
             </div>
         </aside>
