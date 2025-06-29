@@ -460,10 +460,16 @@ function refreshGameState() {
                 updateCharacterLevel(data.character.level);
                 
                 if (data.character.experience !== undefined) {
+                    console.log('Updating experience bar:', data.character.experience, '/', data.character.experience_to_next);
                     updateExperienceBar({
                         current: data.character.experience,
                         required: data.character.experience_to_next || 1000
                     });
+                }
+                
+                // Force update character level display
+                if (data.character.level) {
+                    updateCharacterLevel(data.character.level);
                 }
             }
         } else {
