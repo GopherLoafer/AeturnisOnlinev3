@@ -163,13 +163,34 @@ function updateGameText(message) {
 
 // ===== Character State Updates =====
 
-function updateCharacterStats(stats) {
-    Object.keys(stats).forEach(stat => {
-        const element = document.getElementById(`stat-${stat}`);
+function updateCharacterStats(character) {
+    // Update individual stat displays
+    const statMappings = {
+        'stat-str': character.str_total || character.str_base || 10,
+        'stat-int': character.int_total || character.int_base || 10,
+        'stat-vit': character.vit_total || character.vit_base || 10,
+        'stat-dex': character.dex_total || character.dex_base || 10,
+        'stat-wis': character.wis_total || character.wis_base || 10
+    };
+    
+    Object.entries(statMappings).forEach(([elementId, value]) => {
+        const element = document.getElementById(elementId);
         if (element) {
-            element.textContent = stats[stat];
+            element.textContent = value;
         }
     });
+    
+    // Update total stats
+    const totalElement = document.getElementById('stat-total');
+    if (totalElement) {
+        const str = character.str_total || character.str_base || 10;
+        const int = character.int_total || character.int_base || 10;
+        const vit = character.vit_total || character.vit_base || 10;
+        const dex = character.dex_total || character.dex_base || 10;
+        const wis = character.wis_total || character.wis_base || 10;
+        const total = str + int + vit + dex + wis;
+        totalElement.textContent = total;
+    }
 }
 
 function updateHealthMana(health, mana) {
@@ -444,13 +465,7 @@ function refreshGameState() {
             
             // Update character display
             if (data.character) {
-                updateCharacterStats({
-                    str: data.character.str_total,
-                    int: data.character.int_total,
-                    vit: data.character.vit_total,
-                    dex: data.character.dex_total,
-                    wis: data.character.wis_total
-                });
+                updateCharacterStats(data.character);
                 
                 updateHealthMana(
                     { current: data.character.health_current, max: data.character.health_max },

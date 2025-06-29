@@ -38,6 +38,13 @@ router.get('/dashboard', async (req, res) => {
 
     const character = result.rows[0];
 
+    // Calculate total stats (base stats + equipment/bonuses)
+    character.str_total = character.str_base || 10;
+    character.int_total = character.int_base || 10;
+    character.vit_total = character.vit_base || 10;
+    character.dex_total = character.dex_base || 10;
+    character.wis_total = character.wis_base || 10;
+
     // Get weapon affinities
     const weaponAffinities = await db.query(
       'SELECT weapon_type, affinity_percentage FROM weapon_affinities WHERE character_id = $1',
@@ -271,6 +278,13 @@ router.get('/api/game/state', requireCharacter, async (req, res) => {
 
     const character = result.rows[0];
     const progressionInfo = await levelService.getProgressionInfo(character.id);
+
+    // Calculate total stats for frontend display
+    character.str_total = character.str_base || 10;
+    character.int_total = character.int_base || 10;
+    character.vit_total = character.vit_base || 10;
+    character.dex_total = character.dex_base || 10;
+    character.wis_total = character.wis_base || 10;
 
     res.json({
       success: true,
