@@ -309,6 +309,43 @@ class Database {
         started_at TIMESTAMP,
         completed_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+
+      // Phase 2.6: Racial events for admin management
+      `CREATE TABLE IF NOT EXISTS racial_events (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        description TEXT,
+        event_type VARCHAR(50) NOT NULL, -- 'experience_boost', 'stat_bonus', 'special_reward'
+        target_race_id INTEGER REFERENCES races(id),
+        bonus_data JSONB DEFAULT '{}',
+        start_time TIMESTAMP NOT NULL,
+        end_time TIMESTAMP NOT NULL,
+        created_by INTEGER REFERENCES users(id),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+
+      // Phase 2.6: Race-specific rewards system
+      `CREATE TABLE IF NOT EXISTS race_specific_rewards (
+        id SERIAL PRIMARY KEY,
+        race_id INTEGER REFERENCES races(id),
+        reward_name VARCHAR(100) NOT NULL,
+        description TEXT,
+        reward_type VARCHAR(50) NOT NULL, -- 'item', 'gold', 'experience', 'ability'
+        reward_data JSONB DEFAULT '{}',
+        level_requirement INTEGER DEFAULT 1,
+        one_time_only BOOLEAN DEFAULT false,
+        created_by INTEGER REFERENCES users(id),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+
+      // Phase 2.6: Character reward claims tracking
+      `CREATE TABLE IF NOT EXISTS character_reward_claims (
+        id SERIAL PRIMARY KEY,
+        character_id INTEGER REFERENCES characters(id) ON DELETE CASCADE,
+        reward_id INTEGER REFERENCES race_specific_rewards(id),
+        claimed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(character_id, reward_id)
       )`
     ];
 
@@ -368,6 +405,9 @@ class Database {
     await this.insertDefaultRacialEquipment();
     await this.insertDefaultRaceRelations();
     await this.insertDefaultRacialQuests();
+    
+    // Phase 2.6: Initialize admin race management system
+    await this.insertDefaultRaceSpecificRewards();
   }
 
   async insertDefaultRaces() {
@@ -1078,6 +1118,137 @@ class Database {
       }
     }
     console.log('Racial quests initialized');
+  }
+
+  // Phase 2.6: Race-specific rewards seeding
+  async insertDefaultRaceSpecificRewards() {
+    // Check if race-specific rewards already exist
+    const existingRewards = await this.pool.query('SELECT COUNT(*) FROM race_specific_rewards');
+    if (parseInt(existingRewards.rows[0].count) > 0) {
+      console.log('Race-specific rewards already exist');
+      return;
+    }
+
+    const rewards = [
+      // Human rewards
+      {
+        race_name: 'Human',
+        reward_name: 'Adaptability Bonus',
+        description: 'Humans receive bonus experience when learning new skills from other races.',
+        reward_type: 'ability',
+        reward_data: JSON.stringify({ cross_race_learning_bonus: 0.25 }),
+        level_requirement: 25,
+        one_time_only: false
+      },
+      {
+        race_name: 'Human',
+        reward_name: 'Diplomatic Achievement',
+        description: 'Achievement for maintaining friendly relations with all races.',
+        reward_type: 'achievement',
+        reward_data: JSON.stringify({ title: 'Peacekeeper', prestige_bonus: 100 }),
+        level_requirement: 50,
+        one_time_only: true
+      },
+
+      // Elf rewards
+      {
+        race_name: 'Elf',
+        reward_name: 'Ancient Wisdom',
+        description: 'Elves gain access to forgotten magical knowledge.',
+        reward_type: 'ability',
+        reward_data: JSON.stringify({ spell_efficiency_bonus: 0.15, mana_cost_reduction: 0.10 }),
+        level_requirement: 100,
+        one_time_only: true
+      },
+      {
+        race_name: 'Elf',
+        reward_name: 'Forest Guardian',
+        description: 'Enhanced connection to nature grants healing abilities.',
+        reward_type: 'ability',
+        reward_data: JSON.stringify({ passive_healing: 2, nature_resistance: 0.20 }),
+        level_requirement: 75,
+        one_time_only: true
+      },
+
+      // Dwarf rewards
+      {
+        race_name: 'Dwarf',
+        reward_name: 'Master Craftsman',
+        description: 'Dwarven crafting skills reach legendary levels.',
+        reward_type: 'ability',
+        reward_data: JSON.stringify({ crafting_quality_bonus: 0.30, durability_bonus: 0.50 }),
+        level_requirement: 150,
+        one_time_only: true
+      },
+      {
+        race_name: 'Dwarf',
+        reward_name: 'Mountain Lord',
+        description: 'Recognition as a true dwarf leader with clan benefits.',
+        reward_type: 'achievement',
+        reward_data: JSON.stringify({ title: 'Mountain Lord', leadership_bonus: 0.15 }),
+        level_requirement: 200,
+        one_time_only: true
+      },
+
+      // Orc rewards
+      {
+        race_name: 'Orc',
+        reward_name: 'Berserker Mastery',
+        description: 'Unlocks advanced berserker techniques.',
+        reward_type: 'ability',
+        reward_data: JSON.stringify({ rage_duration_bonus: 0.50, damage_scaling: 0.25 }),
+        level_requirement: 75,
+        one_time_only: true
+      },
+      {
+        race_name: 'Orc',
+        reward_name: 'Warchief Heritage',
+        description: 'Ancestral power awakens in worthy orc warriors.',
+        reward_type: 'ability',
+        reward_data: JSON.stringify({ intimidation_aura: true, battle_cry_bonus: 0.40 }),
+        level_requirement: 300,
+        one_time_only: true
+      },
+
+      // Dark Elf rewards
+      {
+        race_name: 'Dark Elf',
+        reward_name: 'Shadow Master',
+        description: 'Mastery over shadow magic grants unique abilities.',
+        reward_type: 'ability',
+        reward_data: JSON.stringify({ invisibility_duration: 300, shadow_damage_bonus: 0.35 }),
+        level_requirement: 125,
+        one_time_only: true
+      },
+      {
+        race_name: 'Dark Elf',
+        reward_name: 'Assassin Lord',
+        description: 'Ultimate recognition in the dark arts.',
+        reward_type: 'achievement',
+        reward_data: JSON.stringify({ title: 'Shadow Lord', critical_multiplier: 0.20 }),
+        level_requirement: 250,
+        one_time_only: true
+      }
+    ];
+
+    for (const reward of rewards) {
+      try {
+        // Get race ID
+        const raceResult = await this.pool.query('SELECT id FROM races WHERE name = $1', [reward.race_name]);
+        if (raceResult.rows.length > 0) {
+          const raceId = raceResult.rows[0].id;
+          
+          await this.pool.query(
+            `INSERT INTO race_specific_rewards (race_id, reward_name, description, reward_type, reward_data, level_requirement, one_time_only)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            [raceId, reward.reward_name, reward.description, reward.reward_type, reward.reward_data, reward.level_requirement, reward.one_time_only]
+          );
+        }
+      } catch (error) {
+        console.error(`Error inserting race-specific reward ${reward.reward_name}:`, error);
+      }
+    }
+    console.log('Race-specific rewards initialized');
   }
 
   async query(text, params = []) {

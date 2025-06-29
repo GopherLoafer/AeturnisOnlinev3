@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .admin-dashboard {
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3), transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3), transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.3), transparent 50%),
+                linear-gradient(135deg, #0f0f23 0%, #010115 100%);
+            min-height: 100vh;
+            color: #e5e7eb;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 2rem;
+        }
+        
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: linear-gradient(145deg, rgba(15, 20, 25, 0.95) 0%, rgba(20, 25, 35, 0.95) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+        
+        .admin-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .admin-header h1 {
+            color: #10b981;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .admin-nav {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(100, 116, 139, 0.2);
+            padding-bottom: 1rem;
+        }
+        
+        .admin-nav a {
+            color: #10b981;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .admin-nav a:hover, .admin-nav a.active {
+            border-color: rgba(59, 130, 246, 0.6);
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-card h3 {
+            color: #10b981;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .stat-label {
+            color: #94a3b8;
+        }
+        
+        .stat-value {
+            color: #e5e7eb;
+            font-weight: 500;
+        }
+        
+        .recommendations {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .recommendations h3 {
+            color: #fca5a5;
+            margin-bottom: 1rem;
+        }
+        
+        .recommendation {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .recommendation:last-child {
+            margin-bottom: 0;
+        }
+        
+        .severity-high {
+            border-left: 4px solid #ef4444;
+        }
+        
+        .severity-medium {
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .severity-low {
+            border-left: 4px solid #10b981;
+        }
+        
+        .back-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .back-link:hover {
+            color: #60a5fa;
+        }
+    </style>
+</head>
+<body class="admin-dashboard">
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Race Statistics Dashboard</h1>
+            <p><a href="/admin/dashboard" class="back-link">← Back to Admin Dashboard</a></p>
+        </div>
+
+        <div class="admin-nav">
+            <a href="/admin/race-management/race-statistics" class="active">Statistics</a>
+            <a href="/admin/race-management/balance-adjustment">Balance Adjustment</a>
+            <a href="/admin/race-management/race-change">Race Change</a>
+            <a href="/admin/race-management/racial-events">Racial Events</a>
+            <a href="/admin/race-management/population-monitoring">Population Monitor</a>
+        </div>
+
+        <div class="stats-grid">
+            <% statistics.forEach(race => { %>
+            <div class="stat-card">
+                <h3><%= race.name %></h3>
+                <div class="stat-row">
+                    <span class="stat-label">Characters:</span>
+                    <span class="stat-value"><%= race.character_count || 0 %></span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Average Level:</span>
+                    <span class="stat-value"><%= race.average_level || 0 %></span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Highest Level:</span>
+                    <span class="stat-value"><%= race.highest_level || 0 %></span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Active (24h):</span>
+                    <span class="stat-value"><%= race.active_24h || 0 %></span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Active (7d):</span>
+                    <span class="stat-value"><%= race.active_7d || 0 %></span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">New (7d):</span>
+                    <span class="stat-value"><%= race.new_characters_7d || 0 %></span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">XP Bonus:</span>
+                    <span class="stat-value"><%= ((race.experience_bonus || 0) * 100).toFixed(1) %>%</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Starting Zone:</span>
+                    <span class="stat-value"><%= race.starting_zone %></span>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+
+        <% if (recommendations && recommendations.length > 0) { %>
+        <div class="recommendations">
+            <h3>⚠️ Balance Recommendations</h3>
+            <% recommendations.forEach(rec => { %>
+            <div class="recommendation severity-<%= rec.severity %>">
+                <strong><%= rec.race_name %></strong> - <%= rec.type.charAt(0).toUpperCase() + rec.type.slice(1) %>
+                <br>
+                <small><%= rec.issue %></small>
+                <br>
+                <em>Suggestion: <%= rec.suggestion %></em>
+            </div>
+            <% }); %>
+        </div>
+        <% } %>
+
+        <div style="margin-top: 2rem;">
+            <h3 style="color: #10b981;">Population Overview</h3>
+            <% if (populationData && populationData.overview) { %>
+            <div class="stat-row">
+                <span class="stat-label">Total Characters:</span>
+                <span class="stat-value"><%= populationData.overview.total_characters %></span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Total Users:</span>
+                <span class="stat-value"><%= populationData.overview.total_users %></span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Characters per User:</span>
+                <span class="stat-value"><%= populationData.overview.characters_per_user.toFixed(2) %></span>
+            </div>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>
