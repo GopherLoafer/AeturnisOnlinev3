@@ -3,6 +3,10 @@ class MobileNavigation {
         this.leftPanel = document.querySelector('.left-panel');
         this.rightPanel = document.querySelector('.right-panel');
         this.overlay = null;
+        this.touchStartX = 0;
+        this.touchStartY = 0;
+        this.touchEndX = 0;
+        this.touchEndY = 0;
         this.init();
     }
     
@@ -11,9 +15,92 @@ class MobileNavigation {
         this.createMobileNav();
         this.createOverlay();
         this.bindEvents();
+        this.initSwipeGestures();
+    }
+    
+    initSwipeGestures() {
+        // Use arrow functions to maintain 'this' context
+        document.addEventListener('touchstart', (e) => {
+            this.touchStartX = e.changedTouches[0].screenX;
+            this.touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+        
+        document.addEventListener('touchend', (e) => {
+            this.touchEndX = e.changedTouches[0].screenX;
+            this.touchEndY = e.changedTouches[0].screenY;
+            this.handleSwipe();
+        }, { passive: true });
+    }
+    
+    handleSwipe() {
+        const swipeThreshold = 50;
+        const verticalThreshold = 100;
+        const diffX = this.touchEndX - this.touchStartX;
+        const diffY = this.touchEndY - this.touchStartY;
+        
+        // Only process horizontal swipes (ignore vertical swipes)
+        if (Math.abs(diffX) > Math.abs(diffY) && 
+            Math.abs(diffX) > swipeThreshold && 
+            Math.abs(diffY) < verticalThreshold) {
+            
+            if (diffX > 0 && this.touchStartX < 20) {
+                // Swipe right from left edge
+                this.togglePanel('left');
+            } else if (diffX < 0 && this.touchStartX > window.innerWidth - 20) {
+                // Swipe left from right edge
+                this.togglePanel('right');
+            }
+        }
+    }
+    
+    togglePanel(side) {
+        const panel = side === 'left' ? this.leftPanel : this.rightPanel;
+        const isActive = panel?.classList.contains('active');
+        
+        this.closeAllPanels();
+        
+        if (!isActive && panel) {
+            panel.classList.add('active');
+            this.overlay?.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Announce to screen readers
+            const announcement = side === 'left' ? 'Character panel opened' : 'Inventory panel opened';
+            this.announceToScreenReader(announcement);
+        }
+    }
+    
+    closeAllPanels() {
+        this.leftPanel?.classList.remove('active');
+        this.rightPanel?.classList.remove('active');
+        this.overlay?.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    announceToScreenReader(message) {
+        const announcement = document.createElement('div');
+        announcement.setAttribute('role', 'status');
+        announcement.setAttribute('aria-live', 'polite');
+        announcement.className = 'sr-only';
+        announcement.textContent = message;
+        document.body.appendChild(announcement);
+        setTimeout(() => announcement.remove(), 1000);
+    }
+    
+    createOverlay() {
+        // Check if overlay already exists
+        this.overlay = document.querySelector('.mobile-overlay');
+        if (!this.overlay) {
+            this.overlay = document.createElement('div');
+            this.overlay.className = 'mobile-overlay';
+            document.body.appendChild(this.overlay);
+        }
     }
     
     createMobileNav() {
+        // Check if nav already exists
+        if (document.querySelector('.mobile-nav-buttons')) return;
+        
         const mobileNav = document.createElement('div');
         mobileNav.className = 'mobile-nav-buttons';
         mobileNav.innerHTML = `
@@ -29,85 +116,30 @@ class MobileNavigation {
             </button>
         `;
         
-        // Insert into header on mobile
-        if (window.innerWidth < 1024) {
-            document.querySelector('.header')?.appendChild(mobileNav);
+        const header = document.querySelector('.header');
+        if (header && window.innerWidth < 1024) {
+            header.appendChild(mobileNav);
         }
-    }
-    
-    createOverlay() {
-        this.overlay = document.createElement('div');
-        this.overlay.className = 'mobile-overlay';
-        document.body.appendChild(this.overlay);
     }
     
     bindEvents() {
-        // Left panel toggle
-        document.querySelector('.left-toggle')?.addEventListener('click', () => {
-            this.togglePanel('left');
-        });
-        
-        // Right panel toggle
-        document.querySelector('.right-toggle')?.addEventListener('click', () => {
-            this.togglePanel('right');
-        });
-        
-        // Overlay click
-        this.overlay.addEventListener('click', () => {
-            this.closeAllPanels();
-        });
-        
-        // Swipe gestures
-        this.initSwipeGestures();
-    }
-    
-    togglePanel(side) {
-        const panel = side === 'left' ? this.leftPanel : this.rightPanel;
-        const isActive = panel.classList.contains('active');
-        
-        this.closeAllPanels();
-        
-        if (!isActive) {
-            panel.classList.add('active');
-            this.overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-    }
-    
-    closeAllPanels() {
-        this.leftPanel?.classList.remove('active');
-        this.rightPanel?.classList.remove('active');
-        this.overlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-    
-    initSwipeGestures() {
-        let touchStartX = 0;
-        let touchEndX = 0;
-        
-        document.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-        
-        document.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            this.handleSwipe();
-        });
-        
-        const handleSwipe = () => {
-            const swipeThreshold = 50;
-            const diff = touchEndX - touchStartX;
-            
-            if (Math.abs(diff) > swipeThreshold) {
-                if (diff > 0 && touchStartX < 20) {
-                    // Swipe right from left edge
-                    this.togglePanel('left');
-                } else if (diff < 0 && touchStartX > window.innerWidth - 20) {
-                    // Swipe left from right edge
-                    this.togglePanel('right');
-                }
+        // Use event delegation for better performance
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.left-toggle')) {
+                this.togglePanel('left');
+            } else if (e.target.closest('.right-toggle')) {
+                this.togglePanel('right');
+            } else if (e.target.classList.contains('mobile-overlay')) {
+                this.closeAllPanels();
             }
-        };
+        });
+        
+        // Close panels on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeAllPanels();
+            }
+        });
     }
 }
 
