@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="character-creation">
+    <div class="creation-container">
+        <h1>Create Your Character</h1>
+        
+        <% if (error) { %>
+        <div class="error-message">
+            <%= error %>
+        </div>
+        <% } %>
+
+        <form method="POST" action="/game/character-creation" class="creation-form">
+            <div class="form-section">
+                <label for="name">Character Name:</label>
+                <input type="text" id="name" name="name" required minlength="3" maxlength="20">
+                <small>3-20 characters, must be unique</small>
+            </div>
+
+            <div class="form-section">
+                <label>Choose Your Race:</label>
+                <div class="race-selection">
+                    <% races.forEach(race => { %>
+                    <div class="race-option">
+                        <input type="radio" id="race-<%= race.id %>" name="raceId" value="<%= race.id %>" required>
+                        <label for="race-<%= race.id %>" class="race-card">
+                            <h3><%= race.name %></h3>
+                            <p class="race-description"><%= race.description %></p>
+                            <div class="race-stats">
+                                <div class="stat-modifier">STR: <%= race.str_modifier >= 0 ? '+' : '' %><%= race.str_modifier %></div>
+                                <div class="stat-modifier">INT: <%= race.int_modifier >= 0 ? '+' : '' %><%= race.int_modifier %></div>
+                                <div class="stat-modifier">VIT: <%= race.vit_modifier >= 0 ? '+' : '' %><%= race.vit_modifier %></div>
+                                <div class="stat-modifier">DEX: <%= race.dex_modifier >= 0 ? '+' : '' %><%= race.dex_modifier %></div>
+                                <div class="stat-modifier">WIS: <%= race.wis_modifier >= 0 ? '+' : '' %><%= race.wis_modifier %></div>
+                            </div>
+                            <div class="starting-zone">
+                                <small>Starting Zone: <%= race.starting_zone.replace('_', ' ').toUpperCase() %></small>
+                            </div>
+                        </label>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create Character</button>
+        </form>
+
+        <div class="creation-info">
+            <h3>Character Creation Tips:</h3>
+            <ul>
+                <li>Your race choice affects starting stats and determines your starting location</li>
+                <li>All races can learn any weapon or magic affinity through practice</li>
+                <li>Character names cannot be changed after creation</li>
+                <li>Race bonuses scale with your level progression</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

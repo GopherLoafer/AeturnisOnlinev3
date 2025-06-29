@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body class="<%= typeof bodyClass !== 'undefined' ? bodyClass : '' %>">
+    <% if (typeof user !== 'undefined' && user) { %>
+    <nav class="main-nav">
+        <div class="nav-left">
+            <h1><a href="/game/dashboard">Aeturnis Online</a></h1>
+            <span class="server-time" id="server-time"></span>
+        </div>
+        <div class="nav-center">
+            <% if (typeof character !== 'undefined' && character) { %>
+            <div class="character-info">
+                <span class="char-name"><%= character.name %></span>
+                <span class="char-race">(<%= character.race_name %>)</span>
+                <span class="char-level">Level <%= character.level %></span>
+            </div>
+            <% } %>
+        </div>
+        <div class="nav-right">
+            <span class="username">Welcome, <%= user.username %></span>
+            <% if (user.is_admin) { %>
+            <a href="/admin" class="admin-link">Admin Panel</a>
+            <% } %>
+            <form method="POST" action="/auth/logout" class="logout-form">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </nav>
+    <% } %>
+
+    <main class="main-content">
+        <%- body %>
+    </main>
+
+    <% if (typeof user !== 'undefined' && user) { %>
+    <script src="/js/game.js"></script>
+    <% } %>
+</body>
+</html>

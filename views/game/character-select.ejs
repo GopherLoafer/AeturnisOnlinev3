@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="character-select">
+    <div class="select-container">
+        <h1>Select Your Character</h1>
+        
+        <div class="character-list">
+            <% characters.forEach(character => { %>
+            <div class="character-card">
+                <form method="POST" action="/game/character-select">
+                    <input type="hidden" name="characterId" value="<%= character.id %>">
+                    <div class="character-info">
+                        <h3><%= character.name %></h3>
+                        <p class="character-race"><%= character.race_name %></p>
+                        <p class="character-level">Level <%= character.level %></p>
+                        <p class="character-location">Location: <%= character.location_zone.replace('_', ' ').toUpperCase() %></p>
+                        <p class="character-last-active">Last Active: <%= new Date(character.last_active).toLocaleDateString() %></p>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Play</button>
+                </form>
+            </div>
+            <% }); %>
+        </div>
+
+        <div class="character-actions">
+            <a href="/game/character-creation" class="btn btn-secondary">Create New Character</a>
+            <form method="POST" action="/auth/logout" class="logout-form">
+                <button type="submit" class="btn btn-danger">Logout</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
