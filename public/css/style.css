@@ -723,6 +723,26 @@ body {
     border-radius: 4px;
 }
 
+/* Admin panel link */
+.admin-link {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background: #ff6b6b;
+    color: white;
+    text-decoration: none;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-right: 0.5rem;
+    transition: background 0.2s;
+}
+
+.admin-link:hover {
+    background: #ff5252;
+    text-decoration: none;
+    color: white;
+}
+
 .starting-zone {
     color: #999;
 }

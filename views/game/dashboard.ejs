@@ -18,6 +18,9 @@
             <span class="location">📍 <%= character.location_zone.replace('_', ' ').toUpperCase() %></span>
         </div>
         <div class="status-right">
+            <% if (user && user.is_admin) { %>
+                <a href="/admin" class="admin-link">ADMIN PANEL</a>
+            <% } %>
             <button class="menu-btn" id="menu-btn">MENU</button>
         </div>
     </div>
