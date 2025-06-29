@@ -20,8 +20,8 @@ let gameState = {
     }
 };
 
-// Timeout for debouncing game state refreshes
-let gameStateRefreshTimeout;
+// Performance optimized game state management
+let debouncedRefreshGameState;
 
 // ===== Combat System Functions =====
 
@@ -501,9 +501,36 @@ function updateGameText(message) {
 
 // ===== Character State Updates =====
 
+// Performance-optimized character stats update
+let optimizedUpdateCharacterStats;
+let lastCharacterStatsUpdate = 0;
+
 function updateCharacterStats(character) {
-    console.log('updateCharacterStats called with:', character);
+    if (!character) return;
     
+    // Throttle updates to prevent excessive DOM manipulation (max 10fps)
+    const now = performance.now();
+    if (now - lastCharacterStatsUpdate < 100) {
+        return;
+    }
+    lastCharacterStatsUpdate = now;
+    
+    // Use performance-optimized updates if available
+    if (window.PerformanceUtils && window.PerformanceUtils.DOMOptimizer) {
+        if (!optimizedUpdateCharacterStats) {
+            const domOptimizer = new window.PerformanceUtils.DOMOptimizer();
+            optimizedUpdateCharacterStats = domOptimizer.batchUpdate.bind(domOptimizer);
+        }
+        
+        optimizedUpdateCharacterStats(() => {
+            performCharacterStatsUpdate(character);
+        });
+    } else {
+        performCharacterStatsUpdate(character);
+    }
+}
+
+function performCharacterStatsUpdate(character) {
     // Update individual stat displays
     const statMappings = {
         'stat-str': character.str_total || character.str_base || 10,
@@ -602,22 +629,57 @@ function updateExperience(expData) {
     updateExperienceBar(expData);
 }
 
+// Performance-optimized experience bar update
+let lastExpUpdate = 0;
+let lastExpData = null;
+
 function updateExperienceBar(expData) {
+    if (!expData || expData.current === undefined || expData.required === undefined) return;
+    
+    // Skip update if data hasn't changed
+    if (lastExpData && 
+        lastExpData.current === expData.current && 
+        lastExpData.required === expData.required) {
+        return;
+    }
+    
+    // Throttle updates to prevent excessive DOM manipulation
+    const now = performance.now();
+    if (now - lastExpUpdate < 100) {
+        return;
+    }
+    
+    lastExpUpdate = now;
+    lastExpData = { ...expData };
+    
+    // Use performance-optimized DOM updates
+    if (window.PerformanceUtils && window.PerformanceUtils.DOMOptimizer) {
+        const domOptimizer = new window.PerformanceUtils.DOMOptimizer();
+        domOptimizer.batchUpdate(() => {
+            performExperienceBarUpdate(expData);
+        });
+    } else {
+        performExperienceBarUpdate(expData);
+    }
+}
+
+function performExperienceBarUpdate(expData) {
     const expBar = document.getElementById('exp-bar');
     const expText = document.getElementById('exp-text');
-    const expLabel = document.querySelector('#exp-bar').closest('.stat-bar').querySelector('.stat-label span:last-child');
+    const expLabel = document.querySelector('#exp-bar')?.closest('.stat-bar')?.querySelector('.stat-label span:last-child');
     
-    if (expBar && expData.current !== undefined && expData.required !== undefined) {
-        const expPercent = Math.floor((expData.current / expData.required) * 100);
+    const expPercent = Math.floor((expData.current / expData.required) * 100);
+    
+    if (expBar) {
         expBar.style.width = `${expPercent}%`;
-        
-        if (expText) {
-            expText.textContent = `${formatNumber(expData.current)}/${formatNumber(expData.required)}`;
-        }
-        
-        if (expLabel) {
-            expLabel.textContent = `${expPercent}% to next`;
-        }
+    }
+    
+    if (expText) {
+        expText.textContent = `${formatNumber(expData.current)}/${formatNumber(expData.required)}`;
+    }
+    
+    if (expLabel) {
+        expLabel.textContent = `${expPercent}% to next`;
     }
 }
 
@@ -808,9 +870,20 @@ function initializeProgressionButtons() {
 // ===== Game State Refresh =====
 
 function refreshGameState() {
-    // Debounce rapid successive calls
-    clearTimeout(gameStateRefreshTimeout);
-    gameStateRefreshTimeout = setTimeout(() => {
+    // Use performance-optimized debouncing
+    if (!debouncedRefreshGameState && window.PerformanceUtils) {
+        debouncedRefreshGameState = window.PerformanceUtils.debounce(executeGameStateRefresh, 500);
+    }
+    
+    if (debouncedRefreshGameState) {
+        debouncedRefreshGameState();
+    } else {
+        // Fallback for when performance utils aren't loaded yet
+        executeGameStateRefresh();
+    }
+}
+
+function executeGameStateRefresh() {
         fetch('/api/game/state')
     .then(response => {
         if (!response.ok) {
@@ -856,7 +929,6 @@ function refreshGameState() {
     .catch(error => {
         console.error('Game state refresh error:', error);
     });
-    }, 150); // 150ms debounce delay
 }
 
 // ===== Utility Functions =====
@@ -877,12 +949,33 @@ function formatNumber(num) {
 // ===== Initialization =====
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize performance monitoring with memory management
+    if (window.PerformanceUtils) {
+        window.PerformanceUtils.initPerformanceOptimizations();
+        
+        // Monitor and optimize memory usage
+        const memoryManager = new window.PerformanceUtils.MemoryManager();
+        
+        // Add cleanup for game state refreshes
+        memoryManager.addInterval(() => {
+            // Clear old combat logs to prevent memory buildup
+            if (gameState.combat.combatLog && gameState.combat.combatLog.length > 50) {
+                gameState.combat.combatLog = gameState.combat.combatLog.slice(-25);
+            }
+        }, 30000); // Clean every 30 seconds
+        
+        // Performance monitoring disabled for better performance
+        // const performanceMonitor = new window.PerformanceUtils.PerformanceMonitor();
+        // performanceMonitor.startMonitoring();
+    }
+    
     // Initialize UI components
     updateServerTime();
     initializeProgressionButtons();
     
-    // Start periodic game state refresh
-    setInterval(refreshGameState, 60000); // Refresh every 60 seconds
+    // Use performance-optimized interval with reduced frequency
+    const refreshInterval = window.PerformanceUtils?.throttle(refreshGameState, 120000) || refreshGameState;
+    setInterval(refreshInterval, 120000); // Refresh every 2 minutes to reduce load
     
     // Initial game state load
     refreshGameState();

@@ -8,20 +8,48 @@ class CharacterCreationWizard {
         this.currentStep = window.currentStep || 1;
         this.sessionData = window.sessionData || {};
         this.validationCache = new Map();
+        this.performanceOptimized = false;
         this.init();
     }
 
     init() {
+        // Initialize performance optimizations if available
+        if (window.PerformanceUtils) {
+            this.initializePerformanceOptimizations();
+        }
+        
         this.setupEventListeners();
         this.setupKeyboardNavigation();
         this.loadStepData();
+    }
+    
+    initializePerformanceOptimizations() {
+        // Initialize performance monitoring
+        window.PerformanceUtils.initPerformanceOptimizations();
+        
+        // Create optimized function references
+        this.optimizedAutoSave = window.PerformanceUtils.debounce(
+            this.performAutoSave.bind(this), 
+            1000
+        );
+        
+        this.optimizedValidation = window.PerformanceUtils.debounce(
+            this.performValidation.bind(this), 
+            500
+        );
+        
+        this.performanceOptimized = true;
     }
 
     setupEventListeners() {
         // Auto-save form data on input changes
         document.addEventListener('input', this.debounce((e) => {
             if (e.target.matches('input, select, textarea')) {
-                this.autoSaveStep();
+                if (this.performanceOptimized && this.optimizedAutoSave) {
+                    this.optimizedAutoSave();
+                } else {
+                    this.autoSaveStep();
+                }
             }
         }, 1000));
 
@@ -102,6 +130,14 @@ class CharacterCreationWizard {
     }
 
     autoSaveStep() {
+        if (this.performanceOptimized && this.optimizedAutoSave) {
+            this.optimizedAutoSave();
+        } else {
+            this.performAutoSave();
+        }
+    }
+    
+    performAutoSave() {
         const formData = this.collectStepData();
         const stepKey = `wizard_step_${this.currentStep}`;
         
@@ -110,6 +146,10 @@ class CharacterCreationWizard {
         } catch (error) {
             console.warn('Failed to auto-save step data:', error);
         }
+    }
+    
+    async performValidation(name, force = false) {
+        return await this.validateNameInternal(name, force);
     }
 
     collectStepData() {
@@ -178,6 +218,14 @@ class CharacterCreationWizard {
 
     // Name validation with caching
     async validateName(name, force = false) {
+        if (this.performanceOptimized && this.optimizedValidation) {
+            return this.optimizedValidation(name, force);
+        } else {
+            return this.validateNameInternal(name, force);
+        }
+    }
+    
+    async validateNameInternal(name, force = false) {
         if (!name || name.length < 3) {
             return { valid: false, errors: ['Name must be at least 3 characters'] };
         }
@@ -301,6 +349,18 @@ class CharacterCreationWizard {
 
     // Animation helpers
     animateValue(element, start, end, duration = 1000) {
+        // Use performance-optimized animation if available
+        if (window.PerformanceUtils && window.PerformanceUtils.DOMOptimizer) {
+            const domOptimizer = new window.PerformanceUtils.DOMOptimizer();
+            domOptimizer.batchUpdate(() => {
+                this.performAnimation(element, start, end, duration);
+            });
+        } else {
+            this.performAnimation(element, start, end, duration);
+        }
+    }
+    
+    performAnimation(element, start, end, duration) {
         const startTime = performance.now();
         const animate = (currentTime) => {
             const elapsed = currentTime - startTime;
@@ -321,13 +381,34 @@ class CharacterCreationWizard {
         return 1 - Math.pow(1 - t, 4);
     }
 
-    // Cleanup
+    // Cleanup with performance optimization
     destroy() {
-        // Clear any timeouts or intervals
-        this.validationCache.clear();
+        // Clear performance optimization resources
+        if (this.performanceOptimized && window.PerformanceUtils) {
+            if (window.PerformanceUtils.MemoryManager) {
+                const memoryManager = new window.PerformanceUtils.MemoryManager();
+                memoryManager.cleanup();
+            }
+        }
+        
+        // Clear validation cache
+        if (this.validationCache) {
+            this.validationCache.clear();
+        }
+        
+        // Clear optimized function references
+        this.optimizedAutoSave = null;
+        this.optimizedValidation = null;
         
         // Remove event listeners if needed
-        document.removeEventListener('keydown', this.keydownHandler);
+        if (this.keydownHandler) {
+            document.removeEventListener('keydown', this.keydownHandler);
+        }
+        
+        // Clear any remaining timeouts
+        if (this.autoSaveTimeout) {
+            clearTimeout(this.autoSaveTimeout);
+        }
     }
 }
 
