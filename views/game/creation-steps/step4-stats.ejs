@@ -222,12 +222,13 @@ function updateDisplay() {
   
   // Update each stat display
   ['str', 'int', 'vit', 'dex', 'wis'].forEach(stat => {
-    document.getElementById(`${stat}-allocated`).textContent = allocatedStats[stat];
-    document.getElementById(`${stat}-total`).textContent = baseStats[stat] + allocatedStats[stat];
+    document.getElementById(stat + '-allocated').textContent = allocatedStats[stat];
+    document.getElementById(stat + '-total').textContent = baseStats[stat] + allocatedStats[stat];
     
     // Update button states
-    const decreaseBtn = document.querySelector(`.stat-allocator:nth-child(${['str', 'int', 'vit', 'dex', 'wis'].indexOf(stat) + 1}) .btn-decrease`);
-    const increaseBtn = document.querySelector(`.stat-allocator:nth-child(${['str', 'int', 'vit', 'dex', 'wis'].indexOf(stat) + 1}) .btn-increase`);
+    const statIndex = ['str', 'int', 'vit', 'dex', 'wis'].indexOf(stat) + 1;
+    const decreaseBtn = document.querySelector('.stat-allocator:nth-child(' + statIndex + ') .btn-decrease');
+    const increaseBtn = document.querySelector('.stat-allocator:nth-child(' + statIndex + ') .btn-increase');
     
     decreaseBtn.disabled = allocatedStats[stat] <= 0;
     increaseBtn.disabled = usedPoints >= totalPoints;
@@ -251,31 +252,28 @@ function updatePreview() {
   };
   
   // Update final stats display
-  document.getElementById('final-stats-grid').innerHTML = `
-    <div class="stat-final">STR: ${finalStats.str}</div>
-    <div class="stat-final">INT: ${finalStats.int}</div>
-    <div class="stat-final">VIT: ${finalStats.vit}</div>
-    <div class="stat-final">DEX: ${finalStats.dex}</div>
-    <div class="stat-final">WIS: ${finalStats.wis}</div>
-  `;
+  document.getElementById('final-stats-grid').innerHTML = 
+    '<div class="stat-final">STR: ' + finalStats.str + '</div>' +
+    '<div class="stat-final">INT: ' + finalStats.int + '</div>' +
+    '<div class="stat-final">VIT: ' + finalStats.vit + '</div>' +
+    '<div class="stat-final">DEX: ' + finalStats.dex + '</div>' +
+    '<div class="stat-final">WIS: ' + finalStats.wis + '</div>';
   
   // Update combat stats
   const health = finalStats.vit * 10;
   const mana = Math.floor(finalStats.int * 5);
   
-  document.getElementById('combat-stats').innerHTML = `
-    <div class="combat-stat">Health: ${health}</div>
-    <div class="combat-stat">Mana: ${mana}</div>
-  `;
+  document.getElementById('combat-stats').innerHTML = 
+    '<div class="combat-stat">Health: ' + health + '</div>' +
+    '<div class="combat-stat">Mana: ' + mana + '</div>';
   
   // Update base stats display
-  document.getElementById('base-stats-display').innerHTML = `
-    <div class="base-stat">STR: ${baseStats.str}</div>
-    <div class="base-stat">INT: ${baseStats.int}</div>
-    <div class="base-stat">VIT: ${baseStats.vit}</div>
-    <div class="base-stat">DEX: ${baseStats.dex}</div>
-    <div class="base-stat">WIS: ${baseStats.wis}</div>
-  `;
+  document.getElementById('base-stats-display').innerHTML = 
+    '<div class="base-stat">STR: ' + baseStats.str + '</div>' +
+    '<div class="base-stat">INT: ' + baseStats.int + '</div>' +
+    '<div class="base-stat">VIT: ' + baseStats.vit + '</div>' +
+    '<div class="base-stat">DEX: ' + baseStats.dex + '</div>' +
+    '<div class="base-stat">WIS: ' + baseStats.wis + '</div>';
 }
 
 function proceedWithStats() {
