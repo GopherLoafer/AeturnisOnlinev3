@@ -10,21 +10,19 @@ class LevelingSystem {
       // Base experience for level 1
       baseExp: 100,
       
-      // Growth phases with higher factors
+      // Growth phases with linear scaling at high levels
       phases: [
-        { name: "Novice",       range: [1, 25],       growthFactor: 1.25 },    // 25% growth
-        { name: "Apprentice",   range: [26, 75],      growthFactor: 1.20 },    // 20% growth
-        { name: "Journeyman",   range: [76, 150],     growthFactor: 1.16 },    // 16% growth
-        { name: "Expert",       range: [151, 300],    growthFactor: 1.12 },    // 12% growth
-        { name: "Master",       range: [301, 500],    growthFactor: 1.09 },    // 9% growth
-        { name: "Grandmaster",  range: [501, 750],    growthFactor: 1.07 },    // 7% growth
-        { name: "Champion",     range: [751, 1000],   growthFactor: 1.05 },    // 5% growth
-        { name: "Legend",       range: [1001, 1500],  growthFactor: 1.04 },    // 4% growth
-        { name: "Mythic",       range: [1501, 2000],  growthFactor: 1.03 },    // 3% growth
-        { name: "Eternal",      range: [2001, 3000],  growthFactor: 1.025 },   // 2.5% growth
-        { name: "Cosmic",       range: [3001, 5000],  growthFactor: 1.02 },    // 2% growth
-        { name: "Transcendent", range: [5001, 10000], growthFactor: 1.015 },   // 1.5% growth
-        { name: "Infinite",     range: [10001, null], growthFactor: 1.01 }     // 1% growth
+        { name: "Novice",       range: [1, 25],       growthFactor: 1.05 },    // 5% growth
+        { name: "Apprentice",   range: [26, 75],      growthFactor: 1.04 },    // 4% growth
+        { name: "Journeyman",   range: [76, 150],     growthFactor: 1.03 },    // 3% growth
+        { name: "Expert",       range: [151, 300],    growthFactor: 1.025 },   // 2.5% growth
+        { name: "Master",       range: [301, 500],    growthFactor: 1.02 },    // 2% growth
+        { name: "Grandmaster",  range: [501, 750],    growthFactor: 1.015 },   // 1.5% growth
+        { name: "Legendary",    range: [751, 1000],   growthFactor: 1.01 },    // 1% growth
+        { name: "Mythical",     range: [1001, 2500],  growthFactor: 1.008 },   // 0.8% growth
+        { name: "Divine",       range: [2501, 5000],  growthFactor: 1.005 },   // 0.5% growth
+        { name: "Immortal",     range: [5001, 10000], growthFactor: 1.002 },   // 0.2% growth
+        { name: "Eternal",      range: [10001, null], growthFactor: 1.0 }      // Linear growth!
       ],
       
       // Smoothing factor for transitions between phases

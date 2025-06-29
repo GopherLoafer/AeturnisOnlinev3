@@ -176,6 +176,11 @@ A classic text-based MMORPG with infinite progression, racial diversity, and aff
 - Reference UIMOCKUP.png for UI design decisions
 
 ## Recent Changes
+- June 29, 2025: **Compound Growth Factors Adjusted for Achievable Progression**
+  - **Linear Growth at High Levels**: Eternal phase (10,001+) now uses 1.0x factor (0% growth)
+  - **Reduced Early Growth**: Novice 5%, Apprentice 4%, down from 25% and 20%
+  - **Level 1,000,000 Now Possible**: Requires 2.04×10³¹ exp (was mathematical infinity)
+  - **Balanced Progression**: Level 100 in hours, Level 1,000 in years, higher levels extreme dedication
 - June 29, 2025: **NUMERIC Type Conversion Completed**
   - **Database Migration**: Converted experience, gold, and total_uses columns from BIGINT to NUMERIC(40,0)
   - **Overflow Protection**: Can now handle numbers 100x larger than BIGINT max (9.2 quintillion)
