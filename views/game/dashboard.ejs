@@ -731,18 +731,28 @@
 
         /* Mini-map (Reference Design) */
         .mini-map {
-            height: 200px;
+            height: 220px;
             background: #0a0a0a;
             border-bottom: 1px solid #333;
             position: relative;
             overflow: hidden;
         }
 
+        .map-location-header {
+            background: #1a1a1a;
+            color: #00ffff;
+            font-weight: bold;
+            text-align: center;
+            padding: 5px 10px;
+            border-bottom: 1px solid #333;
+            font-size: 12px;
+        }
+
         .map-grid {
             display: grid;
             grid-template-columns: repeat(9, 1fr);
             grid-template-rows: repeat(9, 1fr);
-            height: 100%;
+            height: calc(100% - 30px);
             padding: 10px;
             gap: 2px;
         }
@@ -1023,7 +1033,6 @@
         <!-- Main Game Area -->
         <main class="main-panel">
             <div class="game-output" id="game-output">
-                <p class="game-text location-text">[ <%= character.location_zone.replace('_', ' ').toUpperCase() %> - Level <%= character.level %> Zone ]</p>
                 <p class="game-text system-text">The ancient trees loom overhead, blocking out most of the sunlight. You hear strange noises in the distance.</p>
                 <p class="game-text">You move north into the shadowy depths.</p>
                 <p class="game-text combat-text">A Wild Dire Wolf (Level <%= Math.min(character.level + 3, character.level * 1.1) %>) appears!</p>
@@ -1069,6 +1078,9 @@
             <!-- Equipment Tab -->
             <div id="equipment" class="tab-content active">
                 <div class="mini-map">
+                    <div class="map-location-header">
+                        🌋 <%= character.location_zone.replace('_', ' ').toUpperCase() %>
+                    </div>
                     <div class="map-grid">
                         <div class="map-cell"></div>
                         <div class="map-cell npc">🏪</div>
