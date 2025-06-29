@@ -1,98 +1,235 @@
-// Infinite Level Progression System
-// Phase 2.2 Implementation - Exponential scaling with racial modifiers
+
+/**
+ * Advanced Infinite Leveling System with Affinity Foundation
+ * Phase 2.3 Implementation - Integrated with leveling-algorithm.js
+ */
 
 class ProgressionSystem {
     constructor() {
-        // Base experience formula: 100 * (level^2.5) + (level * 50)
-        // This creates exponential growth that scales infinitely
-        this.baseExperienceMultiplier = 100;
-        this.exponentialFactor = 2.5;
-        this.linearBonus = 50;
-        
-        // Prestige markers based on level milestones
+        // Advanced leveling configuration from leveling-algorithm.js
+        this.config = {
+            baseExp: 100,
+            
+            // Growth phases with higher factors for infinite scaling
+            phases: [
+                { name: "Novice",       range: [1, 25],       growthFactor: 1.25 },
+                { name: "Apprentice",   range: [26, 75],      growthFactor: 1.20 },
+                { name: "Journeyman",   range: [76, 150],     growthFactor: 1.16 },
+                { name: "Expert",       range: [151, 300],    growthFactor: 1.12 },
+                { name: "Master",       range: [301, 500],    growthFactor: 1.09 },
+                { name: "Grandmaster",  range: [501, 750],    growthFactor: 1.07 },
+                { name: "Champion",     range: [751, 1000],   growthFactor: 1.05 },
+                { name: "Legend",       range: [1001, 1500],  growthFactor: 1.04 },
+                { name: "Mythic",       range: [1501, 2000],  growthFactor: 1.03 },
+                { name: "Eternal",      range: [2001, 3000],  growthFactor: 1.025 },
+                { name: "Cosmic",       range: [3001, 5000],  growthFactor: 1.02 },
+                { name: "Transcendent", range: [5001, 10000], growthFactor: 1.015 },
+                { name: "Infinite",     range: [10001, null], growthFactor: 1.01 }
+            ],
+            
+            smoothingRange: 5,
+            
+            // Soft caps for ultra-high levels
+            softCaps: [
+                { level: 1000,  strength: 0.95 },
+                { level: 2500,  strength: 0.90 },
+                { level: 5000,  strength: 0.85 },
+                { level: 10000, strength: 0.80 }
+            ],
+            
+            prestigeMultiplier: 0.95
+        };
+
+        // Prestige markers
         this.prestigeMarkers = {
-            bronze: 100,    // Bronze star at level 100
-            silver: 500,    // Silver star at level 500
-            gold: 1000,     // Gold star at level 1000
-            platinum: 2500, // Platinum star at level 2500
-            diamond: 5000,  // Diamond star at level 5000
-            legendary: 10000 // Legendary star at level 10000
+            bronze: 100,
+            silver: 500,
+            gold: 1000,
+            platinum: 2500,
+            diamond: 5000,
+            legendary: 10000
         };
         
-        // Exponential milestone levels for infinite progression
-        this.milestoneLevels = [
-            1000,    // First major milestone
-            5000,    // 5x increase
-            15000,   // 3x increase
-            40000,   // ~2.7x increase
-            100000,  // 2.5x increase
-            250000,  // 2.5x increase
-            600000,  // 2.4x increase
-            1400000, // ~2.3x increase
-            3200000, // ~2.3x increase
-            7200000, // 2.25x increase
-            16000000 // ~2.2x increase
-            // Pattern continues: each milestone roughly 2.0-2.5x the previous
-        ];
+        // Milestone interval for rewards
+        this.milestoneInterval = 100;
+
+        // Phase 2.3: Affinity System Foundation
+        this.affinitySystem = {
+            weapons: {
+                sword: { maxLevel: 100, baseGainRate: 0.05 },
+                axe: { maxLevel: 100, baseGainRate: 0.05 },
+                mace: { maxLevel: 100, baseGainRate: 0.05 },
+                dagger: { maxLevel: 100, baseGainRate: 0.06 },
+                staff: { maxLevel: 100, baseGainRate: 0.04 },
+                bow: { maxLevel: 100, baseGainRate: 0.04 },
+                unarmed: { maxLevel: 100, baseGainRate: 0.07 }
+            },
+            magic: {
+                fire: { maxLevel: 100, baseGainRate: 0.03 },
+                ice: { maxLevel: 100, baseGainRate: 0.03 },
+                lightning: { maxLevel: 100, baseGainRate: 0.03 },
+                earth: { maxLevel: 100, baseGainRate: 0.03 },
+                holy: { maxLevel: 100, baseGainRate: 0.025 },
+                dark: { maxLevel: 100, baseGainRate: 0.025 },
+                arcane: { maxLevel: 100, baseGainRate: 0.02 },
+                nature: { maxLevel: 100, baseGainRate: 0.035 }
+            },
+            bonusThresholds: [25, 50, 75, 100] // Affinity levels that provide bonuses
+        };
     }
 
     /**
-     * Calculate experience required for a specific level
-     * Formula: 100 * (level^2.5) + (level * 50)
-     * @param {number} level - Target level
-     * @returns {number} Experience required for that level
+     * Get the phase information for a given level
+     */
+    getPhaseForLevel(level) {
+        for (const phase of this.config.phases) {
+            if (phase.range[1] === null || level <= phase.range[1]) {
+                return phase;
+            }
+        }
+        return this.config.phases[this.config.phases.length - 1];
+    }
+
+    /**
+     * Calculate experience required for a specific level using advanced algorithm
      */
     getExperienceForLevel(level) {
         if (level <= 1) return 0;
         
-        const exponentialComponent = this.baseExperienceMultiplier * Math.pow(level, this.exponentialFactor);
-        const linearComponent = level * this.linearBonus;
-        
-        return Math.floor(exponentialComponent + linearComponent);
-    }
-
-    /**
-     * Calculate total experience needed to reach a level from level 1
-     * @param {number} level - Target level
-     * @returns {number} Total experience needed
-     */
-    getTotalExperienceForLevel(level) {
         let totalExp = 0;
-        for (let i = 2; i <= level; i++) {
-            totalExp += this.getExperienceForLevel(i);
+        
+        for (let lvl = 2; lvl <= level; lvl++) {
+            totalExp += this.getExpToNextLevel(lvl - 1);
         }
-        return totalExp;
+        
+        return Math.floor(totalExp);
     }
 
     /**
-     * Calculate level from total experience
-     * @param {number} totalExperience - Total experience accumulated
-     * @returns {number} Current level
+     * Advanced experience calculation with phase transitions and soft caps
+     */
+    getExpToNextLevel(currentLevel, prestige = 0) {
+        if (currentLevel < 1) return this.config.baseExp;
+        
+        // Get smoothed growth factor
+        let growthFactor = this.getSmoothedGrowthFactor(currentLevel);
+        
+        // Calculate base requirement using compound growth
+        let baseRequirement = this.config.baseExp;
+        
+        for (let lvl = 1; lvl < currentLevel; lvl++) {
+            const factor = this.getSmoothedGrowthFactor(lvl);
+            baseRequirement *= factor;
+        }
+        
+        // Apply soft caps for very high levels
+        baseRequirement = this.applySoftCaps(baseRequirement, currentLevel);
+        
+        // Apply logarithmic dampener
+        const dampener = 1 + Math.log10(currentLevel + 10) / 20;
+        baseRequirement *= dampener;
+        
+        // Apply prestige bonus
+        if (prestige > 0) {
+            baseRequirement *= Math.pow(this.config.prestigeMultiplier, prestige);
+        }
+        
+        // Ensure minimum progression
+        const minimumExp = this.config.baseExp * currentLevel;
+        baseRequirement = Math.max(baseRequirement, minimumExp);
+        
+        return Math.floor(baseRequirement);
+    }
+
+    /**
+     * Get smoothed growth factor for phase transitions
+     */
+    getSmoothedGrowthFactor(level) {
+        const currentPhase = this.getPhaseForLevel(level);
+        const currentIndex = this.config.phases.indexOf(currentPhase);
+        
+        if (currentIndex === this.config.phases.length - 1 || 
+            level <= currentPhase.range[0] + this.config.smoothingRange) {
+            return currentPhase.growthFactor;
+        }
+        
+        const phaseEnd = currentPhase.range[1];
+        if (level >= phaseEnd - this.config.smoothingRange) {
+            const nextPhase = this.config.phases[currentIndex + 1];
+            const transitionStart = phaseEnd - this.config.smoothingRange;
+            const transitionEnd = phaseEnd + this.config.smoothingRange;
+            
+            if (level <= transitionEnd) {
+                const progress = (level - transitionStart) / (2 * this.config.smoothingRange);
+                return this.lerp(
+                    currentPhase.growthFactor, 
+                    nextPhase.growthFactor, 
+                    this.smoothstep(progress)
+                );
+            }
+        }
+        
+        return currentPhase.growthFactor;
+    }
+
+    /**
+     * Apply soft caps based on level thresholds
+     */
+    applySoftCaps(baseRequirement, level) {
+        let modifiedRequirement = baseRequirement;
+        
+        for (const softCap of this.config.softCaps) {
+            if (level > softCap.level) {
+                const levelsOverCap = level - softCap.level;
+                const reductionFactor = Math.pow(softCap.strength, levelsOverCap / 100);
+                modifiedRequirement *= reductionFactor;
+            }
+        }
+        
+        return modifiedRequirement;
+    }
+
+    /**
+     * Linear interpolation
+     */
+    lerp(a, b, t) {
+        return a + (b - a) * t;
+    }
+
+    /**
+     * Smooth step function
+     */
+    smoothstep(t) {
+        t = Math.max(0, Math.min(1, t));
+        return t * t * (3 - 2 * t);
+    }
+
+    /**
+     * Calculate level from total experience using advanced algorithm
      */
     getLevelFromExperience(totalExperience) {
         if (totalExperience < 0) return 1;
         
         let level = 1;
-        let expUsed = 0;
+        let expNeeded = 0;
         
-        // Iterate through levels until we exceed the total experience
-        while (true) {
-            const expForNextLevel = this.getExperienceForLevel(level + 1);
-            if (expUsed + expForNextLevel > totalExperience) {
-                break;
-            }
-            expUsed += expForNextLevel;
+        while (expNeeded <= totalExperience) {
             level++;
+            expNeeded = this.getExperienceForLevel(level);
         }
         
-        return level;
+        return level - 1;
     }
 
     /**
-     * Calculate experience needed for next level
-     * @param {number} currentLevel - Current character level
-     * @param {number} currentExperience - Current total experience
-     * @returns {object} Experience info for next level
+     * Get total experience needed to reach a level
+     */
+    getTotalExperienceForLevel(level) {
+        return this.getExperienceForLevel(level);
+    }
+
+    /**
+     * Calculate experience progress with advanced algorithm
      */
     getExperienceProgress(currentLevel, currentExperience) {
         const expForCurrentLevel = this.getTotalExperienceForLevel(currentLevel);
@@ -104,21 +241,19 @@ class ProgressionSystem {
         
         return {
             currentLevel,
-            currentLevelProgress,
+            currentLevelProgress: Math.max(0, currentLevelProgress),
             expNeededForNext,
-            remainingExp,
-            progressPercentage: Math.floor((currentLevelProgress / expNeededForNext) * 100)
+            remainingExp: Math.max(0, remainingExp),
+            progressPercentage: Math.min(100, Math.max(0, Math.floor((currentLevelProgress / expNeededForNext) * 100))),
+            phase: this.getPhaseForLevel(currentLevel).name
         };
     }
 
     /**
-     * Calculate dynamic stat gains per level based on race modifiers
-     * @param {number} level - Character level
-     * @param {object} raceData - Race information with modifiers
-     * @returns {object} Stat gains for this level
+     * Enhanced stat gains with affinity bonuses
      */
     calculateStatGains(level, raceData) {
-        // Base stat gains per level (gets higher at milestone levels)
+        // Base stat gains
         let baseGains = {
             str: 2,
             int: 2,
@@ -126,6 +261,14 @@ class ProgressionSystem {
             dex: 2,
             wis: 2
         };
+
+        // Phase bonus
+        const phase = this.getPhaseForLevel(level);
+        const phaseBonus = this.getPhaseStatBonus(phase.name);
+        
+        Object.keys(baseGains).forEach(stat => {
+            baseGains[stat] += phaseBonus;
+        });
 
         // Milestone bonus every 100 levels
         if (level % this.milestoneInterval === 0) {
@@ -135,7 +278,7 @@ class ProgressionSystem {
             });
         }
 
-        // Apply racial modifiers to stat gains
+        // Apply racial modifiers
         const racialGains = {
             str: Math.floor(baseGains.str * (1 + (raceData.str_modifier || 0) * 0.02)),
             int: Math.floor(baseGains.int * (1 + (raceData.int_modifier || 0) * 0.02)),
@@ -148,10 +291,80 @@ class ProgressionSystem {
     }
 
     /**
-     * Apply experience gain with racial bonuses
-     * @param {number} baseExperience - Base experience to award
-     * @param {object} raceData - Race information with experience bonus
-     * @returns {number} Final experience after racial bonuses
+     * Get phase-based stat bonus
+     */
+    getPhaseStatBonus(phaseName) {
+        const bonuses = {
+            "Novice": 0,
+            "Apprentice": 1,
+            "Journeyman": 2,
+            "Expert": 3,
+            "Master": 5,
+            "Grandmaster": 7,
+            "Champion": 10,
+            "Legend": 15,
+            "Mythic": 20,
+            "Eternal": 30,
+            "Cosmic": 40,
+            "Transcendent": 60,
+            "Infinite": 100
+        };
+        return bonuses[phaseName] || 0;
+    }
+
+    /**
+     * Phase 2.3: Calculate affinity gain from combat/casting
+     */
+    calculateAffinityGain(affinityType, category, level, raceData) {
+        const affinity = this.affinitySystem[category][affinityType];
+        if (!affinity) return 0;
+
+        // Base gain rate
+        let gainRate = affinity.baseGainRate;
+
+        // Level-based scaling (higher levels gain affinity slower)
+        const levelPenalty = Math.max(0.1, 1 - (level / 1000));
+        gainRate *= levelPenalty;
+
+        // Racial bonuses for affinity gain
+        if (category === 'weapons' && raceData.weapon_affinity_bonus) {
+            gainRate *= (1 + raceData.weapon_affinity_bonus);
+        }
+        if (category === 'magic' && raceData.magic_affinity_bonus) {
+            gainRate *= (1 + raceData.magic_affinity_bonus);
+        }
+
+        // Random variance (0.5x to 1.5x)
+        const variance = 0.5 + Math.random();
+        gainRate *= variance;
+
+        return Math.min(0.5, gainRate); // Cap at 0.5% per action
+    }
+
+    /**
+     * Phase 2.3: Get affinity damage bonus
+     */
+    getAffinityDamageBonus(affinityLevel) {
+        if (affinityLevel >= 100) return 0.60; // 60% bonus at max
+        if (affinityLevel >= 75) return 0.40;  // 40% bonus
+        if (affinityLevel >= 50) return 0.25;  // 25% bonus
+        if (affinityLevel >= 25) return 0.10;  // 10% bonus
+        return 0; // No bonus below 25%
+    }
+
+    /**
+     * Phase 2.3: Get affinity special attack chance
+     */
+    getAffinitySpecialChance(affinityLevel) {
+        if (affinityLevel >= 100) return 0.40; // 40% chance at max
+        if (affinityLevel >= 75) return 0.25;  // 25% chance
+        if (affinityLevel >= 50) return 0.15;  // 15% chance
+        if (affinityLevel >= 25) return 0.05;  // 5% chance
+        return 0; // No special attacks below 25%
+    }
+
+    /**
+     * Apply experience bonus with racial modifiers
      */
     applyExperienceBonus(baseExperience, raceData) {
         const experienceBonus = raceData.experience_bonus || 0;
@@ -159,9 +372,7 @@ class ProgressionSystem {
     }
 
     /**
-     * Get prestige marker for a given level
-     * @param {number} level - Character level
-     * @returns {string|null} Prestige marker name or null
+     * Get prestige marker for level
      */
     getPrestigeMarker(level) {
         if (level >= this.prestigeMarkers.legendary) return 'legendary';
@@ -174,99 +385,47 @@ class ProgressionSystem {
     }
 
     /**
-     * Check if level qualifies for milestone rewards
-     * @param {number} level - Character level
-     * @returns {boolean} True if milestone level
+     * Check if level is milestone
      */
     isMilestoneLevel(level) {
-        return this.milestoneLevels.includes(level);
+        return level % this.milestoneInterval === 0 && level > 0;
     }
 
     /**
-     * Calculate milestone reward based on level
-     * @param {number} level - Milestone level
-     * @returns {object} Reward details
+     * Get milestone reward with enhanced rewards
      */
     getMilestoneReward(level) {
         if (!this.isMilestoneLevel(level)) return null;
 
-        const milestoneIndex = this.milestoneLevels.indexOf(level);
-        const milestoneNumber = milestoneIndex + 1;
+        const milestoneNumber = level / this.milestoneInterval;
         
-        // Exponential gold rewards: starts at 50,000 and increases significantly
-        const baseReward = 50000;
-        const goldReward = Math.floor(baseReward * Math.pow(3, milestoneIndex));
+        // Exponential gold rewards
+        const baseReward = 1000;
+        const goldReward = Math.floor(baseReward * Math.pow(1.5, milestoneNumber));
+        
+        // Phase-based special rewards
+        const phase = this.getPhaseForLevel(level);
+        let specialReward = `${phase.name} Phase Achievement`;
+        
+        // Major milestone rewards
+        if (level >= 1000) {
+            specialReward += " + Affinity Mastery Bonus";
+        }
+        if (level >= 5000) {
+            specialReward += " + Legendary Weapon Unlock";
+        }
         
         return {
             level,
             milestoneNumber,
             goldReward,
-            specialReward: this.getSpecialMilestoneReward(level)
+            specialReward,
+            phase: phase.name
         };
     }
 
     /**
-     * Get special rewards for significant milestones
-     * @param {number} level - Milestone level
-     * @returns {string|null} Special reward description
-     */
-    getSpecialMilestoneReward(level) {
-        const prestige = this.getPrestigeMarker(level);
-        
-        switch (level) {
-            case 1000:
-                return 'Gold Prestige Star + Title: "Ascendant"';
-            case 5000:
-                return 'Diamond Prestige Star + Title: "Transcendent"';
-            case 15000:
-                return 'Legendary Star + Title: "Apex Warrior"';
-            case 40000:
-                return 'Mythic Crown + Title: "Planar Champion"';
-            case 100000:
-                return 'Ethereal Aura + Title: "Reality Shaper"';
-            case 250000:
-                return 'Cosmic Emblem + Title: "Universe Walker"';
-            case 600000:
-                return 'Dimensional Seal + Title: "Infinity Breaker"';
-            case 1400000:
-                return 'Primordial Mark + Title: "Existence Defier"';
-            case 3200000:
-                return 'Origin Crystal + Title: "Void Conqueror"';
-            case 7200000:
-                return 'Creation Spark + Title: "Reality Architect"';
-            case 16000000:
-                return 'Ultimate Ascension + Title: "Omnipotent One"';
-            default:
-                if (prestige) {
-                    return `${prestige.charAt(0).toUpperCase() + prestige.slice(1)} Tier Achievement`;
-                }
-                return 'Legendary Achievement Unlocked';
-        }
-    }
-
-    /**
-     * Get next milestone information for display
-     * @param {number} currentLevel - Current character level
-     * @returns {object|null} Next milestone info or null if no more milestones
-     */
-    getNextMilestone(currentLevel) {
-        const nextMilestone = this.milestoneLevels.find(level => level > currentLevel);
-        
-        if (!nextMilestone) {
-            return null; // No more predefined milestones
-        }
-        
-        return {
-            level: nextMilestone,
-            levelsRemaining: nextMilestone - currentLevel,
-            reward: this.getMilestoneReward(nextMilestone)
-        };
-    }
-
-    /**
-     * Get content unlocks for a specific level
-     * @param {number} level - Character level
-     * @returns {array} Array of unlocked content
+     * Get content unlocks for level
      */
     getContentUnlocks(level) {
         const unlocks = [];
@@ -281,14 +440,30 @@ class ProgressionSystem {
         if (level >= 1000) unlocks.push('Celestial Planes');
         if (level >= 2500) unlocks.push('Void Dimensions');
 
-        // Feature unlocks
-        if (level >= 5) unlocks.push('Chat Channel: General');
-        if (level >= 15) unlocks.push('Guild System');
-        if (level >= 30) unlocks.push('PvP Arena');
-        if (level >= 75) unlocks.push('Crafting System');
-        if (level >= 150) unlocks.push('Advanced Combat');
+        // Affinity unlocks
+        if (level >= 15) unlocks.push('Weapon Affinity Training');
+        if (level >= 30) unlocks.push('Magic Affinity Training');
+        if (level >= 75) unlocks.push('Advanced Combat Techniques');
+        if (level >= 150) unlocks.push('Elemental Mastery');
+        if (level >= 500) unlocks.push('Legendary Abilities');
 
         return unlocks;
+    }
+
+    /**
+     * Format large numbers for display
+     */
+    formatNumber(num) {
+        const units = ['', 'K', 'M', 'B', 'T', 'Q'];
+        let unitIndex = 0;
+        let value = num;
+        
+        while (value >= 1000 && unitIndex < units.length - 1) {
+            value /= 1000;
+            unitIndex++;
+        }
+        
+        return value.toFixed(2) + units[unitIndex];
     }
 }
 

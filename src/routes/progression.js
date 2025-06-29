@@ -1,5 +1,6 @@
-// Progression Routes - API endpoints for infinite level progression
-// Phase 2.2 Implementation
+
+// Progression Routes - API endpoints for infinite level progression and affinity system
+// Phase 2.3 Implementation
 
 const express = require('express');
 const LevelService = require('../levelService');
@@ -8,56 +9,54 @@ const { requireCharacter } = require('../middleware/auth');
 const router = express.Router();
 const levelService = new LevelService();
 
-// Award experience (for admin testing and future combat/quest integration)
+// Award experience with enhanced error handling
 router.post('/award-experience', requireCharacter, async (req, res) => {
     try {
         const { amount } = req.body;
+        const characterId = req.session.characterId;
 
-        if (!amount || amount <= 0) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Valid experience amount is required' 
+        // Validate experience amount
+        const expAmount = parseInt(amount);
+        if (isNaN(expAmount) || expAmount <= 0 || expAmount > 100000) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid experience amount. Must be between 1 and 100,000.'
             });
         }
 
-        // Cap experience awards to prevent overflow (max 100 million per award)
-        const MAX_EXPERIENCE_AWARD = 100000000;
-        if (amount > MAX_EXPERIENCE_AWARD) {
-            return res.status(400).json({ 
-                success: false, 
-                error: `Experience amount too large. Maximum allowed: ${MAX_EXPERIENCE_AWARD.toLocaleString()}` 
-            });
-        }
-
-        const results = await levelService.awardExperience(req.session.characterId, parseInt(amount));
-
+        const result = await levelService.awardExperience(characterId, expAmount);
+        
         res.json({
             success: true,
-            ...results
+            data: result
         });
+
     } catch (error) {
-        console.error('Award experience error:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Failed to award experience' 
+        console.error('Error awarding experience:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to award experience',
+            details: error.message
         });
     }
 });
 
-// Get character progression information
+// Get progression information
 router.get('/info', requireCharacter, async (req, res) => {
     try {
-        const progressInfo = await levelService.getProgressionInfo(req.session.characterId);
-
+        const characterId = req.session.characterId;
+        const progressInfo = await levelService.getProgressionInfo(characterId);
+        
         res.json({
             success: true,
-            progression: progressInfo
+            data: progressInfo
         });
+
     } catch (error) {
-        console.error('Progression info error:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Failed to get progression info' 
+        console.error('Error getting progression info:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to get progression information'
         });
     }
 });
@@ -67,54 +66,118 @@ router.get('/leaderboard', async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 50;
         const leaderboard = await levelService.getLeaderboard(limit);
-
+        
         res.json({
             success: true,
-            leaderboard
+            data: leaderboard
         });
+
     } catch (error) {
-        console.error('Leaderboard error:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Failed to get leaderboard' 
+        console.error('Error getting leaderboard:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to get leaderboard'
         });
     }
 });
 
-// Get milestone rewards for character
+// Get milestone rewards
 router.get('/milestones', requireCharacter, async (req, res) => {
     try {
-        const milestones = await levelService.getMilestoneRewards(req.session.characterId);
-
+        const characterId = req.session.characterId;
+        const milestones = await levelService.getMilestoneRewards(characterId);
+        
         res.json({
             success: true,
-            milestones
+            data: milestones
         });
+
     } catch (error) {
-        console.error('Milestones error:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Failed to get milestone rewards' 
+        console.error('Error getting milestones:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to get milestone rewards'
         });
     }
 });
 
-// Simulate level up for testing (admin only for now)
-router.post('/simulate-level-up', requireCharacter, async (req, res) => {
+// Phase 2.3: Award affinity experience
+router.post('/award-affinity', requireCharacter, async (req, res) => {
     try {
-        // For testing purposes - award enough experience to level up
-        const results = await levelService.awardExperience(req.session.characterId, 1000);
+        const { affinityType, category, amount = 1 } = req.body;
+        const characterId = req.session.characterId;
 
+        // Validate affinity parameters
+        if (!affinityType || !category) {
+            return res.status(400).json({
+                success: false,
+                error: 'Affinity type and category are required'
+            });
+        }
+
+        if (!['weapons', 'magic'].includes(category)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Category must be "weapons" or "magic"'
+            });
+        }
+
+        const result = await levelService.awardAffinityExperience(characterId, affinityType, category, amount);
+        
         res.json({
             success: true,
-            message: 'Level up simulated successfully',
-            ...results
+            data: result
         });
+
     } catch (error) {
-        console.error('Simulate level up error:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Failed to simulate level up' 
+        console.error('Error awarding affinity experience:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to award affinity experience'
+        });
+    }
+});
+
+// Phase 2.3: Get character affinities
+router.get('/affinities', requireCharacter, async (req, res) => {
+    try {
+        const characterId = req.session.characterId;
+        const affinities = await levelService.getCharacterAffinities(characterId);
+        
+        res.json({
+            success: true,
+            data: affinities
+        });
+
+    } catch (error) {
+        console.error('Error getting affinities:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to get character affinities'
+        });
+    }
+});
+
+// Phase 2.3: Get affinity system information
+router.get('/affinity-info', (req, res) => {
+    try {
+        const affinityInfo = levelService.progression.affinitySystem;
+        
+        res.json({
+            success: true,
+            data: {
+                weapons: Object.keys(affinityInfo.weapons),
+                magic: Object.keys(affinityInfo.magic),
+                bonusThresholds: affinityInfo.bonusThresholds,
+                description: 'Affinity system tracks mastery in weapons and magic schools'
+            }
+        });
+
+    } catch (error) {
+        console.error('Error getting affinity info:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to get affinity information'
         });
     }
 });

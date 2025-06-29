@@ -1,5 +1,6 @@
-// Level Service - Manages character progression and level ups
-// Phase 2.2 Implementation
+
+// Advanced Level Service - Manages character progression and affinity system
+// Phase 2.3 Implementation with leveling-algorithm.js integration
 
 const db = require('./database');
 const ProgressionSystem = require('./progression');
@@ -10,10 +11,7 @@ class LevelService {
     }
 
     /**
-     * Award experience to a character and handle level ups
-     * @param {number} characterId - Character ID
-     * @param {number} experienceAmount - Base experience to award
-     * @returns {object} Level up results
+     * Award experience with advanced progression system
      */
     async awardExperience(characterId, experienceAmount) {
         const client = await db.getClient();
@@ -24,7 +22,8 @@ class LevelService {
             // Get character with race data
             const charResult = await client.query(`
                 SELECT c.*, r.name as race_name, r.str_modifier, r.int_modifier, 
-                       r.vit_modifier, r.dex_modifier, r.wis_modifier, r.experience_bonus
+                       r.vit_modifier, r.dex_modifier, r.wis_modifier, r.experience_bonus,
+                       r.weapon_affinity_bonus, r.magic_affinity_bonus
                 FROM characters c
                 JOIN races r ON c.race_id = r.id
                 WHERE c.id = $1
@@ -41,22 +40,30 @@ class LevelService {
                 vit_modifier: character.vit_modifier,
                 dex_modifier: character.dex_modifier,
                 wis_modifier: character.wis_modifier,
-                experience_bonus: character.experience_bonus || 0
+                experience_bonus: character.experience_bonus || 0,
+                weapon_affinity_bonus: character.weapon_affinity_bonus || 0,
+                magic_affinity_bonus: character.magic_affinity_bonus || 0
             };
 
             // Apply racial experience bonus
             const finalExperience = this.progression.applyExperienceBonus(experienceAmount, raceData);
-            const newTotalExperience = character.experience + finalExperience;
             
-            // PostgreSQL BIGINT maximum value is 9,223,372,036,854,775,807
-            const MAX_BIGINT = 9223372036854775807;
+            // Validate experience amount
+            if (finalExperience <= 0 || finalExperience > 1000000) {
+                throw new Error(`Invalid experience amount: ${finalExperience}`);
+            }
+            
+            const newTotalExperience = BigInt(character.experience) + BigInt(finalExperience);
+            
+            // PostgreSQL BIGINT limit check
+            const MAX_BIGINT = BigInt('9223372036854775807');
             if (newTotalExperience > MAX_BIGINT) {
                 throw new Error(`Experience overflow: ${newTotalExperience} exceeds PostgreSQL BIGINT limit`);
             }
 
-            // Calculate old and new levels
+            // Calculate levels using advanced algorithm
             const oldLevel = character.level;
-            const newLevel = this.progression.getLevelFromExperience(newTotalExperience);
+            const newLevel = this.progression.getLevelFromExperience(Number(newTotalExperience));
 
             let levelUpResults = {
                 experienceGained: finalExperience,
@@ -66,19 +73,21 @@ class LevelService {
                 statGains: null,
                 milestoneRewards: [],
                 newPrestigeMarker: null,
-                contentUnlocks: []
+                contentUnlocks: [],
+                phaseInfo: this.progression.getPhaseForLevel(newLevel)
             };
 
             // Update character experience
             await client.query(
                 'UPDATE characters SET experience = $1, last_active = CURRENT_TIMESTAMP WHERE id = $2',
-                [newTotalExperience, characterId]
+                [newTotalExperience.toString(), characterId]
             );
 
-            // Handle level ups
+            // Handle level ups with advanced system
             if (levelUpResults.leveledUp) {
                 levelUpResults = await this.handleLevelUp(client, characterId, character, raceData, oldLevel, newLevel);
                 levelUpResults.experienceGained = finalExperience;
+                levelUpResults.phaseInfo = this.progression.getPhaseForLevel(newLevel);
             }
 
             await client.query('COMMIT');
@@ -90,6 +99,7 @@ class LevelService {
 
         } catch (error) {
             await client.query('ROLLBACK');
+            console.error('Error awarding experience:', error);
             throw error;
         } finally {
             client.release();
@@ -97,21 +107,14 @@ class LevelService {
     }
 
     /**
-     * Handle level up process including stat gains and rewards
-     * @param {object} client - Database client
-     * @param {number} characterId - Character ID
-     * @param {object} character - Character data
-     * @param {object} raceData - Race modifiers
-     * @param {number} oldLevel - Previous level
-     * @param {number} newLevel - New level
-     * @returns {object} Level up results
+     * Handle level up with advanced stat calculations
      */
     async handleLevelUp(client, characterId, character, raceData, oldLevel, newLevel) {
         let totalStatGains = { str: 0, int: 0, vit: 0, dex: 0, wis: 0 };
         let milestoneRewards = [];
         let contentUnlocks = [];
 
-        // Calculate stat gains for each level gained
+        // Calculate stat gains for each level using advanced system
         for (let level = oldLevel + 1; level <= newLevel; level++) {
             const statGains = this.progression.calculateStatGains(level, raceData);
             
@@ -133,18 +136,16 @@ class LevelService {
                 );
                 
                 if (existingMilestone.rows.length === 0) {
-                    // Award milestone gold and track it
+                    // Award milestone gold
                     await client.query(
                         'UPDATE characters SET gold = gold + $1 WHERE id = $2',
                         [milestone.goldReward, characterId]
                     );
 
                     await client.query(
-                        'INSERT INTO milestone_rewards (character_id, milestone_level, gold_reward, special_reward) VALUES ($1, $2, $3, $4)',
-                        [characterId, level, milestone.goldReward, milestone.specialReward]
+                        'INSERT INTO milestone_rewards (character_id, milestone_level, gold_reward, special_reward, phase_name) VALUES ($1, $2, $3, $4, $5)',
+                        [characterId, level, milestone.goldReward, milestone.specialReward, milestone.phase]
                     );
-                } else {
-                    console.log(`Milestone ${level} already claimed for character ${characterId}`);
                 }
             }
 
@@ -186,13 +187,13 @@ class LevelService {
             newLevel,
             newStats.str, newStats.int, newStats.vit, newStats.dex, newStats.wis,
             newHealthMax, newManaMax,
-            Math.floor(totalStatGains.vit * 10), // Health bonus from VIT gains
-            Math.floor(totalStatGains.int * 5),  // Mana bonus from INT gains
+            Math.floor(totalStatGains.vit * 10),
+            Math.floor(totalStatGains.int * 5),
             totalStatGains.str + totalStatGains.int + totalStatGains.vit + totalStatGains.dex + totalStatGains.wis,
             characterId
         ]);
 
-        // Check and update prestige marker
+        // Update prestige marker
         const newPrestigeMarker = this.progression.getPrestigeMarker(newLevel);
         if (newPrestigeMarker && newPrestigeMarker !== character.prestige_marker) {
             await client.query(
@@ -211,14 +212,13 @@ class LevelService {
             manaGain: Math.floor(totalStatGains.int * 5),
             milestoneRewards,
             newPrestigeMarker,
-            contentUnlocks: [...new Set(contentUnlocks)] // Remove duplicates
+            contentUnlocks: [...new Set(contentUnlocks)],
+            phase: this.progression.getPhaseForLevel(newLevel).name
         };
     }
 
     /**
-     * Get character's current level progression info
-     * @param {number} characterId - Character ID
-     * @returns {object} Progression information
+     * Get progression info with advanced algorithm
      */
     async getProgressionInfo(characterId) {
         const result = await db.query(
@@ -231,24 +231,113 @@ class LevelService {
         }
 
         const character = result.rows[0];
-        const progressInfo = this.progression.getExperienceProgress(character.level, character.experience);
+        const progressInfo = this.progression.getExperienceProgress(character.level, parseInt(character.experience));
         
         return {
             ...progressInfo,
             prestigeMarker: character.prestige_marker,
             nextMilestone: this.getNextMilestone(character.level),
-            contentUnlocks: this.progression.getContentUnlocks(character.level)
+            contentUnlocks: this.progression.getContentUnlocks(character.level),
+            phaseInfo: this.progression.getPhaseForLevel(character.level)
         };
     }
 
     /**
-     * Get next milestone information
-     * @param {number} currentLevel - Current character level
-     * @returns {object} Next milestone info
+     * Phase 2.3: Award affinity experience
+     */
+    async awardAffinityExperience(characterId, affinityType, category, amount = 1) {
+        const client = await db.getClient();
+        
+        try {
+            await client.query('BEGIN');
+
+            // Get character and race data
+            const charResult = await client.query(`
+                SELECT c.level, r.weapon_affinity_bonus, r.magic_affinity_bonus
+                FROM characters c
+                JOIN races r ON c.race_id = r.id
+                WHERE c.id = $1
+            `, [characterId]);
+
+            if (charResult.rows.length === 0) {
+                throw new Error('Character not found');
+            }
+
+            const character = charResult.rows[0];
+            const raceData = {
+                weapon_affinity_bonus: character.weapon_affinity_bonus || 0,
+                magic_affinity_bonus: character.magic_affinity_bonus || 0
+            };
+
+            // Calculate affinity gain
+            const affinityGain = this.progression.calculateAffinityGain(
+                affinityType, category, character.level, raceData
+            ) * amount;
+
+            // Update or insert affinity record
+            await client.query(`
+                INSERT INTO character_affinities (character_id, affinity_type, category, level, total_experience)
+                VALUES ($1, $2, $3, $4, $4)
+                ON CONFLICT (character_id, affinity_type, category)
+                DO UPDATE SET 
+                    total_experience = character_affinities.total_experience + $4,
+                    level = LEAST(100, character_affinities.level + $4),
+                    last_used = CURRENT_TIMESTAMP
+            `, [characterId, affinityType, category, affinityGain]);
+
+            await client.query('COMMIT');
+
+            return {
+                affinityType,
+                category,
+                gainAmount: affinityGain,
+                success: true
+            };
+
+        } catch (error) {
+            await client.query('ROLLBACK');
+            console.error('Error awarding affinity experience:', error);
+            throw error;
+        } finally {
+            client.release();
+        }
+    }
+
+    /**
+     * Get character affinities
+     */
+    async getCharacterAffinities(characterId) {
+        const result = await db.query(`
+            SELECT affinity_type, category, level, total_experience, last_used
+            FROM character_affinities
+            WHERE character_id = $1
+            ORDER BY category, affinity_type
+        `, [characterId]);
+
+        const affinities = {
+            weapons: {},
+            magic: {}
+        };
+
+        result.rows.forEach(row => {
+            affinities[row.category][row.affinity_type] = {
+                level: parseFloat(row.level),
+                totalExperience: parseFloat(row.total_experience),
+                lastUsed: row.last_used,
+                damageBonus: this.progression.getAffinityDamageBonus(row.level),
+                specialChance: this.progression.getAffinitySpecialChance(row.level)
+            };
+        });
+
+        return affinities;
+    }
+
+    /**
+     * Get next milestone with advanced progression
      */
     getNextMilestone(currentLevel) {
         const nextMilestone = Math.ceil(currentLevel / this.progression.milestoneInterval) * this.progression.milestoneInterval;
-        if (nextMilestone === currentLevel) {
+        if (nextMilestone === currentLevel && currentLevel > 0) {
             return this.progression.getMilestoneReward(currentLevel);
         }
         return {
@@ -259,8 +348,7 @@ class LevelService {
     }
 
     /**
-     * Update leaderboard cache for efficient ranking
-     * @param {number} characterId - Character ID
+     * Update leaderboard cache
      */
     async updateLeaderboardCache(characterId) {
         try {
@@ -292,9 +380,7 @@ class LevelService {
     }
 
     /**
-     * Get top level leaderboard
-     * @param {number} limit - Number of entries to return
-     * @returns {array} Leaderboard entries
+     * Get leaderboard with phase information
      */
     async getLeaderboard(limit = 50) {
         const result = await db.query(`
@@ -312,14 +398,13 @@ class LevelService {
             level: row.level,
             experience: row.experience,
             prestigeMarker: row.prestige_marker,
-            prestigeDisplay: this.getPrestigeDisplay(row.prestige_marker)
+            prestigeDisplay: this.getPrestigeDisplay(row.prestige_marker),
+            phase: this.progression.getPhaseForLevel(row.level).name
         }));
     }
 
     /**
      * Get prestige display symbol
-     * @param {string} prestigeMarker - Prestige marker name
-     * @returns {string} Display symbol
      */
     getPrestigeDisplay(prestigeMarker) {
         const symbols = {
@@ -334,13 +419,11 @@ class LevelService {
     }
 
     /**
-     * Get milestone rewards for a character
-     * @param {number} characterId - Character ID
-     * @returns {array} Milestone rewards
+     * Get milestone rewards
      */
     async getMilestoneRewards(characterId) {
         const result = await db.query(`
-            SELECT milestone_level, gold_reward, special_reward, claimed_at
+            SELECT milestone_level, gold_reward, special_reward, phase_name, claimed_at
             FROM milestone_rewards
             WHERE character_id = $1
             ORDER BY milestone_level DESC
