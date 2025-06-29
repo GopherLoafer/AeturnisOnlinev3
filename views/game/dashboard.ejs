@@ -35,10 +35,11 @@
                 "bottom-panel bottom-panel bottom-panel";
             grid-template-columns: 320px 1fr 340px;
             grid-template-rows: 1fr 240px;
-            height: 100vh;
+            height: calc(100vh - 40px);
             gap: 20px;
             background: transparent;
             padding: 20px;
+            overflow: hidden;
         }
 
         /* Header */
@@ -1698,7 +1699,11 @@
             messageElement.className = 'game-text';
             messageElement.innerHTML = message;
             gameOutput.appendChild(messageElement);
-            gameOutput.scrollTop = gameOutput.scrollHeight;
+            
+            // Scroll only the game output container, not the page
+            setTimeout(() => {
+                gameOutput.scrollTop = gameOutput.scrollHeight;
+            }, 0);
             
             // Keep only last 50 messages for performance
             while (gameOutput.children.length > 50) {
@@ -1837,6 +1842,23 @@
                 }
             }
         }
+
+        // Prevent auto-scrolling on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ensure page starts at top
+            window.scrollTo(0, 0);
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+            
+            // Disable any automatic scrolling behavior
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+        });
+
+        // Prevent any scroll events from bubbling up to the window
+        document.getElementById('game-output').addEventListener('scroll', function(e) {
+            e.stopPropagation();
+        });
     </script>
 </body>
 </html>
