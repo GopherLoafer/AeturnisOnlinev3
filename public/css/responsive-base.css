@@ -514,3 +514,53 @@ img[data-src].loaded {
         opacity: 1;
     }
 }
+
+/* Step 8: Chat Resize Indicator Styles */
+/* Chat resize indicator */
+.chat-collapse-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    cursor: ns-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    z-index: 20;
+}
+
+.indicator-line {
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    transition: all 0.2s ease;
+}
+
+.indicator-text {
+    position: absolute;
+    top: 100%;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.chat-collapse-indicator:hover .indicator-line {
+    background: rgba(255, 255, 255, 0.6);
+    width: 60px;
+}
+
+.chat-collapse-indicator:hover .indicator-text {
+    opacity: 1;
+}
+
+/* Hide resize handle on mobile */
+@media (max-width: 768px) {
+    .chat-collapse-indicator {
+        display: none;
+    }
+}
