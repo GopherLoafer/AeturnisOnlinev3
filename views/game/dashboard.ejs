@@ -264,6 +264,16 @@
             border-radius: 8px;
             padding: 0;
             backdrop-filter: blur(10px);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
         }
 
         .stat-bars {
@@ -373,10 +383,29 @@
 
         .equipment-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-areas:
+                ". helmet ."
+                "gloves chest shield"
+                ". legs weapon"
+                ". boots ."
+                "ring1 necklace ring2";
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 8px;
             margin-bottom: 12px;
+            justify-items: center;
+            padding: 10px;
         }
+
+        .equipment-slot.helmet { grid-area: helmet; }
+        .equipment-slot.gloves { grid-area: gloves; }
+        .equipment-slot.chest { grid-area: chest; }
+        .equipment-slot.shield { grid-area: shield; }
+        .equipment-slot.legs { grid-area: legs; }
+        .equipment-slot.weapon { grid-area: weapon; }
+        .equipment-slot.boots { grid-area: boots; }
+        .equipment-slot.ring1 { grid-area: ring1; }
+        .equipment-slot.ring2 { grid-area: ring2; }
+        .equipment-slot.necklace { grid-area: necklace; }
 
         .equipment-slot {
             aspect-ratio: 1;
@@ -1560,15 +1589,16 @@
                     <div class="equipment-section">
                         <h3>Equipment</h3>
                         <div class="equipment-grid">
-                            <div class="equipment-slot equipped">⛑️</div>
-                            <div class="equipment-slot equipped">🛡️</div>
-                            <div class="equipment-slot equipped">👖</div>
-                            <div class="equipment-slot equipped">⚔️</div>
-                            <div class="equipment-slot">🛡️</div>
-                            <div class="equipment-slot equipped">👢</div>
-                            <div class="equipment-slot equipped">💍</div>
-                            <div class="equipment-slot equipped">💍</div>
-                            <div class="equipment-slot">📿</div>
+                            <div class="equipment-slot helmet equipped" title="Helmet">⛑️</div>
+                            <div class="equipment-slot gloves equipped" title="Gloves">🧤</div>
+                            <div class="equipment-slot chest equipped" title="Chest Armor">🛡️</div>
+                            <div class="equipment-slot shield" title="Shield">🛡️</div>
+                            <div class="equipment-slot legs equipped" title="Leg Armor">👖</div>
+                            <div class="equipment-slot weapon equipped" title="Weapon">⚔️</div>
+                            <div class="equipment-slot boots equipped" title="Boots">👢</div>
+                            <div class="equipment-slot ring1 equipped" title="Ring 1">💍</div>
+                            <div class="equipment-slot necklace" title="Necklace">📿</div>
+                            <div class="equipment-slot ring2 equipped" title="Ring 2">💍</div>
                         </div>
                     </div>
                 </div>
