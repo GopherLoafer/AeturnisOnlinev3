@@ -1,0 +1,65 @@
+{
+  "name": "Aeturnis Online",
+  "short_name": "Aeturnis",
+  "description": "A modern text-based MMORPG experience",
+  "start_url": "/game/dashboard",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f1419",
+  "theme_color": "#10b981",
+  "categories": ["games", "entertainment"],
+  "dir": "ltr",
+  "lang": "en-US",
+  "icons": [
+    {
+      "src": "/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/images/icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile gameplay"
+    },
+    {
+      "src": "/images/screenshot-desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Desktop gameplay"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Quick Battle",
+      "short_name": "Battle",
+      "description": "Jump into combat",
+      "url": "/game/dashboard?action=fight",
+      "icons": [{"src": "/images/battle-icon.png", "sizes": "96x96"}]
+    },
+    {
+      "name": "Inventory",
+      "short_name": "Items",
+      "description": "Manage your inventory",
+      "url": "/game/dashboard?panel=inventory",
+      "icons": [{"src": "/images/inventory-icon.png", "sizes": "96x96"}]
+    }
+  ]
+}
