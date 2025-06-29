@@ -13,12 +13,14 @@
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: #0a0a0a;
-            color: #e0e0e0;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0f0a 0%, #151a15 100%);
+            color: #e0f4e4;
             height: 100vh;
             overflow: hidden;
             font-size: 14px;
+            line-height: 1.5;
+            text-rendering: optimizeLegibility;
         }
 
         /* Main Layout */
@@ -27,12 +29,12 @@
             grid-template-areas:
                 "left-panel main right-panel"
                 "bottom-panel bottom-panel bottom-panel";
-            grid-template-columns: 280px 1fr 280px;
-            grid-template-rows: 1fr 200px;
+            grid-template-columns: 300px 1fr 320px;
+            grid-template-rows: 1fr 220px;
             height: 100vh;
-            gap: 2px;
-            background: #1a1a1a;
-            padding: 2px;
+            gap: 12px;
+            background: #0a0f0a;
+            padding: 12px;
         }
 
         /* Header */
@@ -104,10 +106,19 @@
         /* Left Panel - Character Info */
         .left-panel {
             grid-area: left-panel;
-            background: #1a1a1a;
-            border: 1px solid #333;
-            padding: 15px;
+            background: linear-gradient(145deg, #141a14 0%, #0f160f 100%);
+            border: 1px solid rgba(0, 255, 65, 0.15);
+            border-radius: 12px;
+            padding: 20px;
             overflow-y: auto;
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            transition: border-color 0.3s ease;
+        }
+
+        .left-panel:hover {
+            border-color: rgba(0, 255, 65, 0.25);
         }
 
         .character-info {
@@ -217,36 +228,69 @@
         .equipment-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            gap: 12px;
             margin-bottom: 20px;
         }
 
         .equipment-slot {
             aspect-ratio: 1;
-            background: #2a2a2a;
-            border: 2px solid #444;
-            border-radius: 8px;
+            background: linear-gradient(145deg, #1a1f1a 0%, #141914 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
-            font-size: 12px;
-            color: #666;
+            font-size: 16px;
+            color: #8fa58f;
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.03);
+        }
+
+        .equipment-slot::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .equipment-slot:hover {
-            border-color: #666;
-            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            color: #b8d4b8;
+        }
+
+        .equipment-slot:hover::before {
+            opacity: 1;
         }
 
         .equipment-slot.equipped {
-            border-color: #00ff00;
-            background: radial-gradient(ellipse at center, #003300, #2a2a2a);
-            color: #fff;
-            font-size: 16px;
+            border-color: rgba(0, 255, 65, 0.4);
+            background: linear-gradient(145deg, #0f1f0f 0%, #0a1a0a 100%);
+            color: #00ff41;
+            font-size: 20px;
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.2),
+                0 0 20px rgba(0, 255, 65, 0.15),
+                inset 0 1px 0 rgba(0, 255, 65, 0.1);
+        }
+
+        .equipment-slot.equipped:hover {
+            border-color: #00ff41;
+            box-shadow: 
+                0 6px 20px rgba(0, 0, 0, 0.3),
+                0 0 30px rgba(0, 255, 65, 0.25);
+            transform: translateY(-3px);
         }
 
         /* Affinity Displays */
@@ -286,11 +330,15 @@
         /* Main Panel */
         .main-panel {
             grid-area: main;
-            background: #0f0f0f;
-            border: 1px solid #333;
+            background: linear-gradient(145deg, #0c120c 0%, #0a0f0a 100%);
+            border: 1px solid rgba(0, 255, 65, 0.1);
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.02);
         }
 
         .game-output {
@@ -342,30 +390,61 @@
         }
 
         .action-btn {
-            background: linear-gradient(to bottom, #3a3a3a, #2a2a2a);
-            border: 1px solid #555;
-            color: #fff;
-            padding: 12px;
-            border-radius: 6px;
+            background: linear-gradient(145deg, #1f241f 0%, #1a1f1a 100%);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            color: #e0f4e4;
+            padding: 14px 18px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
-            font-size: 12px;
-            font-weight: bold;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 13px;
+            font-weight: 600;
             text-transform: uppercase;
+            letter-spacing: 0.8px;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(5px);
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s;
         }
 
         .action-btn:hover:not(:disabled) {
-            background: linear-gradient(to bottom, #4a4a4a, #3a3a3a);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            background: linear-gradient(145deg, #2a2f2a 0%, #1f241f 100%);
+            border-color: rgba(0, 255, 65, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(0, 255, 65, 0.1);
+            color: #fff;
+        }
+
+        .action-btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .action-btn:active:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
         }
 
         .action-btn:disabled {
-            opacity: 0.5;
+            opacity: 0.3;
             cursor: not-allowed;
-            background: #222;
+            background: #0f140f;
+            border-color: rgba(255, 255, 255, 0.05);
+            transform: none;
         }
 
         .action-btn.movement { border-color: #66ff66; color: #66ff66; }
@@ -375,11 +454,20 @@
         /* Right Panel */
         .right-panel {
             grid-area: right-panel;
-            background: #1a1a1a;
-            border: 1px solid #333;
+            background: linear-gradient(145deg, #141a14 0%, #0f160f 100%);
+            border: 1px solid rgba(0, 255, 65, 0.15);
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            transition: border-color 0.3s ease;
+        }
+
+        .right-panel:hover {
+            border-color: rgba(0, 255, 65, 0.25);
         }
 
         .panel-tabs {
@@ -390,25 +478,47 @@
 
         .tab {
             flex: 1;
-            padding: 12px 8px;
+            padding: 14px 12px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
-            font-size: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 13px;
             background: transparent;
             border: none;
-            color: #666;
+            color: #8fa58f;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            position: relative;
         }
 
         .tab:hover {
-            background: #1a1a1a;
-            color: #ccc;
+            background: rgba(0, 255, 65, 0.08);
+            color: #b8d4b8;
+            transform: translateY(-1px);
         }
 
         .tab.active {
-            background: #2a2a2a;
-            border-bottom: 2px solid #00ff00;
-            color: #00ff00;
+            background: rgba(0, 255, 65, 0.12);
+            color: #00ff41;
+            box-shadow: 
+                inset 0 -2px 0 #00ff41,
+                0 2px 8px rgba(0, 255, 65, 0.15);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff41, transparent);
+            animation: tabPulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes tabPulse {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
         }
 
         .tab-content {
@@ -537,10 +647,14 @@
         /* Bottom Panel - Chat */
         .bottom-panel {
             grid-area: bottom-panel;
-            background: #1a1a1a;
-            border: 1px solid #333;
+            background: linear-gradient(145deg, #141a14 0%, #0f160f 100%);
+            border: 1px solid rgba(0, 255, 65, 0.15);
+            border-radius: 12px 12px 0 0;
             display: flex;
             flex-direction: column;
+            box-shadow: 
+                0 -4px 20px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.03);
         }
 
         .chat-tabs {
