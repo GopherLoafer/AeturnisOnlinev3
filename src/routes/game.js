@@ -253,4 +253,36 @@ router.post('/character-select', async (req, res) => {
   }
 });
 
+// API endpoint for game state
+router.get('/api/game/state', requireCharacter, async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT c.*, r.name as race_name, r.str_modifier, r.int_modifier, 
+             r.vit_modifier, r.dex_modifier, r.wis_modifier,
+             r.experience_bonus, r.special_ability
+      FROM characters c
+      JOIN races r ON c.race_id = r.id
+      WHERE c.id = $1 AND c.user_id = $2
+    `, [req.session.characterId, req.session.userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Character not found' });
+    }
+
+    const character = result.rows[0];
+    const progressionInfo = await levelService.getProgressionInfo(character.id);
+
+    res.json({
+      success: true,
+      character: {
+        ...character,
+        experience_to_next: progressionInfo.experienceToNext
+      }
+    });
+  } catch (error) {
+    console.error('Game state API error:', error);
+    res.status(500).json({ success: false, error: 'Failed to get game state' });
+  }
+});
+
 module.exports = router;

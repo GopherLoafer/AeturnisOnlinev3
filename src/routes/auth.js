@@ -176,4 +176,16 @@ router.post('/logout', (req, res) => {
   });
 });
 
+// Logout
+router.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Session destroy error:', err);
+      return res.redirect('/game/dashboard');
+    }
+    res.clearCookie('connect.sid');
+    res.redirect('/');
+  });
+});
+
 module.exports = router;

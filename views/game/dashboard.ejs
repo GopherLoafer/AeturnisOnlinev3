@@ -857,7 +857,7 @@
 
             <div class="affinity-section">
                 <h4>Weapon Affinities</h4>
-                <% weaponAffinities.forEach(affinity => { %>
+                <% weaponAffinities.forEach(function(affinity) { %>
                 <div class="affinity-item">
                     <span class="affinity-name"><%= affinity.weapon_type %></span>
                     <span class="affinity-value"><%= parseFloat(affinity.affinity_percentage).toFixed(1) %>%</span>
@@ -865,7 +865,7 @@
                 <% }); %>
                 
                 <h4 style="margin-top: 15px;">Magic Affinities</h4>
-                <% magicAffinities.forEach(affinity => { %>
+                <% magicAffinities.forEach(function(affinity) { %>
                 <div class="affinity-item">
                     <span class="affinity-name"><%= affinity.magic_school %></span>
                     <span class="affinity-value"><%= parseFloat(affinity.affinity_percentage).toFixed(1) %>%</span>

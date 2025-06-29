@@ -6,6 +6,8 @@
 
 const { query } = require('./database');
 
+const { query } = require('./database');
+
 class AffinityService {
   constructor() {
     // Weapon types with progression rates
@@ -388,5 +390,7 @@ class AffinityService {
     }
   }
 }
+
+module.exports = new AffinityService();
 
 module.exports = new AffinityService();
