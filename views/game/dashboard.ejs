@@ -2089,6 +2089,18 @@
                 .catch(err => console.error('Service Worker registration failed:', err));
         });
     }
+
+    // Prevent zoom on input focus (iOS fix)
+    document.addEventListener('touchstart', function(e) {
+        if (e.touches.length > 1) {
+            e.preventDefault();
+        }
+    });
+
+    // Additional iOS viewport fixes
+    document.addEventListener('gesturestart', function(e) {
+        e.preventDefault();
+    });
     </script>
 </head>
 <body>
@@ -2443,8 +2455,151 @@
                     <div class="affinity-section">
                         <h4>Weapon Mastery</h4>
                         <div class="affinity-grid">
-                            <% weaponAffinities.forEach(affinity => { %>
-                            <div class="affinity-item">
+                            <% weaponAffinities.forEach(affinity => { %>                            <div class="affinity-item">
                                 <div class="affinity-icon weapon-<%= affinity.weapon_type %>">⚔️</div>
                                 <span class="affinity-name"><%= affinity.weapon_type.charAt(0).toUpperCase() + affinity.weapon_type.slice(1) %></span>
                                 <span class="affinity-value"><%= parseFloat(affinity.affinity_percentage).toFixed(1) %>%</span>
+                            </div>
+                            <% }); %>
+                        </div>
+                        <hr>
+                        <h4>Magic Affinities</h4>
+                        <div class="affinity-grid">
+                            <% magicAffinities.forEach(affinity => { %>
+                                <div class="affinity-item">
+                                    <div class="affinity-icon magic-<%= affinity.magic_type %>">✨</div>
+                                    <span class="affinity-name"><%= affinity.magic_type.charAt(0).toUpperCase() + affinity.magic_type.slice(1) %></span>
+                                    <span class="affinity-value"><%= parseFloat(affinity.affinity_percentage).toFixed(1) %>%</span>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Abilities Tab -->
+                <div id="abilities" class="tab-content">
+                    <% if (raceAbilities && raceAbilities.length > 0) { %>
+                        <% raceAbilities.forEach(ability => { %>
+                            <div class="ability-item">
+                                <div class="ability-header">
+                                    <span class="ability-name"><%= ability.name %></span>
+                                    <span class="ability-type active"><%= ability.type %></span>
+                                </div>
+                                <div class="ability-description"><%= ability.description %></div>
+                                <button class="ability-btn" onclick="useAbility('<%= ability.id %>')"
+                                    <% if (character.mana_current < ability.mana_cost) { %>disabled<% } %>>
+                                    Use (<%= ability.mana_cost %> Mana)
+                                </button>
+                            </div>
+                        <% }); %>
+                    <% } else if (loading) { %>
+                        <p class="loading">Loading abilities...</p>
+                    <% } else if (error) { %>
+                        <p class="error">Failed to load abilities.</p>
+                    <% } else { %>
+                        <p class="no-abilities">No abilities available for your race.</p>
+                    <% } %>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Chat Panel -->
+        <div class="chat-panel">
+            <div class="chat-header">
+                <span class="chat-title">Game Chat</span>
+                <span class="chat-expand-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </span>
+            </div>
+
+            <div class="chat-tabs">
+                <button class="chat-tab active" onclick="switchChatTab('global')">Global</button>
+                <button class="chat-tab" onclick="switchChatTab('guild')">Guild</button>
+                <button class="chat-tab" onclick="switchChatTab('party')">Party</button>
+                <button class="chat-tab" onclick="switchChatTab('system')">System</button>
+            </div>
+
+            <div class="chat-messages">
+                <div class="chat-message">
+                    <span class="chat-name global">Bard</span>: Hello world!
+                </div>
+                <div class="chat-message">
+                    <span class="chat-name guild">Knight</span>: Anyone need help with a quest?
+                </div>
+                <div class="chat-message">
+                    <span class="chat-name party">Mage</span>: I'm ready to go!
+                </div>
+                <div class="chat-message">
+                    <span class="chat-name system">System</span>: Welcome to Aeturnis Online!
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" placeholder="Type your message...">
+                <button class="chat-send">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Time display
+        function updateServerTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('server-time').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        setInterval(updateServerTime, 1000);
+
+        // Tab Switching
+        function switchTab(tabId) {
+            const tabs = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            document.querySelector(`.tab-button[onclick="switchTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function switchLeftTab(tabId) {
+            const tabs = document.querySelectorAll('.left-tab-button');
+            const tabContents = document.querySelectorAll('.left-tab-content');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            document.querySelector(`.left-tab-button[onclick="switchLeftTab('${tabId}')"]`).classList.add('active');
+            document.getElementById('left-' + tabId).classList.add('active');
+        }
+
+        function switchChatTab(tabId) {
+            const tabs = document.querySelectorAll('.chat-tab');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.chat-tab[onclick="switchChatTab('${tabId}')"]`).classList.add('active');
+        }
+
+        // Toggle settings dropdown visibility
+        function toggleSettingsDropdown() {
+            document.getElementById('settings-dropdown').classList.toggle('show');
+        }
+
+        // Close the dropdown if the user clicks outside of it
+        window.onclick = function(event) {
+            if (!event.target.matches('.settings-btn')) {
+                var dropdowns = document.getElementsByClassName("dropdown-menu");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
