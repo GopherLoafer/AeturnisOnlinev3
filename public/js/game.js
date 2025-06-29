@@ -268,7 +268,7 @@ function updateExperienceBar(expData) {
         expBar.style.width = `${expPercent}%`;
         
         if (expText) {
-            expText.textContent = `${expPercent}%`;
+            expText.textContent = `${formatNumber(expData.current)}/${formatNumber(expData.required)}`;
         }
         
         if (expLabel) {
@@ -456,19 +456,8 @@ function addProgressionMessage(message, type = 'info') {
 
 function initializeProgressionButtons() {
     console.log('Initializing progression buttons');
-    
-    // Add click handlers for experience gain buttons
-    const expButtons = document.querySelectorAll('[onclick*="gainExperience"]');
-    expButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const amount = this.textContent.match(/\d+/)?.[0];
-            if (amount) {
-                gainExperience(amount);
-            }
-        });
-    });
-    
+    // Buttons already have onclick handlers in HTML template
+    // No additional event listeners needed to prevent double calls
     console.log('Progression buttons initialized');
 }
 
