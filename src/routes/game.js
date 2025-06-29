@@ -58,6 +58,19 @@ router.get('/dashboard', async (req, res) => {
       [character.id]
     );
 
+    // Get race abilities
+    const raceAbilities = await db.query(`
+      SELECT ra.*, 
+             CASE WHEN cac.cooldown_expires > NOW() 
+                  THEN EXTRACT(EPOCH FROM (cac.cooldown_expires - NOW()))::INTEGER 
+                  ELSE 0 END as cooldown_remaining
+      FROM race_abilities ra
+      JOIN characters c ON c.race_id = ra.race_id
+      LEFT JOIN character_ability_cooldowns cac ON cac.character_id = c.id AND cac.ability_name = ra.ability_name
+      WHERE c.id = $1
+      ORDER BY ra.ability_type, ra.ability_name
+    `, [character.id]);
+
     // Get progression information
     const progressionInfo = await levelService.getProgressionInfo(character.id);
 
@@ -66,6 +79,7 @@ router.get('/dashboard', async (req, res) => {
       character,
       weaponAffinities: weaponAffinities.rows,
       magicAffinities: magicAffinities.rows,
+      raceAbilities: raceAbilities.rows,
       progression: progressionInfo,
       user: req.user
     });
