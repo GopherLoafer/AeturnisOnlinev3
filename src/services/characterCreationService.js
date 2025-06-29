@@ -164,8 +164,8 @@ class CharacterCreationService {
       
       return backgrounds.rows.map(bg => ({
         ...bg,
-        starting_items: JSON.parse(bg.starting_items || '[]'),
-        stat_bonuses: JSON.parse(bg.stat_bonuses || '{}')
+        starting_items: bg.starting_items || [],
+        stat_bonuses: bg.stat_bonuses || {}
       }));
     } catch (error) {
       console.error('Error getting backgrounds:', error);
