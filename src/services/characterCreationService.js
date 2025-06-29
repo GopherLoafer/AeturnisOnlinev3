@@ -250,7 +250,7 @@ class CharacterCreationService {
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW(), NOW())
         RETURNING id
       `, [
-        userId, sessionData.raceId, sessionData.name, 1, 0,
+        userId, sessionData.raceId, sessionData.name, 1, 25,
         stats.str, stats.int, stats.vit, stats.dex, stats.wis,
         health, health, mana, mana,
         startingGold, race.starting_zone

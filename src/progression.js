@@ -237,8 +237,6 @@ class ProgressionSystem {
         const expNeededForNext = expForNextLevel - expForCurrentLevel;
         const remainingExp = expForNextLevel - currentExperience;
         
-        // Debug logging (removed for performance)
-        
         return {
             currentLevel,
             currentLevelProgress: Math.max(0, currentLevelProgress),
