@@ -33,9 +33,9 @@
             grid-template-areas:
                 "header header header"
                 "left-panel main right-panel"
-                "bottom-panel bottom-panel bottom-panel";
+                "chat-panel chat-panel chat-panel";
             grid-template-columns: 320px 1fr 340px;
-            grid-template-rows: 60px 1fr 240px;
+            grid-template-rows: 60px 1fr 200px;
             height: calc(100vh - 40px);
             gap: 20px;
             background: transparent;
@@ -984,8 +984,8 @@
         }
 
         /* Bottom Panel - Chat */
-        .bottom-panel {
-            grid-area: bottom-panel;
+        .chat-panel {
+            grid-area: chat-panel;
             background: 
                 linear-gradient(145deg, rgba(15, 20, 25, 0.95) 0%, rgba(20, 25, 35, 0.95) 100%);
             border: 1px solid rgba(236, 72, 153, 0.3);
@@ -1104,7 +1104,7 @@
                 grid-template-areas:
                     "header"
                     "main"
-                    "bottom-panel";
+                    "chat-panel";
                 grid-template-columns: 1fr;
                 grid-template-rows: 60px 1fr 150px;
             }
@@ -1227,8 +1227,8 @@
 
         .map-grid {
             display: grid;
-            grid-template-columns: repeat(9, 1fr);
-            grid-template-rows: repeat(9, 1fr);
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(6, 1fr);
             height: calc(100% - 26px);
             padding: 6px;
             gap: 1px;
@@ -1631,94 +1631,52 @@
                     🌋 <%= character.location_zone.replace('_', ' ').toUpperCase() %>
                 </div>
                 <div class="map-grid">
+                    <!-- Row 1 -->
                     <div class="map-cell"></div>
                     <div class="map-cell npc">🏪</div>
                     <div class="map-cell"></div>
-                    <div class="map-cell"></div>
                     <div class="map-cell enemy">!</div>
                     <div class="map-cell"></div>
                     <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
                     
+                    <!-- Row 2 -->
                     <div class="map-cell"></div>
                     <div class="map-cell"></div>
-                    <div class="map-cell player">P</div>
+                    <div class="map-cell" onclick="move('north')">↑</div>
                     <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell enemy">!</div>
-                    <div class="map-cell"></div>
-                    
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell current" onclick="move('north')">@</div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell" onclick="move('west')"></div>
                     <div class="map-cell treasure">💎</div>
-                    <div class="map-cell" onclick="move('east')"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
                     <div class="map-cell"></div>
                     
+                    <!-- Row 3 -->
+                    <div class="map-cell"></div>
+                    <div class="map-cell" onclick="move('west')">←</div>
+                    <div class="map-cell current">@</div>
+                    <div class="map-cell" onclick="move('east')">→</div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell water">🌊</div>
+                    
+                    <!-- Row 4 -->
                     <div class="map-cell"></div>
                     <div class="map-cell"></div>
-                    <div class="map-cell" onclick="move('south')"></div>
+                    <div class="map-cell" onclick="move('south')">↓</div>
                     <div class="map-cell"></div>
+                    <div class="map-cell obstacle">🗿</div>
                     <div class="map-cell"></div>
-                    <div class="map-cell"></div>
+                    
+                    <!-- Row 5 -->
                     <div class="map-cell danger">⚠️</div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
                     <div class="map-cell"></div>
                     <div class="map-cell"></div>
                     <div class="map-cell exit">🚪</div>
                     <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    
-                    <div class="map-cell"></div>
-                    <div class="map-cell obstacle">🗿</div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell water">🌊</div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
                     <div class="map-cell resource">🌳</div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
                     
-                    <div class="map-cell"></div>
+                    <!-- Row 6 -->
                     <div class="map-cell"></div>
                     <div class="map-cell hidden">?</div>
                     <div class="map-cell"></div>
                     <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
-                    <div class="map-cell"></div>
+                    <div class="map-cell player">P</div>
                     <div class="map-cell"></div>
                 </div>
             </div>
@@ -1833,7 +1791,7 @@
             </div>
         </aside>
         <!-- Bottom Panel - Chat -->
-        <section class="bottom-panel">
+        <section class="chat-panel">
             <div class="chat-tabs">
                 <button class="chat-tab active" data-channel="all">All</button>
                 <button class="chat-tab" data-channel="global">Global</button>
