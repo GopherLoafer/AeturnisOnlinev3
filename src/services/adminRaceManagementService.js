@@ -66,7 +66,7 @@ class AdminRaceManagementService {
         SELECT 
           r.name,
           COUNT(c.id) as count,
-          ROUND((COUNT(c.id)::float / NULLIF((SELECT COUNT(*) FROM characters), 0)) * 100, 2) as percentage
+          ROUND((COUNT(c.id)::numeric / NULLIF((SELECT COUNT(*) FROM characters), 0)) * 100, 2) as percentage
         FROM races r
         LEFT JOIN characters c ON r.id = c.race_id
         GROUP BY r.id, r.name

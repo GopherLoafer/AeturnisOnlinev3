@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Chat Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #0f1419 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #10b981;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .admin-nav a {
+            padding: 10px 20px;
+            background: rgba(20, 25, 35, 0.8);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 8px;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .admin-nav a:hover {
+            border-color: rgba(59, 130, 246, 0.6);
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .chat-monitor {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            height: 600px;
+        }
+
+        .chat-messages {
+            background: rgba(20, 25, 35, 0.8);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .chat-controls {
+            background: rgba(20, 25, 35, 0.8);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .message-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid #10b981;
+            border-radius: 8px;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .message-channel {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .message-author {
+            color: #3b82f6;
+            font-weight: bold;
+        }
+
+        .message-text {
+            color: #e2e8f0;
+        }
+
+        .control-section {
+            margin-bottom: 20px;
+        }
+
+        .control-section h3 {
+            color: #10b981;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .channel-filter {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .channel-filter label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .channel-filter input[type="checkbox"] {
+            accent-color: #10b981;
+        }
+
+        .stats-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .stat-value {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #94a3b8;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <h1>Chat Monitor</h1>
+        
+        <nav class="admin-nav">
+            <a href="/admin">Dashboard</a>
+            <a href="/admin/users">Users</a>
+            <a href="/admin/characters">Characters</a>
+            <a href="/admin/race-management/race-statistics">Race Management</a>
+            <a href="/admin/chat">Chat Monitor</a>
+            <a href="/admin/actions">Action Log</a>
+            <a href="/game/dashboard">Back to Game</a>
+        </nav>
+
+        <div class="chat-monitor">
+            <div class="chat-messages" id="chat-messages">
+                <div class="loading">Loading chat messages...</div>
+            </div>
+
+            <div class="chat-controls">
+                <div class="control-section">
+                    <h3>Chat Statistics</h3>
+                    <div class="stats-box" id="chat-stats">
+                        <div class="stat-item">
+                            <span>Total Messages:</span>
+                            <span class="stat-value" id="total-messages">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Active Users:</span>
+                            <span class="stat-value" id="active-users">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Recent Activity:</span>
+                            <span class="stat-value" id="recent-activity">0/min</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>Channel Filters</h3>
+                    <div class="channel-filter">
+                        <label>
+                            <input type="checkbox" value="global" checked> Global Chat
+                        </label>
+                        <label>
+                            <input type="checkbox" value="guild" checked> Guild Chat
+                        </label>
+                        <label>
+                            <input type="checkbox" value="party" checked> Party Chat
+                        </label>
+                        <label>
+                            <input type="checkbox" value="system" checked> System Messages
+                        </label>
+                    </div>
+                </div>
+
+                <button class="refresh-btn" onclick="loadChatMessages()">Refresh Messages</button>
+            </div>
+        </div>
+
+        <script>
+            let allMessages = [];
+            
+            function getChannelColor(channel) {
+                const colors = {
+                    global: '#ffffff',
+                    guild: '#10b981',
+                    party: '#3b82f6',
+                    system: '#fbbf24'
+                };
+                return colors[channel] || '#94a3b8';
+            }
+
+            function formatTimestamp(timestamp) {
+                return new Date(timestamp).toLocaleTimeString();
+            }
+
+            function renderMessages(messages) {
+                const container = document.getElementById('chat-messages');
+                
+                if (messages.length === 0) {
+                    container.innerHTML = '<div class="loading">No messages found</div>';
+                    return;
+                }
+
+                const messageHTML = messages.map(message => `
+                    <div class="message-item">
+                        <div class="message-header">
+                            <span class="message-channel" style="color: ${getChannelColor(message.channel)}">
+                                [${message.channel.toUpperCase()}]
+                            </span>
+                            <span>${formatTimestamp(message.timestamp)}</span>
+                        </div>
+                        <div style="margin-bottom: 5px;">
+                            <span class="message-author">${message.character_name || 'System'}</span>
+                        </div>
+                        <div class="message-text">${message.message}</div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = messageHTML;
+                container.scrollTop = container.scrollHeight;
+            }
+
+            function updateStats(messages) {
+                document.getElementById('total-messages').textContent = messages.length;
+                
+                const uniqueUsers = new Set(messages.map(m => m.character_name).filter(Boolean));
+                document.getElementById('active-users').textContent = uniqueUsers.size;
+                
+                const recentMessages = messages.filter(m => 
+                    new Date() - new Date(m.timestamp) < 60000
+                );
+                document.getElementById('recent-activity').textContent = recentMessages.length + '/min';
+            }
+
+            function loadChatMessages() {
+                fetch('/admin/api/chat-messages')
+                    .then(response => response.json())
+                    .then(messages => {
+                        allMessages = messages;
+                        filterAndRenderMessages();
+                        updateStats(messages);
+                    })
+                    .catch(error => {
+                        console.error('Error loading chat messages:', error);
+                        document.getElementById('chat-messages').innerHTML = 
+                            '<div class="loading">Error loading chat messages</div>';
+                    });
+            }
+
+            function filterAndRenderMessages() {
+                const checkedChannels = Array.from(document.querySelectorAll('.channel-filter input:checked'))
+                    .map(cb => cb.value);
+                
+                const filteredMessages = allMessages.filter(message => 
+                    checkedChannels.includes(message.channel)
+                );
+                
+                renderMessages(filteredMessages);
+            }
+
+            // Event listeners for channel filters
+            document.querySelectorAll('.channel-filter input').forEach(checkbox => {
+                checkbox.addEventListener('change', filterAndRenderMessages);
+            });
+
+            // Initial load
+            loadChatMessages();
+
+            // Auto-refresh every 30 seconds
+            setInterval(loadChatMessages, 30000);
+        </script>
+    </div>
+</body>
+</html>

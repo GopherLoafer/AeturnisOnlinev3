@@ -188,4 +188,59 @@ router.get('/actions', async (req, res) => {
   }
 });
 
+// API Endpoints for Admin Templates
+
+// API: Get users data
+router.get('/api/users', async (req, res) => {
+  try {
+    const users = await db.query(`
+      SELECT u.*, COUNT(c.id) as character_count
+      FROM users u
+      LEFT JOIN characters c ON u.id = c.user_id
+      GROUP BY u.id
+      ORDER BY u.created_at DESC
+    `);
+    res.json(users.rows);
+  } catch (error) {
+    console.error('API users error:', error);
+    res.status(500).json({ error: 'Failed to load users' });
+  }
+});
+
+// API: Get characters data
+router.get('/api/characters', async (req, res) => {
+  try {
+    const characters = await db.query(`
+      SELECT c.*, u.username, r.name as race_name
+      FROM characters c
+      JOIN users u ON c.user_id = u.id
+      JOIN races r ON c.race_id = r.id
+      ORDER BY c.created_at DESC
+      LIMIT 500
+    `);
+    res.json(characters.rows);
+  } catch (error) {
+    console.error('API characters error:', error);
+    res.status(500).json({ error: 'Failed to load characters' });
+  }
+});
+
+// API: Get chat messages data
+router.get('/api/chat-messages', async (req, res) => {
+  try {
+    const messages = await db.query(`
+      SELECT cm.*, c.name as character_name, u.username
+      FROM chat_messages cm
+      JOIN characters c ON cm.character_id = c.id
+      JOIN users u ON c.user_id = u.id
+      ORDER BY cm.created_at DESC
+      LIMIT 200
+    `);
+    res.json(messages.rows);
+  } catch (error) {
+    console.error('API chat messages error:', error);
+    res.status(500).json({ error: 'Failed to load chat messages' });
+  }
+});
+
 module.exports = router;
