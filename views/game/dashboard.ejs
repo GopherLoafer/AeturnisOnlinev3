@@ -1632,7 +1632,7 @@
         }
 
         .dropdown-item {
-            display: block;
+            display: block,
             padding: 8px 12px;
             color: #e0e0e0;
             text-decoration: none;
@@ -2135,6 +2135,19 @@
                     </div>
                 </div>
             </div>
+            <!-- Mobile Navigation Buttons -->
+            <div class="mobile-nav-buttons">
+                <button class="nav-btn left-toggle" aria-label="Toggle character panel">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                </button>
+                <button class="nav-btn right-toggle" aria-label="Toggle inventory panel">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <!-- Left Panel - Modular Blocks -->
@@ -2446,7 +2459,6 @@
                         <div class="inventory-slot"></div>
                         <div class="inventory-slot"></div>
                         <div class="inventory-slot"></div>
-                        <div class="inventory-slot"></div>
                     </div>
                 </div>
 
@@ -2502,6 +2514,9 @@
                 </div>
             </div>
         </aside>
+
+        <!-- Mobile Overlay -->
+        <div class="mobile-overlay"></div>
 
         <!-- Chat Panel -->
         <div class="chat-panel">
@@ -2600,6 +2615,22 @@
                 }
             }
         }
+    </script>
+    <!-- Load mobile features first -->
+    <script src="/js/mobile-navigation.js"></script>
+    <script src="/js/chat-system.js"></script>
+    <script src="/js/game.js"></script>
+
+    <script>
+        // Force mobile initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, screen width:', window.innerWidth);
+            if (window.innerWidth < 1024) {
+                console.log('Mobile screen detected, ensuring mobile features are active');
+                // Add mobile class to body for debugging
+                document.body.classList.add('mobile-device');
+            }
+        });
     </script>
 </body>
 </html>

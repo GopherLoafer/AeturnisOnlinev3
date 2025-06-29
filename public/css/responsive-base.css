@@ -279,6 +279,82 @@ img[data-src].loaded {
     }
 }
 
+/* EMERGENCY MOBILE LAYOUT FIXES */
+@media (max-width: 1023px) {
+    body.mobile-device .game-container,
+    .game-container {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto 1fr auto !important;
+        grid-template-areas: 
+            "header"
+            "main" 
+            "chat" !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: 100vw !important;
+        overflow: hidden !important;
+        padding: 5px !important;
+        gap: 5px !important;
+        margin: 0 !important;
+    }
+    
+    .header {
+        grid-area: header !important;
+        order: 1 !important;
+    }
+    
+    .main-panel {
+        grid-area: main !important;
+        order: 2 !important;
+        overflow-y: auto !important;
+    }
+    
+    .chat-panel {
+        grid-area: chat !important;
+        order: 3 !important;
+        height: 120px !important;
+    }
+    
+    .left-panel, .right-panel {
+        display: none !important;
+    }
+    
+    .left-panel.active, .right-panel.active {
+        display: block !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 85% !important;
+        height: 100vh !important;
+        z-index: 1000 !important;
+        background: var(--bg-darker) !important;
+        border: 1px solid rgba(59, 130, 246, 0.3) !important;
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.8) !important;
+        overflow-y: auto !important;
+        padding: 20px !important;
+        transform: translateX(0) !important;
+    }
+    
+    .right-panel.active {
+        left: auto !important;
+        right: 0 !important;
+    }
+    
+    .mobile-overlay.active {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: rgba(0, 0, 0, 0.7) !important;
+        z-index: 999 !important;
+        display: block !important;
+    }
+}
+
 /* Add at the end of file - Emergency mobile fixes */
 
 /* iPhone and small device fixes */
@@ -400,6 +476,71 @@ img[data-src].loaded {
     
     .left-panel {
         width: 200px !important;
+    }
+}
+
+/* CRITICAL MOBILE FIXES */
+@media (max-width: 1023px) {
+    /* Force mobile layout */
+    .game-container {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto 1fr auto !important;
+        grid-template-areas: 
+            "header"
+            "main"
+            "chat" !important;
+        height: 100vh !important;
+        overflow: hidden !important;
+        padding: 5px !important;
+        gap: 5px !important;
+    }
+    
+    .header {
+        grid-area: header !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 10px !important;
+        flex-wrap: wrap !important;
+    }
+    
+    .main-panel {
+        grid-area: main !important;
+        overflow-y: auto !important;
+        padding: 10px !important;
+    }
+    
+    .chat-panel {
+        grid-area: chat !important;
+        height: 120px !important;
+        overflow: hidden !important;
+    }
+    
+    /* Show mobile navigation */
+    .mobile-nav-buttons {
+        display: flex !important;
+        gap: 10px !important;
+        margin-left: auto !important;
+    }
+    
+    .nav-btn {
+        background: rgba(59, 130, 246, 0.2) !important;
+        border: 1px solid rgba(59, 130, 246, 0.4) !important;
+        color: #3b82f6 !important;
+        width: 44px !important;
+        height: 44px !important;
+        border-radius: 8px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .nav-btn:active {
+        transform: scale(0.95) !important;
+        background: rgba(59, 130, 246, 0.4) !important;
     }
 }
 
@@ -803,17 +944,20 @@ img[data-src].loaded {
 /* Mobile panel overlays */
 @media (max-width: 1023px) {
     .left-panel, .right-panel {
-        position: fixed;
-        top: 0;
-        height: 100vh;
-        width: 85%;
-        max-width: 360px;
-        z-index: 1000;
-        transition: transform 0.3s cubic-bezier(0.23, 1, 0.320, 1);
-        overscroll-behavior: contain;
-        background: var(--glass-bg);
-        backdrop-filter: var(--glass-blur);
-        border: 1px solid var(--glass-border);
+        position: fixed !important;
+        top: 0 !important;
+        height: 100vh !important;
+        width: 85% !important;
+        max-width: 360px !important;
+        z-index: 1000 !important;
+        transition: transform 0.3s cubic-bezier(0.23, 1, 0.320, 1) !important;
+        overscroll-behavior: contain !important;
+        background: var(--bg-darker) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(59, 130, 246, 0.3) !important;
+        overflow-y: auto !important;
+        padding: 20px !important;
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.8) !important;
     }
     
     .left-panel {
@@ -885,11 +1029,39 @@ img[data-src].loaded {
 /* Desktop - static panels */
 @media (min-width: 1024px) {
     .left-panel, .right-panel {
-        position: static;
+        position: static !important;
         transform: none !important;
+        display: block !important;
     }
     
     .mobile-nav-buttons, .mobile-overlay {
         display: none !important;
+    }
+    
+    .game-container {
+        grid-template-columns: 300px 1fr 300px !important;
+        grid-template-areas: 
+            "header header header"
+            "left main right"
+            "left chat right" !important;
+    }
+}
+
+/* Force mobile nav visibility on small screens */
+@media (max-width: 1023px) {
+    .mobile-nav-buttons {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    /* Hide panels by default on mobile */
+    .left-panel:not(.active), 
+    .right-panel:not(.active) {
+        transform: translateX(-100%) !important;
+    }
+    
+    .right-panel:not(.active) {
+        transform: translateX(100%) !important;
     }
 }

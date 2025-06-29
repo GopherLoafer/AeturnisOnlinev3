@@ -98,27 +98,45 @@ class MobileNavigation {
     }
     
     createMobileNav() {
-        // Check if nav already exists
-        if (document.querySelector('.mobile-nav-buttons')) return;
+        // Check if nav already exists in header
+        const existingNav = document.querySelector('.mobile-nav-buttons');
+        if (existingNav) {
+            console.log('Mobile nav buttons already exist');
+            return;
+        }
         
-        const mobileNav = document.createElement('div');
-        mobileNav.className = 'mobile-nav-buttons';
-        mobileNav.innerHTML = `
-            <button class="nav-btn left-toggle" aria-label="Toggle character panel">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-                </svg>
-            </button>
-            <button class="nav-btn right-toggle" aria-label="Toggle inventory panel">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M7 8V6a5 5 0 1 1 10 0v2h1a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h1zm2 0h6V6a3 3 0 0 0-6 0v2z"/>
-                </svg>
-            </button>
-        `;
+        console.log('Creating mobile navigation buttons');
         
+        // Mobile nav should already be in template, but ensure it's visible
         const header = document.querySelector('.header');
-        if (header && window.innerWidth < 1024) {
-            header.appendChild(mobileNav);
+        if (header) {
+            let mobileNavButtons = header.querySelector('.mobile-nav-buttons');
+            if (!mobileNavButtons) {
+                // Create if it doesn't exist
+                mobileNavButtons = document.createElement('div');
+                mobileNavButtons.className = 'mobile-nav-buttons';
+                mobileNavButtons.innerHTML = `
+                    <button class="nav-btn left-toggle" aria-label="Toggle character panel">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </button>
+                    <button class="nav-btn right-toggle" aria-label="Toggle inventory panel">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                        </svg>
+                    </button>
+                `;
+                header.appendChild(mobileNavButtons);
+            }
+            
+            // Force visibility on mobile
+            if (window.innerWidth < 1024) {
+                mobileNavButtons.style.display = 'flex';
+                mobileNavButtons.style.visibility = 'visible';
+                mobileNavButtons.style.opacity = '1';
+                console.log('Mobile nav buttons should now be visible');
+            }
         }
     }
     
@@ -245,16 +263,20 @@ window.ChatHandler = ChatHandler;
     function initializeMobileFeatures() {
         const isMobile = window.innerWidth < 1024;
         
-        if (isMobile && document.querySelector('.game-container')) {
-            // Initialize mobile navigation if not already done
-            if (!mobileNav && typeof MobileNavigation !== 'undefined') {
+        console.log('Initializing mobile features, isMobile:', isMobile);
+        
+        // Always initialize mobile navigation on small screens
+        if (isMobile) {
+            if (!mobileNav) {
+                console.log('Creating MobileNavigation instance');
                 mobileNav = new MobileNavigation();
                 window.mobileNav = mobileNav;
             }
         }
         
         // Initialize chat handler for ALL screen sizes
-        if (!chatHandler && typeof ChatHandler !== 'undefined') {
+        if (!chatHandler) {
+            console.log('Creating ChatHandler instance');
             chatHandler = new ChatHandler();
             window.chatHandler = chatHandler;
         }
