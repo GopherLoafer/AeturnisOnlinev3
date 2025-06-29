@@ -346,6 +346,113 @@ class Database {
         reward_id INTEGER REFERENCES race_specific_rewards(id),
         claimed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(character_id, reward_id)
+      )`,
+
+      // Phase 3.1: Monsters table (basic implementation for combat)
+      `CREATE TABLE IF NOT EXISTS monsters (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        description TEXT,
+        level INTEGER NOT NULL DEFAULT 1,
+        base_health INTEGER NOT NULL DEFAULT 100,
+        base_damage INTEGER NOT NULL DEFAULT 10,
+        defense INTEGER NOT NULL DEFAULT 5,
+        experience_reward NUMERIC(40,0) NOT NULL DEFAULT 50,
+        gold_reward NUMERIC(40,0) NOT NULL DEFAULT 10,
+        element_type VARCHAR(50) DEFAULT 'neutral',
+        special_abilities JSONB DEFAULT '[]',
+        loot_table JSONB DEFAULT '[]',
+        spawn_zone VARCHAR(100) NOT NULL,
+        respawn_time INTEGER DEFAULT 300,
+        created_at TIMESTAMP DEFAULT NOW()
+      )`,
+
+      // Phase 3.1: Combat sessions table for tracking active battles
+      `CREATE TABLE IF NOT EXISTS combat_sessions (
+        id SERIAL PRIMARY KEY,
+        attacker_id INTEGER NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+        defender_id INTEGER REFERENCES characters(id) ON DELETE CASCADE,
+        defender_type VARCHAR(50) NOT NULL DEFAULT 'monster',
+        monster_id INTEGER REFERENCES monsters(id) ON DELETE CASCADE,
+        session_status VARCHAR(20) NOT NULL DEFAULT 'active',
+        turn_count INTEGER DEFAULT 0,
+        started_at TIMESTAMP DEFAULT NOW(),
+        ended_at TIMESTAMP,
+        winner_id INTEGER,
+        winner_type VARCHAR(50),
+        experience_gained NUMERIC(40,0) DEFAULT 0,
+        gold_gained NUMERIC(40,0) DEFAULT 0,
+        loot_gained JSONB DEFAULT '[]'
+      )`,
+
+      // Phase 3.1: Combat actions log for tracking all combat moves
+      `CREATE TABLE IF NOT EXISTS combat_actions (
+        id SERIAL PRIMARY KEY,
+        session_id INTEGER NOT NULL REFERENCES combat_sessions(id) ON DELETE CASCADE,
+        actor_id INTEGER NOT NULL,
+        actor_type VARCHAR(50) NOT NULL,
+        action_type VARCHAR(50) NOT NULL,
+        action_details JSONB NOT NULL,
+        damage_dealt INTEGER DEFAULT 0,
+        damage_type VARCHAR(50),
+        critical_hit BOOLEAN DEFAULT FALSE,
+        dodged BOOLEAN DEFAULT FALSE,
+        blocked BOOLEAN DEFAULT FALSE,
+        timestamp TIMESTAMP DEFAULT NOW()
+      )`,
+
+      // Phase 3.1: Player action cooldowns for spam prevention
+      `CREATE TABLE IF NOT EXISTS player_cooldowns (
+        character_id INTEGER PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
+        last_action_time TIMESTAMP NOT NULL DEFAULT NOW(),
+        action_count INTEGER DEFAULT 0,
+        cooldown_until TIMESTAMP,
+        spam_warnings INTEGER DEFAULT 0,
+        temp_locked_until TIMESTAMP,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )`,
+
+      // Phase 3.1: Combat queue for managing turn order and actions
+      `CREATE TABLE IF NOT EXISTS combat_queue (
+        id SERIAL PRIMARY KEY,
+        session_id INTEGER NOT NULL REFERENCES combat_sessions(id) ON DELETE CASCADE,
+        character_id INTEGER NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+        action_type VARCHAR(50) NOT NULL,
+        action_data JSONB NOT NULL,
+        priority INTEGER DEFAULT 0,
+        processed BOOLEAN DEFAULT FALSE,
+        queued_at TIMESTAMP DEFAULT NOW(),
+        processed_at TIMESTAMP
+      )`,
+
+      // Phase 3.1: Monster spawns for tracking active monsters
+      `CREATE TABLE IF NOT EXISTS monster_spawns (
+        id SERIAL PRIMARY KEY,
+        monster_id INTEGER NOT NULL REFERENCES monsters(id) ON DELETE CASCADE,
+        current_health INTEGER NOT NULL,
+        max_health INTEGER NOT NULL,
+        location_zone VARCHAR(100) NOT NULL,
+        location_x INTEGER DEFAULT 0,
+        location_y INTEGER DEFAULT 0,
+        status VARCHAR(20) DEFAULT 'alive',
+        spawned_at TIMESTAMP DEFAULT NOW(),
+        last_combat TIMESTAMP,
+        respawn_at TIMESTAMP
+      )`,
+
+      // Phase 3.1: Combat buffs and debuffs
+      `CREATE TABLE IF NOT EXISTS combat_effects (
+        id SERIAL PRIMARY KEY,
+        target_id INTEGER NOT NULL,
+        target_type VARCHAR(50) NOT NULL,
+        effect_type VARCHAR(50) NOT NULL,
+        effect_name VARCHAR(100) NOT NULL,
+        effect_data JSONB NOT NULL,
+        duration INTEGER NOT NULL,
+        remaining_duration INTEGER NOT NULL,
+        applied_at TIMESTAMP DEFAULT NOW(),
+        expires_at TIMESTAMP NOT NULL
       )`
     ];
 
@@ -1267,6 +1374,207 @@ class Database {
 
   async close() {
     await this.pool.end();
+  }
+
+  // Phase 3.1: Insert default monsters for combat system
+  async insertDefaultMonsters() {
+    // Check if monsters already exist
+    const existingMonsters = await this.pool.query('SELECT COUNT(*) FROM monsters');
+    if (parseInt(existingMonsters.rows[0].count) > 0) {
+      console.log('Monsters already exist');
+      return;
+    }
+
+    const monsters = [
+      // Low level monsters (1-10)
+      {
+        name: 'Training Dummy',
+        description: 'A practice target for aspiring warriors.',
+        level: 1,
+        base_health: 50,
+        base_damage: 5,
+        defense: 0,
+        experience_reward: 25,
+        gold_reward: 5,
+        element_type: 'neutral',
+        spawn_zone: 'training_grounds',
+        respawn_time: 30
+      },
+      {
+        name: 'Weak Goblin',
+        description: 'A small, cowardly creature.',
+        level: 2,
+        base_health: 80,
+        base_damage: 8,
+        defense: 2,
+        experience_reward: 50,
+        gold_reward: 10,
+        element_type: 'neutral',
+        spawn_zone: 'forest_edge',
+        respawn_time: 60
+      },
+      {
+        name: 'Wolf Pup',
+        description: 'A young wolf learning to hunt.',
+        level: 3,
+        base_health: 100,
+        base_damage: 12,
+        defense: 3,
+        experience_reward: 75,
+        gold_reward: 15,
+        element_type: 'neutral',
+        spawn_zone: 'forest_edge',
+        respawn_time: 90
+      },
+      
+      // Mid level monsters (11-25)
+      {
+        name: 'Bandit Scout',
+        description: 'A quick and cunning thief.',
+        level: 12,
+        base_health: 300,
+        base_damage: 25,
+        defense: 10,
+        experience_reward: 300,
+        gold_reward: 50,
+        element_type: 'neutral',
+        spawn_zone: 'bandit_camp',
+        respawn_time: 180
+      },
+      {
+        name: 'Dark Wolf',
+        description: 'A fierce predator of the night.',
+        level: 15,
+        base_health: 400,
+        base_damage: 35,
+        defense: 12,
+        experience_reward: 450,
+        gold_reward: 75,
+        element_type: 'dark',
+        spawn_zone: 'dark_forest',
+        respawn_time: 240
+      },
+      
+      // High level monsters (26-50)
+      {
+        name: 'Orc Warrior',
+        description: 'A battle-hardened orc fighter.',
+        level: 30,
+        base_health: 800,
+        base_damage: 60,
+        defense: 25,
+        experience_reward: 1000,
+        gold_reward: 150,
+        element_type: 'neutral',
+        spawn_zone: 'orc_stronghold',
+        respawn_time: 300
+      },
+      {
+        name: 'Elemental Drake',
+        description: 'A young dragon infused with elemental power.',
+        level: 45,
+        base_health: 1500,
+        base_damage: 100,
+        defense: 40,
+        experience_reward: 2500,
+        gold_reward: 400,
+        element_type: 'fire',
+        spawn_zone: 'dragon_peaks',
+        respawn_time: 600
+      },
+      
+      // Zone-specific monsters for starting areas
+      {
+        name: 'Sewer Rat',
+        description: 'A diseased rodent from the sewers.',
+        level: 2,
+        base_health: 60,
+        base_damage: 6,
+        defense: 1,
+        experience_reward: 40,
+        gold_reward: 8,
+        element_type: 'neutral',
+        spawn_zone: 'Brightwater Village',
+        respawn_time: 45
+      },
+      {
+        name: 'Corrupted Sprite',
+        description: 'A forest spirit tainted by dark magic.',
+        level: 5,
+        base_health: 120,
+        base_damage: 15,
+        defense: 5,
+        experience_reward: 100,
+        gold_reward: 20,
+        element_type: 'dark',
+        spawn_zone: 'Silverleaf Sanctum',
+        respawn_time: 120
+      },
+      {
+        name: 'Cave Spider',
+        description: 'A venomous arachnid from the depths.',
+        level: 4,
+        base_health: 90,
+        base_damage: 10,
+        defense: 4,
+        experience_reward: 80,
+        gold_reward: 12,
+        element_type: 'neutral',
+        spawn_zone: 'Ironforge Stronghold',
+        respawn_time: 90
+      }
+    ];
+
+    // Insert monsters
+    for (const monster of monsters) {
+      try {
+        await this.pool.query(
+          `INSERT INTO monsters (name, description, level, base_health, base_damage, defense, 
+           experience_reward, gold_reward, element_type, spawn_zone, respawn_time)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+          [monster.name, monster.description, monster.level, monster.base_health,
+           monster.base_damage, monster.defense, monster.experience_reward,
+           monster.gold_reward, monster.element_type, monster.spawn_zone, monster.respawn_time]
+        );
+      } catch (error) {
+        console.error(`Error inserting monster ${monster.name}:`, error);
+      }
+    }
+
+    console.log('Default monsters inserted');
+    
+    // Spawn initial monsters
+    await this.spawnMonsters();
+  }
+
+  // Spawn monsters in their zones
+  async spawnMonsters() {
+    try {
+      // Get all monsters
+      const monsters = await this.pool.query('SELECT * FROM monsters');
+      
+      for (const monster of monsters.rows) {
+        // Check if already spawned
+        const existing = await this.pool.query(
+          `SELECT COUNT(*) FROM monster_spawns 
+           WHERE monster_id = $1 AND status = 'alive'`,
+          [monster.id]
+        );
+        
+        if (parseInt(existing.rows[0].count) === 0) {
+          // Spawn the monster
+          await this.pool.query(
+            `INSERT INTO monster_spawns (monster_id, current_health, max_health, location_zone)
+             VALUES ($1, $2, $3, $4)`,
+            [monster.id, monster.base_health, monster.base_health, monster.spawn_zone]
+          );
+        }
+      }
+      
+      console.log('Monsters spawned in zones');
+    } catch (error) {
+      console.error('Error spawning monsters:', error);
+    }
   }
 }
 

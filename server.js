@@ -86,6 +86,7 @@ app.use('/admin/race-management', adminRaceManagementRoutes);
 app.use('/api/abilities', requireAuth, abilitiesRoutes);
 app.use('/api/progression', requireAuth, progressionRoutes);
 app.use('/api/affinity', requireAuth, require('./src/routes/affinity'));
+app.use('/api/combat', requireAuth, require('./src/routes/combat'));
 app.use('/api/game', requireAuth, gameRoutes);
 app.use('/', startingZonesRoutes);
 

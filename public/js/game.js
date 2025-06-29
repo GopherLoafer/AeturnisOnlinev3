@@ -11,11 +11,313 @@ let gameState = {
         weapons: {},
         magic: {}
     },
-    cooldowns: {}
+    cooldowns: {},
+    combat: {
+        inCombat: false,
+        session: null,
+        cooldownUntil: null,
+        combatLog: []
+    }
 };
 
 // Timeout for debouncing game state refreshes
 let gameStateRefreshTimeout;
+
+// ===== Combat System Functions =====
+
+async function checkCombatStatus() {
+    try {
+        const response = await fetch('/api/combat/status');
+        const data = await response.json();
+        
+        gameState.combat.inCombat = data.inCombat;
+        if (data.inCombat) {
+            gameState.combat.session = data.session;
+            gameState.combat.combatLog = data.combatLog || [];
+            updateCombatDisplay();
+        } else {
+            // Show available monsters
+            await loadAvailableMonsters();
+        }
+    } catch (error) {
+        console.error('Error checking combat status:', error);
+    }
+}
+
+async function loadAvailableMonsters() {
+    try {
+        const response = await fetch('/api/combat/monsters');
+        const data = await response.json();
+        
+        if (data.monsters && data.monsters.length > 0) {
+            const gameText = document.getElementById('game-text');
+            gameText.innerHTML = `
+                <p class="game-text location-text">You are in ${data.zone}</p>
+                <p class="game-text">Available monsters to fight:</p>
+            `;
+            
+            data.monsters.forEach(monster => {
+                const monsterDiv = document.createElement('div');
+                monsterDiv.className = 'monster-info';
+                monsterDiv.innerHTML = `
+                    <p class="game-text enemy-text">
+                        ${monster.name} (Level ${monster.level}) - ${monster.description}
+                        <button class="action-btn combat" onclick="startCombat('${monster.id}', 'monster')">
+                            ⚔️ Attack
+                        </button>
+                    </p>
+                `;
+                gameText.appendChild(monsterDiv);
+            });
+        } else {
+            updateGameText('No monsters in this area.');
+        }
+    } catch (error) {
+        console.error('Error loading monsters:', error);
+    }
+}
+
+async function startCombat(targetId, targetType) {
+    try {
+        // Check cooldown first
+        const cooldownCheck = await checkCooldown();
+        if (!cooldownCheck.canAct) {
+            updateGameText(cooldownCheck.message || 'You must wait before taking another action.');
+            return;
+        }
+        
+        const response = await fetch('/api/combat/start', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ targetId, targetType })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            gameState.combat.inCombat = true;
+            gameState.combat.session = data.session;
+            updateGameText(data.message);
+            updateCombatDisplay();
+        } else {
+            updateGameText(data.error || 'Failed to start combat');
+        }
+    } catch (error) {
+        console.error('Error starting combat:', error);
+        updateGameText('Failed to start combat');
+    }
+}
+
+async function performCombatAction(actionType) {
+    if (!gameState.combat.inCombat || !gameState.combat.session) {
+        updateGameText('You are not in combat!');
+        return;
+    }
+    
+    try {
+        // Check cooldown first
+        const cooldownCheck = await checkCooldown();
+        if (!cooldownCheck.canAct) {
+            updateGameText(cooldownCheck.message || 'You must wait before taking another action.');
+            showCooldownTimer(cooldownCheck.remainingTime || cooldownCheck.remainingCooldown);
+            return;
+        }
+        
+        const response = await fetch('/api/combat/action', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                sessionId: gameState.combat.session.id,
+                actionType: actionType,
+                actionData: {}
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update cooldown
+            if (data.cooldownUntil) {
+                gameState.combat.cooldownUntil = new Date(data.cooldownUntil);
+                showCooldownTimer();
+            }
+            
+            // Display action result
+            if (data.result) {
+                displayCombatAction(data.result);
+            }
+            
+            // Update combat status
+            if (data.combatStatus) {
+                gameState.combat.session = data.combatStatus;
+                updateCombatDisplay();
+                
+                // Check if combat ended
+                if (data.combatStatus.session_status !== 'active') {
+                    gameState.combat.inCombat = false;
+                    setTimeout(() => {
+                        checkCombatStatus();
+                    }, 3000);
+                }
+            }
+        } else {
+            updateGameText(data.error || 'Action failed');
+            if (data.remainingTime) {
+                showCooldownTimer(data.remainingTime);
+            }
+        }
+    } catch (error) {
+        console.error('Error performing combat action:', error);
+        updateGameText('Failed to perform action');
+    }
+}
+
+async function checkCooldown() {
+    try {
+        const response = await fetch('/api/combat/cooldown');
+        const data = await response.json();
+        return data.cooldown || { canAct: true };
+    } catch (error) {
+        console.error('Error checking cooldown:', error);
+        return { canAct: true };
+    }
+}
+
+function showCooldownTimer(remainingMs) {
+    const actionButtons = document.querySelectorAll('.action-btn.combat');
+    
+    if (!remainingMs && gameState.combat.cooldownUntil) {
+        remainingMs = Math.max(0, new Date(gameState.combat.cooldownUntil) - new Date());
+    }
+    
+    if (remainingMs <= 0) {
+        actionButtons.forEach(btn => {
+            btn.disabled = false;
+            btn.textContent = btn.textContent.replace(/ \(\d+\.\d+s\)/, '');
+        });
+        return;
+    }
+    
+    actionButtons.forEach(btn => {
+        btn.disabled = true;
+    });
+    
+    const updateTimer = () => {
+        const now = new Date();
+        const remaining = Math.max(0, new Date(gameState.combat.cooldownUntil) - now);
+        
+        if (remaining <= 0) {
+            actionButtons.forEach(btn => {
+                btn.disabled = false;
+                btn.textContent = btn.textContent.replace(/ \(\d+\.\d+s\)/, '');
+            });
+            return;
+        }
+        
+        const seconds = (remaining / 1000).toFixed(1);
+        actionButtons.forEach(btn => {
+            const baseText = btn.textContent.replace(/ \(\d+\.\d+s\)/, '');
+            btn.textContent = `${baseText} (${seconds}s)`;
+        });
+        
+        setTimeout(updateTimer, 100);
+    };
+    
+    updateTimer();
+}
+
+function displayCombatAction(action) {
+    const gameText = document.getElementById('game-text');
+    const actionDiv = document.createElement('div');
+    actionDiv.className = 'combat-action';
+    
+    let actionText = '';
+    
+    switch(action.action_type) {
+        case 'attack':
+            actionText = `<p class="game-text combat-text">${action.attacker_name} attacks ${action.defender_name}!</p>`;
+            if (action.result.hit) {
+                actionText += `<p class="game-text damage-text">Hit for ${action.result.damage} damage!</p>`;
+            } else {
+                actionText += `<p class="game-text miss-text">Attack missed!</p>`;
+            }
+            break;
+        
+        case 'spell':
+            actionText = `<p class="game-text spell-text">${action.attacker_name} casts a spell at ${action.defender_name}!</p>`;
+            actionText += `<p class="game-text damage-text">Spell deals ${action.result.damage} damage!</p>`;
+            break;
+        
+        case 'defend':
+            actionText = `<p class="game-text defend-text">${action.attacker_name} takes a defensive stance!</p>`;
+            break;
+        
+        case 'flee':
+            if (action.result.success) {
+                actionText = `<p class="game-text flee-text">${action.attacker_name} fled from combat!</p>`;
+            } else {
+                actionText = `<p class="game-text flee-text">${action.attacker_name} couldn't escape!</p>`;
+            }
+            break;
+        
+        case 'victory':
+            actionText = `<p class="game-text victory-text">Victory! You have defeated ${action.defender_name}!</p>`;
+            if (action.result.rewards) {
+                actionText += `<p class="game-text loot-text">Gained ${action.result.rewards.experience} experience and ${action.result.rewards.gold} gold!</p>`;
+            }
+            break;
+        
+        case 'defeat':
+            actionText = `<p class="game-text defeat-text">You have been defeated by ${action.attacker_name}!</p>`;
+            break;
+    }
+    
+    actionDiv.innerHTML = actionText;
+    gameText.appendChild(actionDiv);
+    
+    // Scroll to bottom
+    gameText.scrollTop = gameText.scrollHeight;
+}
+
+function updateCombatDisplay() {
+    if (!gameState.combat.session) return;
+    
+    const session = gameState.combat.session;
+    
+    // Update combat info in game text
+    const gameText = document.getElementById('game-text');
+    gameText.innerHTML = `
+        <div class="combat-status">
+            <p class="game-text combat-header">⚔️ In Combat with ${session.defender_name}</p>
+            <div class="combat-health">
+                <p class="game-text">Your Health: ${session.attacker_current_health}/${session.attacker_max_health}</p>
+                <p class="game-text enemy-text">${session.defender_name} Health: ${session.defender_current_health}/${session.defender_max_health}</p>
+            </div>
+        </div>
+    `;
+    
+    // Add combat log
+    if (gameState.combat.combatLog && gameState.combat.combatLog.length > 0) {
+        gameState.combat.combatLog.forEach(action => {
+            displayCombatAction(action);
+        });
+    }
+    
+    // Update action buttons for combat
+    const actionPanel = document.querySelector('.combat-actions');
+    if (actionPanel) {
+        actionPanel.innerHTML = `
+            <button class="action-btn combat primary" onclick="performCombatAction('attack')">⚔️ Attack</button>
+            <button class="action-btn combat secondary" onclick="performCombatAction('spell')">🔮 Cast Spell</button>
+            <button class="action-btn combat defend" onclick="performCombatAction('defend')">🛡️ Defend</button>
+            <button class="action-btn combat flee" onclick="performCombatAction('flee')">🏃 Flee</button>
+        `;
+    }
+}
 
 // ===== Tab System for Sidebar =====
 
@@ -102,6 +404,24 @@ function move(direction) {
 // ===== Action System =====
 
 function performAction(action) {
+    // If we're in combat and it's a combat action
+    if (gameState.combat.inCombat && ['attack', 'spell', 'defend', 'flee'].includes(action)) {
+        performCombatAction(action);
+        return;
+    }
+    
+    // If action is 'fight', check for monsters and start combat
+    if (action === 'fight') {
+        checkCombatStatus();
+        return;
+    }
+    
+    // Handle 'cast' action differently based on combat state
+    if (action === 'cast' && !gameState.combat.inCombat) {
+        updateGameText('You attempt to cast a spell, but there is no target.');
+        return;
+    }
+    
     if (isCooldownActive(action)) return;
     
     const cooldownTimes = {
@@ -575,6 +895,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set default tab
     switchTab('equipment');
+    
+    // Check combat status on load
+    checkCombatStatus();
     
     console.log('Aeturnis Online client initialized');
 });

@@ -1347,6 +1347,90 @@
             justify-content: center;
             flex-wrap: wrap;
         }
+        
+        /* Combat Styles */
+        .combat-status {
+            background: rgba(50, 0, 0, 0.5);
+            border: 1px solid #ff0000;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        
+        .combat-header {
+            color: #ff6666 !important;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .combat-health {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+        
+        .enemy-text {
+            color: #ff6666 !important;
+        }
+        
+        .monster-info {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #333;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        
+        .monster-info .action-btn {
+            float: right;
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+        
+        .combat-action {
+            margin: 5px 0;
+        }
+        
+        .victory-text {
+            color: #FFD700 !important;
+            font-weight: bold;
+        }
+        
+        .defeat-text {
+            color: #ff0000 !important;
+            font-weight: bold;
+        }
+        
+        .flee-text {
+            color: #cccccc !important;
+            font-style: italic;
+        }
+        
+        .defend-text {
+            color: #0099ff !important;
+        }
+        
+        .spell-text {
+            color: #9966ff !important;
+        }
+        
+        .miss-text {
+            color: #999999 !important;
+            font-style: italic;
+        }
+        
+        .action-btn.combat:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .action-btn.defend {
+            background: linear-gradient(135deg, #0066cc, #003366);
+        }
+        
+        .action-btn.flee {
+            background: linear-gradient(135deg, #666666, #333333);
+        }
 
         .action-btn.primary {
             background: rgba(255, 69, 69, 0.2);
