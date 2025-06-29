@@ -365,12 +365,21 @@ function gainExperience(amount) {
     })
     .then(response => {
         console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
         return response.json();
     })
     .then(data => {
         console.log('Response data:', data);
         if (data.success) {
-            addProgressionMessage(data.message, 'success');
+            const expGained = data.data?.experienceGained || amount;
+            addProgressionMessage(`Gained ${expGained} experience!`, 'success');
+            
+            if (data.data?.leveledUp) {
+                addProgressionMessage(`Level up! Now level ${data.data.newLevel}!`, 'level-up');
+            }
+            
             refreshGameState();
         } else {
             addProgressionMessage(data.error || 'Failed to award experience', 'error');
@@ -423,7 +432,12 @@ function refreshGameState() {
     console.log('Game state refresh triggered');
     
     fetch('/api/game/state')
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             gameState.character = data.character;
@@ -452,6 +466,8 @@ function refreshGameState() {
                     });
                 }
             }
+        } else {
+            console.error('Game state error:', data.error);
         }
     })
     .catch(error => {
@@ -482,7 +498,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeProgressionButtons();
     
     // Start periodic game state refresh
-    setInterval(refreshGameState, 30000); // Refresh every 30 seconds
+    setInterval(refreshGameState, 60000); // Refresh every 60 seconds
     
     // Initial game state load
     refreshGameState();
