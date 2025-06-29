@@ -12,10 +12,12 @@
     font-weight: 400;
 }
 
+/* Responsive wizard container */
 .wizard-container {
-    max-width: 1200px;
+    width: 100%;
+    max-width: 1000px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: var(--spacing-md);
 }
 
 /* Wizard Header */
@@ -42,14 +44,14 @@
     margin-bottom: 2rem;
 }
 
-/* Step Indicator */
+/* Step indicator responsiveness */
 .step-indicator {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 0;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-lg);
 }
 
 .step-indicator-item {
@@ -69,7 +71,6 @@
 .step-indicator-item.completed {
     opacity: 0.8;
     color: #34d399;
-}
 }
 
 .step-number {
@@ -107,6 +108,16 @@
     height: 2px;
     background-color: #333;
     margin: 0 1rem;
+}
+
+@media (max-width: 640px) {
+    .step-indicator {
+        font-size: var(--font-xs);
+    }
+    
+    .step-connector {
+        width: 20px;
+    }
 }
 
 .step-indicator-item.completed + .step-connector {
@@ -378,12 +389,20 @@
     color: #ffcc44;
 }
 
-/* Background Step */
+/* Race/Background selection grids */
+.race-grid, 
 .background-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+}
+
+@media (max-width: 640px) {
+    .race-grid, 
+    .background-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
 }
 
 .background-card {
@@ -855,14 +874,7 @@
 }
 
 /* Navigation */
-.step-navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid #555;
-}
+/* Placeholder for step-navigation - moved to responsive section */
 
 /* Buttons */
 .btn {
@@ -1023,50 +1035,39 @@
     pointer-events: none;
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .wizard-container {
-        padding: 1rem;
-    }
-    
-    .race-grid, .background-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .stats-allocation {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .step-indicator {
-        gap: 0.5rem;
-    }
-    
-    .step-connector {
-        width: 30px;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .derived-stats {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
+/* Stats allocation */
+.stats-allocation {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--spacing-sm);
 }
 
 @media (max-width: 480px) {
-    .wizard-header h1 {
-        font-size: 2rem;
-    }
-    
-    .step-navigation {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Navigation buttons */
+.step-navigation {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+@media (max-width: 480px) {
+    .step-navigation {
+        flex-direction: column;
+    }
+    
+    .step-navigation button {
+        width: 100%;
     }
 }
