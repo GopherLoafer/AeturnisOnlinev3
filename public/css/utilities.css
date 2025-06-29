@@ -1,0 +1,33 @@
+/* Display Utilities */
+.mobile-only { display: block; }
+.tablet-up { display: none; }
+.desktop-up { display: none; }
+
+@media (min-width: 768px) {
+    .mobile-only { display: none; }
+    .tablet-up { display: block; }
+}
+
+@media (min-width: 1024px) {
+    .tablet-only { display: none; }
+    .desktop-up { display: block; }
+}
+
+/* Container */
+.container {
+    width: 100%;
+    padding: 0 var(--spacing-md);
+    margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+    .container { max-width: 750px; }
+}
+
+@media (min-width: 1024px) {
+    .container { max-width: 980px; }
+}
+
+@media (min-width: 1440px) {
+    .container { max-width: 1200px; }
+}
