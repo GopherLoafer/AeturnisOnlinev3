@@ -1,10 +1,15 @@
 /* Character Creation Wizard Styles */
 
 .character-creation-wizard {
-    background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3), transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3), transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.3), transparent 50%),
+        linear-gradient(135deg, #0f0f23 0%, #010115 100%);
     min-height: 100vh;
-    color: #00ff41;
-    font-family: 'Courier New', monospace;
+    color: #e5e7eb;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 400;
 }
 
 .wizard-container {
@@ -14,12 +19,27 @@
 }
 
 /* Wizard Header */
+.wizard-header {
+    background: linear-gradient(145deg, rgba(15, 20, 25, 0.95) 0%, rgba(20, 25, 35, 0.95) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(20px);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
 .wizard-header h1 {
     text-align: center;
-    color: #00ff41;
-    text-shadow: 0 0 10px #00ff41;
-    margin-bottom: 2rem;
     font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #10b981, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 2rem;
 }
 
 /* Step Indicator */
@@ -27,7 +47,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 3rem;
+    margin-bottom: 0;
     flex-wrap: wrap;
     gap: 1rem;
 }
@@ -38,16 +58,18 @@
     align-items: center;
     opacity: 0.5;
     transition: all 0.3s ease;
+    padding: 0.5rem;
 }
 
 .step-indicator-item.active {
     opacity: 1;
-    color: #00ff41;
+    color: #10b981;
 }
 
 .step-indicator-item.completed {
     opacity: 0.8;
-    color: #66ff66;
+    color: #34d399;
+}
 }
 
 .step-number {
@@ -64,13 +86,13 @@
 }
 
 .step-indicator-item.active .step-number {
-    background-color: #00ff41;
+    background-color: #10b981;
     color: #000;
-    box-shadow: 0 0 15px #00ff41;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
 }
 
 .step-indicator-item.completed .step-number {
-    background-color: #66ff66;
+    background-color: #34d399;
     color: #000;
 }
 
@@ -93,23 +115,29 @@
 
 /* Creation Steps */
 .creation-step {
-    background: rgba(0, 0, 0, 0.8);
-    border: 2px solid #00ff41;
-    border-radius: 8px;
+    background: linear-gradient(145deg, rgba(15, 20, 25, 0.95) 0%, rgba(20, 25, 35, 0.95) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 16px;
     padding: 2rem;
     margin-bottom: 2rem;
+    backdrop-filter: blur(20px);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 .step-header h2 {
-    color: #00ff41;
+    color: #10b981;
     margin-bottom: 0.5rem;
     font-size: 1.8rem;
+    font-weight: 600;
 }
 
 .step-description {
-    color: #ccc;
+    color: #94a3b8;
     margin-bottom: 2rem;
     font-size: 1.1rem;
+    line-height: 1.6;
 }
 
 /* Name Step */
