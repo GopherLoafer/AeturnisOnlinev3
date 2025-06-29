@@ -120,16 +120,26 @@ class LevelService {
                 const milestone = this.progression.getMilestoneReward(level);
                 milestoneRewards.push(milestone);
                 
-                // Award milestone gold and track it
-                await client.query(
-                    'UPDATE characters SET gold = gold + $1 WHERE id = $2',
-                    [milestone.goldReward, characterId]
+                // Check if milestone reward already exists
+                const existingMilestone = await client.query(
+                    'SELECT id FROM milestone_rewards WHERE character_id = $1 AND milestone_level = $2',
+                    [characterId, level]
                 );
+                
+                if (existingMilestone.rows.length === 0) {
+                    // Award milestone gold and track it
+                    await client.query(
+                        'UPDATE characters SET gold = gold + $1 WHERE id = $2',
+                        [milestone.goldReward, characterId]
+                    );
 
-                await client.query(
-                    'INSERT INTO milestone_rewards (character_id, milestone_level, gold_reward, special_reward) VALUES ($1, $2, $3, $4)',
-                    [characterId, level, milestone.goldReward, milestone.specialReward]
-                );
+                    await client.query(
+                        'INSERT INTO milestone_rewards (character_id, milestone_level, gold_reward, special_reward) VALUES ($1, $2, $3, $4)',
+                        [characterId, level, milestone.goldReward, milestone.specialReward]
+                    );
+                } else {
+                    console.log(`Milestone ${level} already claimed for character ${characterId}`);
+                }
             }
 
             // Collect content unlocks
