@@ -241,16 +241,20 @@ function updateExperience(expData) {
 }
 
 function updateExperienceBar(expData) {
+    console.log('updateExperienceBar called with:', expData);
     const expBar = document.getElementById('exp-bar');
     const expText = document.getElementById('exp-text');
     
     if (expBar && expData.current !== undefined && expData.required !== undefined) {
         const expPercent = (expData.current / expData.required) * 100;
+        console.log('Experience percent calculated:', expPercent, '% (', expData.current, '/', expData.required, ')');
         expBar.style.width = `${expPercent}%`;
         
         if (expText) {
             expText.textContent = `${formatNumber(expData.current)}/${formatNumber(expData.required)}`;
         }
+    } else {
+        console.log('Missing exp data or elements - expBar:', !!expBar, 'current:', expData.current, 'required:', expData.required);
     }
 }
 
@@ -479,10 +483,20 @@ function refreshGameState() {
                 updateCharacterLevel(data.character.level);
                 
                 if (data.character.experience !== undefined) {
-                    console.log('Updating experience bar:', data.character.experience, '/', data.character.experience_to_next);
+                    console.log('Character experience data:', {
+                        level: data.character.level,
+                        total_experience: data.character.experience,
+                        experience_progress: data.character.experience_progress,
+                        experience_to_next: data.character.experience_to_next
+                    });
+                    
+                    // Use experience_progress (current level progress) instead of total experience
+                    const currentProgress = data.character.experience_progress || 0;
+                    const required = data.character.experience_to_next || 1000;
+                    
                     updateExperienceBar({
-                        current: data.character.experience,
-                        required: data.character.experience_to_next || 1000
+                        current: currentProgress,
+                        required: required
                     });
                 }
                 

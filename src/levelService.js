@@ -235,6 +235,7 @@ class LevelService {
         
         return {
             ...progressInfo,
+            experienceToNext: progressInfo.expNeededForNext,  // Add this for frontend compatibility
             prestigeMarker: character.prestige_marker,
             nextMilestone: this.getNextMilestone(character.level),
             contentUnlocks: this.progression.getContentUnlocks(character.level),

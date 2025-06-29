@@ -776,7 +776,7 @@
         <!-- Left Panel - Character Info -->
         <aside class="left-panel">
             <div class="character-info">
-                <div class="character-title"><%= character.race_name %> - Level <%= character.level %></div>
+                <div class="character-title"><%= character.race_name %> - Level <span id="character-level"><%= character.level %></span></div>
                 <div class="character-title">📍 <%= character.location_zone.replace('_', ' ').toUpperCase() %></div>
                 
                 <div class="stat-bars">
