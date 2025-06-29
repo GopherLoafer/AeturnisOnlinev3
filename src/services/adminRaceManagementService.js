@@ -75,22 +75,27 @@ class AdminRaceManagementService {
 
       const levelDistribution = await this.db.query(`
         SELECT 
-          r.name as race_name,
-          CASE 
-            WHEN c.level BETWEEN 1 AND 10 THEN '1-10'
-            WHEN c.level BETWEEN 11 AND 25 THEN '11-25'
-            WHEN c.level BETWEEN 26 AND 50 THEN '26-50'
-            WHEN c.level BETWEEN 51 AND 100 THEN '51-100'
-            WHEN c.level BETWEEN 101 AND 500 THEN '101-500'
-            WHEN c.level BETWEEN 501 AND 1000 THEN '501-1000'
-            ELSE '1000+'
-          END as level_range,
+          level_data.race_name,
+          level_data.level_range,
           COUNT(*) as count
-        FROM characters c
-        JOIN races r ON c.race_id = r.id
-        GROUP BY r.name, level_range
-        ORDER BY r.name, 
-          CASE level_range 
+        FROM (
+          SELECT 
+            r.name as race_name,
+            CASE 
+              WHEN c.level BETWEEN 1 AND 10 THEN '1-10'
+              WHEN c.level BETWEEN 11 AND 25 THEN '11-25'
+              WHEN c.level BETWEEN 26 AND 50 THEN '26-50'
+              WHEN c.level BETWEEN 51 AND 100 THEN '51-100'
+              WHEN c.level BETWEEN 101 AND 500 THEN '101-500'
+              WHEN c.level BETWEEN 501 AND 1000 THEN '501-1000'
+              ELSE '1000+'
+            END as level_range
+          FROM characters c
+          JOIN races r ON c.race_id = r.id
+        ) level_data
+        GROUP BY level_data.race_name, level_data.level_range
+        ORDER BY level_data.race_name, 
+          CASE level_data.level_range 
             WHEN '1-10' THEN 1
             WHEN '11-25' THEN 2
             WHEN '26-50' THEN 3
