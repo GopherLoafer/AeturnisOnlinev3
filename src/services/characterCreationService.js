@@ -174,9 +174,9 @@ class CharacterCreationService {
   }
 
   /**
-   * Calculate starting stats based on race and background
+   * Calculate starting stats based on race, background, and allocated points
    */
-  calculateStartingStats(race, background) {
+  calculateStartingStats(race, background, statAllocation = null) {
     const baseStats = { str: 10, int: 10, vit: 10, dex: 10, wis: 10 };
     
     // Apply race modifiers
@@ -199,6 +199,15 @@ class CharacterCreationService {
       baseStats.wis += bonuses.wis || 0;
     }
     
+    // Apply allocated stat points from character creation step 4
+    if (statAllocation) {
+      baseStats.str += statAllocation.str || 0;
+      baseStats.int += statAllocation.int || 0;
+      baseStats.vit += statAllocation.vit || 0;
+      baseStats.dex += statAllocation.dex || 0;
+      baseStats.wis += statAllocation.wis || 0;
+    }
+    
     return baseStats;
   }
 
@@ -218,8 +227,8 @@ class CharacterCreationService {
       const backgroundResult = await client.query('SELECT * FROM character_backgrounds WHERE id = $1', [sessionData.backgroundId]);
       const background = backgroundResult.rows[0];
       
-      // Calculate final stats
-      const stats = this.calculateStartingStats(race, background);
+      // Calculate final stats including allocated points from step 4
+      const stats = this.calculateStartingStats(race, background, sessionData.statAllocation);
       
       // Calculate starting health and mana
       const health = stats.vit * 10;

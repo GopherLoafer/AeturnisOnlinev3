@@ -177,6 +177,12 @@ A classic text-based MMORPG with infinite progression, racial diversity, and aff
 - Reference UIMOCKUP.png for UI design decisions
 
 ## Recent Changes
+- June 29, 2025: **Critical Character Creation Bug Fixed**
+  - **Stat Allocation Issue**: Fixed major bug where stat points allocated in step 4 weren't being applied to final character
+  - **Root Cause**: calculateStartingStats() function only applied race/background bonuses, ignored player's stat allocation
+  - **Solution**: Modified calculateStartingStats() to accept and apply statAllocation parameter from session data
+  - **Impact**: Characters now receive all intended stat points (base + race + background + allocated)
+  - **Database Fix**: Updated existing test character with correct stat values
 - June 29, 2025: **Phase 2.4 Character Creation Flow Implementation Completed**
   - **Multi-Step Wizard**: Created professional 5-step character creation process
   - **Database Extensions**: Added 4 new tables for backgrounds, tutorials, and session management
