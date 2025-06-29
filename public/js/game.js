@@ -1,6 +1,7 @@
 // Game Interface JavaScript
 document.addEventListener('DOMContentLoaded', function() {
     initializeGame();
+    initializeProgressionButtons();
 });
 
 function initializeGame() {
@@ -43,7 +44,7 @@ function initializeTabs() {
     const tabButtons = document.querySelectorAll('.tab-btn');
     tabButtons.forEach(button => {
         button.addEventListener('click', function() {
-            const tabName = this.getAttribute('onclick').match(/'([^']+)'/)[1];
+            const tabName = this.getAttribute('data-tab');
             showTab(tabName);
         });
     });
@@ -79,7 +80,7 @@ function initializeChatTabs() {
     const chatTabs = document.querySelectorAll('.chat-tab');
     chatTabs.forEach(tab => {
         tab.addEventListener('click', function() {
-            const channel = this.getAttribute('onclick').match(/'([^']+)'/)[1];
+            const channel = this.getAttribute('data-chat');
             showChat(channel);
         });
     });
@@ -482,6 +483,57 @@ function addProgressionMessage(message, className = '') {
     
     // Also add to main game output
     addToGameOutput(message, className);
+}
+
+// Initialize progression button event listeners
+function initializeProgressionButtons() {
+    console.log('Initializing progression buttons');
+    
+    const testBtn = document.getElementById('test-btn');
+    if (testBtn) {
+        testBtn.addEventListener('click', function() {
+            console.log('Test button clicked');
+            addProgressionMessage('Test message - buttons are working!', 'success');
+        });
+    }
+    
+    const gain100Btn = document.getElementById('gain-100-exp');
+    if (gain100Btn) {
+        gain100Btn.addEventListener('click', function() {
+            gainExperience(100);
+        });
+    }
+    
+    const gain1000Btn = document.getElementById('gain-1000-exp');
+    if (gain1000Btn) {
+        gain1000Btn.addEventListener('click', function() {
+            gainExperience(1000);
+        });
+    }
+    
+    const simulateBtn = document.getElementById('simulate-levelup');
+    if (simulateBtn) {
+        simulateBtn.addEventListener('click', function() {
+            simulateLevelUp();
+        });
+    }
+    
+    const leaderboardBtn = document.getElementById('view-leaderboard');
+    if (leaderboardBtn) {
+        leaderboardBtn.addEventListener('click', function() {
+            showLeaderboard();
+        });
+    }
+    
+    console.log('Progression buttons initialized');
+    
+    // Initialize menu button
+    const menuBtn = document.getElementById('menu-btn');
+    if (menuBtn) {
+        menuBtn.addEventListener('click', function() {
+            toggleMenu();
+        });
+    }
 }
 
 // Keyboard shortcuts

@@ -18,7 +18,7 @@
             <span class="location">📍 <%= character.location_zone.replace('_', ' ').toUpperCase() %></span>
         </div>
         <div class="status-right">
-            <button class="menu-btn" onclick="toggleMenu()">MENU</button>
+            <button class="menu-btn" id="menu-btn">MENU</button>
         </div>
     </div>
 
@@ -122,10 +122,10 @@
             <!-- Inventory/Skills/Quests Tabs -->
             <div class="tab-container">
                 <div class="tabs">
-                    <button class="tab-btn active" onclick="showTab('inventory')">Inventory</button>
-                    <button class="tab-btn" onclick="showTab('skills')">Skills</button>
-                    <button class="tab-btn" onclick="showTab('progression')">Progression</button>
-                    <button class="tab-btn" onclick="showTab('quests')">Quests</button>
+                    <button class="tab-btn active" data-tab="inventory">Inventory</button>
+                    <button class="tab-btn" data-tab="skills">Skills</button>
+                    <button class="tab-btn" data-tab="progression">Progression</button>
+                    <button class="tab-btn" data-tab="quests">Quests</button>
                 </div>
                 
                 <div id="inventory" class="tab-content active">
@@ -192,11 +192,11 @@
                         </div>
 
                         <div class="progression-actions">
-                            <button onclick="console.log('Test button clicked'); addProgressionMessage('Test message', 'success');" class="progression-btn">Test Button</button>
-                            <button onclick="gainExperience(100)" class="progression-btn">Gain 100 EXP</button>
-                            <button onclick="gainExperience(1000)" class="progression-btn">Gain 1000 EXP</button>
-                            <button onclick="simulateLevelUp()" class="progression-btn">Simulate Level Up</button>
-                            <button onclick="showLeaderboard()" class="progression-btn">View Leaderboard</button>
+                            <button id="test-btn" class="progression-btn">Test Button</button>
+                            <button id="gain-100-exp" class="progression-btn">Gain 100 EXP</button>
+                            <button id="gain-1000-exp" class="progression-btn">Gain 1000 EXP</button>
+                            <button id="simulate-levelup" class="progression-btn">Simulate Level Up</button>
+                            <button id="view-leaderboard" class="progression-btn">View Leaderboard</button>
                         </div>
 
                         <div id="progression-output" class="progression-output">
@@ -235,11 +235,11 @@
     <!-- Chat Area -->
     <div class="chat-area">
         <div class="chat-tabs">
-            <button class="chat-tab active" onclick="showChat('all')">All</button>
-            <button class="chat-tab" onclick="showChat('global')">Global</button>
-            <button class="chat-tab" onclick="showChat('guild')">Guild</button>
-            <button class="chat-tab" onclick="showChat('party')">Party</button>
-            <button class="chat-tab" onclick="showChat('combat')">Combat</button>
+            <button class="chat-tab active" data-chat="all">All</button>
+            <button class="chat-tab" data-chat="global">Global</button>
+            <button class="chat-tab" data-chat="guild">Guild</button>
+            <button class="chat-tab" data-chat="party">Party</button>
+            <button class="chat-tab" data-chat="combat">Combat</button>
         </div>
         
         <div class="chat-messages" id="chat-messages">
