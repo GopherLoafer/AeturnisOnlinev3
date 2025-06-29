@@ -177,9 +177,12 @@ A classic text-based MMORPG with infinite progression, racial diversity, and aff
 
 ## Recent Changes
 - June 29, 2025: Phase 2.2 Infinite Level Progression completed
+- **Exponential Milestone System**: Replaced frequent 100-level milestones with exponential scaling (1000, 5000, 15000, 40000, 100000+)
+- **Enhanced Reward Display**: Added dedicated "Recent Rewards" panel with color-coded messages and persistent display
+- **Milestone Rewards Redesigned**: Gold rewards scale exponentially (50K base × 3^milestone), special rewards with cosmic themes
+- **Database Cleanup**: Cleared old milestone data to prevent performance issues with new system
 - Exponential experience curve system supporting infinite scaling
 - Dynamic stat gains per level with racial modifiers and milestone bonuses
-- Milestone reward system every 100 levels with gold and special rewards
 - Six-tier prestige marker system (Bronze to Legendary) with visual effects
 - Global leaderboard with performance-optimized caching
 - Level-based content unlocking for zones and features

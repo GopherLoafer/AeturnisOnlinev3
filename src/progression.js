@@ -19,8 +19,21 @@ class ProgressionSystem {
             legendary: 10000 // Legendary star at level 10000
         };
         
-        // Milestone rewards every 100 levels
-        this.milestoneInterval = 100;
+        // Exponential milestone levels for infinite progression
+        this.milestoneLevels = [
+            1000,    // First major milestone
+            5000,    // 5x increase
+            15000,   // 3x increase
+            40000,   // ~2.7x increase
+            100000,  // 2.5x increase
+            250000,  // 2.5x increase
+            600000,  // 2.4x increase
+            1400000, // ~2.3x increase
+            3200000, // ~2.3x increase
+            7200000, // 2.25x increase
+            16000000 // ~2.2x increase
+            // Pattern continues: each milestone roughly 2.0-2.5x the previous
+        ];
     }
 
     /**
@@ -166,7 +179,7 @@ class ProgressionSystem {
      * @returns {boolean} True if milestone level
      */
     isMilestoneLevel(level) {
-        return level % this.milestoneInterval === 0 && level > 0;
+        return this.milestoneLevels.includes(level);
     }
 
     /**
@@ -177,8 +190,12 @@ class ProgressionSystem {
     getMilestoneReward(level) {
         if (!this.isMilestoneLevel(level)) return null;
 
-        const milestoneNumber = level / this.milestoneInterval;
-        const goldReward = Math.floor(1000 * Math.pow(milestoneNumber, 1.5));
+        const milestoneIndex = this.milestoneLevels.indexOf(level);
+        const milestoneNumber = milestoneIndex + 1;
+        
+        // Exponential gold rewards: starts at 50,000 and increases significantly
+        const baseReward = 50000;
+        const goldReward = Math.floor(baseReward * Math.pow(3, milestoneIndex));
         
         return {
             level,
@@ -197,24 +214,53 @@ class ProgressionSystem {
         const prestige = this.getPrestigeMarker(level);
         
         switch (level) {
-            case 100:
-                return 'Bronze Prestige Star + Title: "Centurion"';
-            case 500:
-                return 'Silver Prestige Star + Title: "Veteran"';
             case 1000:
-                return 'Gold Prestige Star + Title: "Champion"';
-            case 2500:
-                return 'Platinum Prestige Star + Title: "Legend"';
+                return 'Gold Prestige Star + Title: "Ascendant"';
             case 5000:
-                return 'Diamond Prestige Star + Title: "Mythic"';
-            case 10000:
-                return 'Legendary Prestige Star + Title: "Immortal"';
+                return 'Diamond Prestige Star + Title: "Transcendent"';
+            case 15000:
+                return 'Legendary Star + Title: "Apex Warrior"';
+            case 40000:
+                return 'Mythic Crown + Title: "Planar Champion"';
+            case 100000:
+                return 'Ethereal Aura + Title: "Reality Shaper"';
+            case 250000:
+                return 'Cosmic Emblem + Title: "Universe Walker"';
+            case 600000:
+                return 'Dimensional Seal + Title: "Infinity Breaker"';
+            case 1400000:
+                return 'Primordial Mark + Title: "Existence Defier"';
+            case 3200000:
+                return 'Origin Crystal + Title: "Void Conqueror"';
+            case 7200000:
+                return 'Creation Spark + Title: "Reality Architect"';
+            case 16000000:
+                return 'Ultimate Ascension + Title: "Omnipotent One"';
             default:
-                if (level >= 1000) {
-                    return `${prestige.charAt(0).toUpperCase() + prestige.slice(1)} Tier Bonus`;
+                if (prestige) {
+                    return `${prestige.charAt(0).toUpperCase() + prestige.slice(1)} Tier Achievement`;
                 }
-                return null;
+                return 'Legendary Achievement Unlocked';
         }
+    }
+
+    /**
+     * Get next milestone information for display
+     * @param {number} currentLevel - Current character level
+     * @returns {object|null} Next milestone info or null if no more milestones
+     */
+    getNextMilestone(currentLevel) {
+        const nextMilestone = this.milestoneLevels.find(level => level > currentLevel);
+        
+        if (!nextMilestone) {
+            return null; // No more predefined milestones
+        }
+        
+        return {
+            level: nextMilestone,
+            levelsRemaining: nextMilestone - currentLevel,
+            reward: this.getMilestoneReward(nextMilestone)
+        };
     }
 
     /**
