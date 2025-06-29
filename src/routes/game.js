@@ -88,44 +88,24 @@ router.post('/character-creation', async (req, res) => {
   const { name, raceId } = req.body;
 
   if (!name || !raceId) {
-    const races = await db.query('SELECT * FROM races ORDER BY name');
-    return res.render('game/character-creation', {
-      title: 'Create Character - Aeturnis Online',
-      races: races.rows,
-      error: 'Character name and race are required'
-    });
+    return res.redirect('/game/character-creation-wizard?error=name-and-race-required');
   }
 
   if (name.length < 3 || name.length > 20) {
-    const races = await db.query('SELECT * FROM races ORDER BY name');
-    return res.render('game/character-creation', {
-      title: 'Create Character - Aeturnis Online',
-      races: races.rows,
-      error: 'Character name must be between 3 and 20 characters'
-    });
+    return res.redirect('/game/character-creation-wizard?error=invalid-name-length');
   }
 
   try {
     // Check if character name is taken
     const existingChar = await db.query('SELECT id FROM characters WHERE name = $1', [name]);
     if (existingChar.rows.length > 0) {
-      const races = await db.query('SELECT * FROM races ORDER BY name');
-      return res.render('game/character-creation', {
-        title: 'Create Character - Aeturnis Online',
-        races: races.rows,
-        error: 'Character name already exists'
-      });
+      return res.redirect('/game/character-creation-wizard?error=name-taken');
     }
 
     // Get race info
     const race = await db.query('SELECT * FROM races WHERE id = $1', [raceId]);
     if (race.rows.length === 0) {
-      const races = await db.query('SELECT * FROM races ORDER BY name');
-      return res.render('game/character-creation', {
-        title: 'Create Character - Aeturnis Online',
-        races: races.rows,
-        error: 'Invalid race selection'
-      });
+      return res.redirect('/game/character-creation-wizard?error=invalid-race');
     }
 
     const raceData = race.rows[0];
@@ -181,12 +161,7 @@ router.post('/character-creation', async (req, res) => {
     res.redirect('/game/dashboard');
   } catch (error) {
     console.error('Character creation error:', error);
-    const races = await db.query('SELECT * FROM races ORDER BY name');
-    res.render('game/character-creation', {
-      title: 'Create Character - Aeturnis Online',
-      races: races.rows,
-      error: 'An error occurred while creating your character'
-    });
+    res.redirect('/game/character-creation-wizard?error=creation-failed');
   }
 });
 
