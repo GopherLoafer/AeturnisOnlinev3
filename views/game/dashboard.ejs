@@ -1451,6 +1451,100 @@
                     <div class="map-cell"></div>
                     <div class="map-cell enemy">!</div>
                     <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell player">P</div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell enemy">!</div>
+                    <div class="map-cell"></div>
+                    
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell current" onclick="move('north')">@</div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell" onclick="move('west')"></div>
+                    <div class="map-cell treasure">💎</div>
+                    <div class="map-cell" onclick="move('east')"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell" onclick="move('south')"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell danger">⚠️</div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell exit">🚪</div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    
+                    <div class="map-cell"></div>
+                    <div class="map-cell obstacle">🗿</div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell water">🌊</div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell resource">🌳</div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell hidden">?</div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                </div>
+            </div>
+
+            <!-- Tabs Panel -->
+            <div class="tabs-panel">
+                <div class="panel-tabs">
+                    <button class="tab-button active" onclick="switchTab('equipment')">Equipment</button>
+                    <button class="tab-button" onclick="switchTab('inventory')">Inventory</button>
+                    <button class="tab-button" onclick="switchTab('affinities')">Affinities</button>
+                    <button class="tab-button" onclick="switchTab('abilities')">Abilities</button>
+                    <div class="settings-dropdown">
                         <button class="tab-button settings-btn" onclick="toggleSettingsDropdown()">⚙️</button>
                         <div class="dropdown-menu" id="settings-dropdown">
                             <% if (user.is_admin) { %>
@@ -1461,177 +1555,96 @@
                     </div>
                 </div>
 
-            <!-- Equipment Tab -->
-            <div id="equipment" class="tab-content active">
-
-                    <div class="map-location-header">
-                        🌋 <%= character.location_zone.replace('_', ' ').toUpperCase() %>
-                    </div>
-                    <div class="map-grid">
-                        <div class="map-cell"></div>
-                        <div class="map-cell npc">🏪</div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell enemy">!</div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell player">P</div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell enemy">!</div>
-                        <div class="map-cell"></div>
-                        
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell current" onclick="move('north')">@</div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell" onclick="move('west')"></div>
-                        <div class="map-cell treasure">💎</div>
-                        <div class="map-cell" onclick="move('east')"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell" onclick="move('south')"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell danger">⚠️</div>
-                        <div class="map-cell"></div>
-                        
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell exit">🚪</div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        
-                        <div class="map-cell"></div>
-                        <div class="map-cell obstacle">🗿</div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell water">🌊</div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell resource">🌳</div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell hidden">?</div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
-                        <div class="map-cell"></div>
+                <!-- Equipment Tab -->
+                <div id="equipment" class="tab-content active">
+                    <div class="equipment-section">
+                        <h3>Equipment</h3>
+                        <div class="equipment-grid">
+                            <div class="equipment-slot equipped">⛑️</div>
+                            <div class="equipment-slot equipped">🛡️</div>
+                            <div class="equipment-slot equipped">👖</div>
+                            <div class="equipment-slot equipped">⚔️</div>
+                            <div class="equipment-slot">🛡️</div>
+                            <div class="equipment-slot equipped">👢</div>
+                            <div class="equipment-slot equipped">💍</div>
+                            <div class="equipment-slot equipped">💍</div>
+                            <div class="equipment-slot">📿</div>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="equipment-section">
-                    <h3>Equipment</h3>
-                    <div class="equipment-grid">
-                        <div class="equipment-slot equipped">⛑️</div>
-                        <div class="equipment-slot equipped">🛡️</div>
-                        <div class="equipment-slot equipped">👖</div>
-                        <div class="equipment-slot equipped">⚔️</div>
-                        <div class="equipment-slot">🛡️</div>
-                        <div class="equipment-slot equipped">👢</div>
-                        <div class="equipment-slot equipped">💍</div>
-                        <div class="equipment-slot equipped">💍</div>
-                        <div class="equipment-slot">📿</div>
+
+                <!-- Inventory Tab -->
+                <div id="inventory" class="tab-content">
+                    <div class="inventory-grid">
+                        <div class="inventory-slot filled">⚔️</div>
+                        <div class="inventory-slot filled">🛡️</div>
+                        <div class="inventory-slot filled">🧪<span class="item-count">12</span></div>
+                        <div class="inventory-slot filled">🧪<span class="item-count">8</span></div>
+                        <div class="inventory-slot filled">🥩<span class="item-count">25</span></div>
+                        <div class="inventory-slot filled">💎</div>
+                        <div class="inventory-slot filled">📜</div>
+                        <div class="inventory-slot filled">🗝️<span class="item-count">3</span></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
+                        <div class="inventory-slot"></div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Inventory Tab -->
-            <div id="inventory" class="tab-content">
-                <div class="inventory-grid">
-                    <div class="inventory-slot filled">⚔️</div>
-                    <div class="inventory-slot filled">🛡️</div>
-                    <div class="inventory-slot filled">🧪<span class="item-count">12</span></div>
-                    <div class="inventory-slot filled">🧪<span class="item-count">8</span></div>
-                    <div class="inventory-slot filled">🥩<span class="item-count">25</span></div>
-                    <div class="inventory-slot filled">💎</div>
-                    <div class="inventory-slot filled">📜</div>
-                    <div class="inventory-slot filled">🗝️<span class="item-count">3</span></div>
-                    <div class="inventory-slot"></div>
-                    <div class="inventory-slot"></div>
-                    <div class="inventory-slot"></div>
-                    <div class="inventory-slot"></div>
-                    <div class="inventory-slot"></div>
-                    <div class="inventory-slot"></div>
-                    <div class="inventory-slot"></div>
-                    <div class="inventory-slot"></div>
-                    <div class="inventory-slot"></div>
-                    <div class="inventory-slot"></div>
-                    <div class="inventory-slot"></div>
-                    <div class="inventory-slot"></div>
-                </div>
-            </div>
+                <!-- Affinities Tab -->
+                <div id="affinities" class="tab-content">
+                    <div class="affinity-section">
+                        <h4>Weapon Mastery</h4>
+                        <div class="affinity-grid">
+                            <% weaponAffinities.forEach(affinity => { %>
+                            <div class="affinity-item">
+                                <div class="affinity-icon weapon-<%= affinity.weapon_type %>">⚔️</div>
+                                <span class="affinity-name"><%= affinity.weapon_type.charAt(0).toUpperCase() + affinity.weapon_type.slice(1) %></span>
+                                <span class="affinity-value"><%= parseFloat(affinity.affinity_percentage).toFixed(1) %>%</span>
+                            </div>
+                            <% }); %>
+                        </div>
 
-            <!-- Affinities Tab -->
-            <div id="affinities" class="tab-content">
-                <div class="affinity-section">
-                    <h4>Weapon Affinities</h4>
-                    <% weaponAffinities.forEach(function(affinity) { %>
-                    <div class="affinity-item">
-                        <span class="affinity-name"><%= affinity.weapon_type %></span>
-                        <span class="affinity-value"><%= parseFloat(affinity.affinity_percentage).toFixed(1) %>%</span>
+                        <h4 style="margin-top: 20px;">Magic Schools</h4>
+                        <div class="affinity-grid">
+                            <% magicAffinities.forEach(affinity => { %>
+                            <div class="affinity-item">
+                                <div class="affinity-icon magic-<%= affinity.magic_school %>">🔮</div>
+                                <span class="affinity-name"><%= affinity.magic_school.charAt(0).toUpperCase() + affinity.magic_school.slice(1) %></span>
+                                <span class="affinity-value"><%= parseFloat(affinity.affinity_percentage).toFixed(1) %>%</span>
+                            </div>
+                            <% }); %>
+                        </div>
                     </div>
-                    <% }); %>
-                    
-                    <h4 style="margin-top: 15px;">Magic Affinities</h4>
-                    <% magicAffinities.forEach(function(affinity) { %>
-                    <div class="affinity-item">
-                        <span class="affinity-name"><%= affinity.magic_school %></span>
-                        <span class="affinity-value"><%= parseFloat(affinity.affinity_percentage).toFixed(1) %>%</span>
-                    </div>
-                    <% }); %>
                 </div>
-            </div>
 
-            <!-- Abilities Tab -->
-            <div id="abilities" class="tab-content">
-                <h4 style="color: #FFD700; margin-bottom: 15px;">Race Abilities</h4>
-                <div id="race-abilities">
-                    <div class="loading">Loading abilities...</div>
+                <!-- Abilities Tab -->
+                <div id="abilities" class="tab-content">
+                    <h4 style="color: #FFD700; margin-bottom: 15px;">Race Abilities</h4>
+                    <div id="race-abilities">
+                        <div class="loading">Loading abilities...</div>
+                    </div>
                 </div>
             </div>
         </aside>
-
         <!-- Bottom Panel - Chat -->
         <section class="bottom-panel">
             <div class="chat-tabs">
