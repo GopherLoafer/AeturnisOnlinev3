@@ -302,7 +302,9 @@ function addToGameOutput(message, className = '') {
 
 // Progression System Functions
 async function gainExperience(amount) {
+    console.log('gainExperience called with amount:', amount);
     try {
+        console.log('Making API request to /api/progression/award-experience');
         const response = await fetch('/api/progression/award-experience', {
             method: 'POST',
             headers: {
@@ -311,7 +313,19 @@ async function gainExperience(amount) {
             body: JSON.stringify({ amount })
         });
 
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            console.error('Response not OK:', response.status, response.statusText);
+            if (response.status === 302) {
+                console.error('Being redirected - likely authentication issue');
+                window.location.reload();
+                return;
+            }
+        }
+
         const data = await response.json();
+        console.log('Response data:', data);
         
         if (data.success) {
             addProgressionMessage(`Gained ${data.experienceGained} experience!`, 'success');
@@ -355,7 +369,9 @@ async function gainExperience(amount) {
 }
 
 async function simulateLevelUp() {
+    console.log('simulateLevelUp called');
     try {
+        console.log('Making API request to /api/progression/simulate-level-up');
         const response = await fetch('/api/progression/simulate-level-up', {
             method: 'POST',
             headers: {
@@ -363,7 +379,19 @@ async function simulateLevelUp() {
             }
         });
 
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            console.error('Response not OK:', response.status, response.statusText);
+            if (response.status === 302) {
+                console.error('Being redirected - likely authentication issue');
+                window.location.reload();
+                return;
+            }
+        }
+
         const data = await response.json();
+        console.log('Response data:', data);
         
         if (data.success) {
             addProgressionMessage(data.message, 'success');
@@ -380,9 +408,24 @@ async function simulateLevelUp() {
 }
 
 async function showLeaderboard() {
+    console.log('showLeaderboard called');
     try {
+        console.log('Making API request to /api/progression/leaderboard');
         const response = await fetch('/api/progression/leaderboard');
+        
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            console.error('Response not OK:', response.status, response.statusText);
+            if (response.status === 302) {
+                console.error('Being redirected - likely authentication issue');
+                window.location.reload();
+                return;
+            }
+        }
+        
         const data = await response.json();
+        console.log('Response data:', data);
         
         if (data.success) {
             displayLeaderboard(data.leaderboard);
@@ -422,8 +465,13 @@ function displayLeaderboard(leaderboard) {
 }
 
 function addProgressionMessage(message, className = '') {
+    console.log('addProgressionMessage called:', message, className);
     const output = document.getElementById('progression-output');
-    if (!output) return;
+    if (!output) {
+        console.warn('progression-output element not found');
+        addToGameOutput(message, className);
+        return;
+    }
 
     const messageElement = document.createElement('div');
     messageElement.textContent = message;
