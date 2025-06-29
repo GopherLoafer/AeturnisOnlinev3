@@ -218,20 +218,44 @@ function updateHealthMana(health, mana) {
     const manaBar = document.getElementById('mana-bar');
     const healthText = document.getElementById('health-text');
     const manaText = document.getElementById('mana-text');
+    const healthDisplay = document.getElementById('health-display');
+    const manaDisplay = document.getElementById('mana-display');
     
-    if (healthBar && health.current !== undefined && health.max !== undefined) {
+    if (health.current !== undefined && health.max !== undefined) {
         const healthPercent = (health.current / health.max) * 100;
-        healthBar.style.width = `${healthPercent}%`;
+        
+        // Update progress bar
+        if (healthBar) {
+            healthBar.style.width = `${healthPercent}%`;
+        }
+        
+        // Update percentage text on bar
         if (healthText) {
             healthText.textContent = `${Math.round(healthPercent)}%`;
         }
+        
+        // Update current/max display
+        if (healthDisplay) {
+            healthDisplay.textContent = `${health.current}/${health.max}`;
+        }
     }
     
-    if (manaBar && mana.current !== undefined && mana.max !== undefined) {
+    if (mana.current !== undefined && mana.max !== undefined) {
         const manaPercent = (mana.current / mana.max) * 100;
-        manaBar.style.width = `${manaPercent}%`;
+        
+        // Update progress bar
+        if (manaBar) {
+            manaBar.style.width = `${manaPercent}%`;
+        }
+        
+        // Update percentage text on bar
         if (manaText) {
             manaText.textContent = `${Math.round(manaPercent)}%`;
+        }
+        
+        // Update current/max display
+        if (manaDisplay) {
+            manaDisplay.textContent = `${mana.current}/${mana.max}`;
         }
     }
 }

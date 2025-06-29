@@ -783,7 +783,7 @@
                     <div class="stat-bar">
                         <div class="stat-label">
                             <span>Health</span>
-                            <span><%= character.health_current %>/<%= character.health_max %></span>
+                            <span id="health-display"><%= character.health_current %>/<%= character.health_max %></span>
                         </div>
                         <div class="bar-container">
                             <div class="bar-fill hp-bar" id="health-bar" style="width: <%= (character.health_current / character.health_max * 100) %>%"></div>
@@ -793,7 +793,7 @@
                     <div class="stat-bar">
                         <div class="stat-label">
                             <span>Mana</span>
-                            <span><%= character.mana_current %>/<%= character.mana_max %></span>
+                            <span id="mana-display"><%= character.mana_current %>/<%= character.mana_max %></span>
                         </div>
                         <div class="bar-container">
                             <div class="bar-fill mp-bar" id="mana-bar" style="width: <%= (character.mana_current / character.mana_max * 100) %>%"></div>
