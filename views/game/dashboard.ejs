@@ -143,6 +143,21 @@
             margin-bottom: 10px;
         }
 
+        .character-name-small {
+            font-size: 14px;
+            color: #10b981;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .gold-display {
+            font-size: 12px;
+            color: #fbbf24;
+            text-align: center;
+            margin-top: 4px;
+        }
+
         .stat-bars {
             margin-bottom: 10px;
         }
@@ -1147,26 +1162,22 @@
         <!-- Left Panel - Character Info -->
         <aside class="left-panel">
             <div class="character-info">
-                <div class="character-name-header">
-                    <%= character.name %>
-                    <% if (character.prestige_marker) { %>
-                        <span class="prestige-marker <%= character.prestige_marker %>">
-                            <% if (character.prestige_marker === 'bronze') { %>🥉<% } %>
-                            <% if (character.prestige_marker === 'silver') { %>🥈<% } %>
-                            <% if (character.prestige_marker === 'gold') { %>🥇<% } %>
-                            <% if (character.prestige_marker === 'platinum') { %>💎<% } %>
-                            <% if (character.prestige_marker === 'diamond') { %>💠<% } %>
-                            <% if (character.prestige_marker === 'legendary') { %>⭐<% } %>
-                        </span>
-                    <% } %>
-                </div>
-                <div class="character-title"><%= character.race_name %> - Level <span id="character-level"><%= character.level %></span></div>
-                <div class="character-title">📍 <%= character.location_zone.replace('_', ' ').toUpperCase() %></div>
-                <div class="resource-display">
-                    💰 <%= character.gold.toLocaleString() %> | ⚡ Lv <%= character.level %> (<%= progression.progressPercentage %>%)
-                </div>
+                <div class="character-title"><%= character.race_name %></div>
                 
                 <div class="stat-bars">
+                    <div class="character-name-small">
+                        <%= character.name %> - Level <span id="character-level"><%= character.level %></span>
+                        <% if (character.prestige_marker) { %>
+                            <span class="prestige-marker <%= character.prestige_marker %>">
+                                <% if (character.prestige_marker === 'bronze') { %>🥉<% } %>
+                                <% if (character.prestige_marker === 'silver') { %>🥈<% } %>
+                                <% if (character.prestige_marker === 'gold') { %>🥇<% } %>
+                                <% if (character.prestige_marker === 'platinum') { %>💎<% } %>
+                                <% if (character.prestige_marker === 'diamond') { %>💠<% } %>
+                                <% if (character.prestige_marker === 'legendary') { %>⭐<% } %>
+                            </span>
+                        <% } %>
+                    </div>
                     <div class="stat-bar">
                         <div class="stat-label">
                             <span>Health</span>
@@ -1196,6 +1207,9 @@
                             <div class="bar-fill exp-bar" id="exp-bar" style="width: <%= progression.progressPercentage %>%"></div>
                             <div class="bar-text" id="exp-text"><%= progression.progressPercentage %>%</div>
                         </div>
+                    </div>
+                    <div class="gold-display">
+                        💰 <%= character.gold.toLocaleString() %> Gold
                     </div>
                 </div>
 
