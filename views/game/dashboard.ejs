@@ -31,10 +31,11 @@
         .game-container {
             display: grid;
             grid-template-areas:
+                "header header header"
                 "left-panel main right-panel"
                 "bottom-panel bottom-panel bottom-panel";
             grid-template-columns: 320px 1fr 340px;
-            grid-template-rows: 1fr 240px;
+            grid-template-rows: 60px 1fr 240px;
             height: calc(100vh - 40px);
             gap: 20px;
             background: transparent;
@@ -45,12 +46,126 @@
         /* Header */
         .header {
             grid-area: header;
-            background: linear-gradient(to bottom, #2a2a2a, #1a1a1a);
-            border-bottom: 2px solid #444;
+            background: linear-gradient(145deg, rgba(15, 20, 25, 0.95) 0%, rgba(20, 25, 35, 0.95) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px;
             display: flex;
             align-items: center;
-            padding: 0 20px;
+            justify-content: space-between;
+            padding: 0 24px;
+            backdrop-filter: blur(20px);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+
+        .game-title {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .server-metrics {
+            display: flex;
             gap: 20px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .metric-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        /* Hide Scrollbars */
+        .left-panel::-webkit-scrollbar,
+        .tab-content::-webkit-scrollbar,
+        .game-output::-webkit-scrollbar,
+        .chat-messages::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        .left-panel,
+        .tab-content,
+        .game-output,
+        .chat-messages {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        /* Tile Information Section */
+        .tile-info-section {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .tile-info-header {
+            color: #10b981;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tile-content {
+            color: #e5e7eb;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .special-tile {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+        }
+
+        .special-tile-name {
+            color: #10b981;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .special-tile-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .tile-action-btn {
+            padding: 4px 12px;
+            font-size: 11px;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: 6px;
+            color: #10b981;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tile-action-btn:hover {
+            background: rgba(16, 185, 129, 0.3);
+            border-color: rgba(16, 185, 129, 0.6);
         }
 
         .resource-bar {
@@ -1294,7 +1409,28 @@
 </head>
 <body>
     <div class="game-container">
-
+        <!-- Header -->
+        <div class="header">
+            <div class="game-title">Aeturnis Online</div>
+            <div class="server-metrics">
+                <div class="metric-item">
+                    <span>⚡</span>
+                    <span>Status: <span class="metric-value">Online</span></span>
+                </div>
+                <div class="metric-item">
+                    <span>👥</span>
+                    <span>Players: <span class="metric-value">247</span></span>
+                </div>
+                <div class="metric-item">
+                    <span>🗺️</span>
+                    <span>Uptime: <span class="metric-value">23h 14m</span></span>
+                </div>
+                <div class="metric-item">
+                    <span>⏰</span>
+                    <span id="server-time">00:00:00</span>
+                </div>
+            </div>
+        </div>
 
         <!-- Left Panel - Modular Blocks -->
         <aside class="left-panel">
@@ -1462,6 +1598,27 @@
                     <button class="action-btn combat primary" onclick="performAction('fight')">⚔️ Fight</button>
                     <button class="action-btn combat secondary" onclick="performAction('cast')">🔮 Cast</button>
                     <button class="action-btn special" onclick="performAction('rest')">💤 Rest</button>
+                </div>
+            </div>
+
+            <!-- Tile Information Section -->
+            <div class="tile-info-section">
+                <div class="tile-info-header">
+                    🗺️ Current Location
+                </div>
+                <div class="tile-content">
+                    <div class="location-name">Darkwood Forest - Northern Path</div>
+                    <div class="location-description">Ancient trees tower above, their branches forming a natural canopy that blocks most sunlight. The forest floor is covered in moss and fallen leaves.</div>
+                    
+                    <!-- Special Tile (Shop/Temple) -->
+                    <div class="special-tile">
+                        <div class="special-tile-name">🏪 Mystic Merchant's Stall</div>
+                        <div class="tile-content">A weathered tent with mystical artifacts and potions displayed on wooden tables.</div>
+                        <div class="special-tile-actions">
+                            <button class="tile-action-btn" onclick="performAction('shop')">Browse Wares</button>
+                            <button class="tile-action-btn" onclick="performAction('talk')">Talk to Merchant</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -1902,6 +2059,20 @@
         document.getElementById('game-output').addEventListener('scroll', function(e) {
             e.stopPropagation();
         });
+
+        // Update server time
+        function updateServerTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const serverTimeElement = document.getElementById('server-time');
+            if (serverTimeElement) {
+                serverTimeElement.textContent = timeString;
+            }
+        }
+
+        // Update time every second
+        setInterval(updateServerTime, 1000);
+        updateServerTime();
     </script>
 </body>
 </html>
