@@ -19,6 +19,15 @@ router.post('/award-experience', requireCharacter, async (req, res) => {
                 error: 'Valid experience amount is required' 
             });
         }
+        
+        // Cap experience awards to prevent overflow (max 100 million per award)
+        const MAX_EXPERIENCE_AWARD = 100000000;
+        if (amount > MAX_EXPERIENCE_AWARD) {
+            return res.status(400).json({ 
+                success: false, 
+                error: `Experience amount too large. Maximum allowed: ${MAX_EXPERIENCE_AWARD.toLocaleString()}` 
+            });
+        }
 
         const results = await levelService.awardExperience(req.session.characterId, parseInt(amount));
         

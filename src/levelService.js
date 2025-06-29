@@ -47,6 +47,12 @@ class LevelService {
             // Apply racial experience bonus
             const finalExperience = this.progression.applyExperienceBonus(experienceAmount, raceData);
             const newTotalExperience = character.experience + finalExperience;
+            
+            // PostgreSQL BIGINT maximum value is 9,223,372,036,854,775,807
+            const MAX_BIGINT = 9223372036854775807;
+            if (newTotalExperience > MAX_BIGINT) {
+                throw new Error(`Experience overflow: ${newTotalExperience} exceeds PostgreSQL BIGINT limit`);
+            }
 
             // Calculate old and new levels
             const oldLevel = character.level;
