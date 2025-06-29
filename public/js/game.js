@@ -467,22 +467,34 @@ function displayLeaderboard(leaderboard) {
 
 function addProgressionMessage(message, className = '') {
     console.log('addProgressionMessage called:', message, className);
-    const output = document.getElementById('progression-output');
-    if (!output) {
-        console.warn('progression-output element not found');
-        addToGameOutput(message, className);
-        return;
+    
+    // Display in the dedicated rewards panel
+    const rewardsDisplay = document.getElementById('rewards-display');
+    if (rewardsDisplay) {
+        // Remove the initial info message if it exists
+        const infoMessage = rewardsDisplay.querySelector('.reward-message.info');
+        if (infoMessage && infoMessage.textContent.includes('Start gaining experience')) {
+            infoMessage.remove();
+        }
+        
+        const messageElement = document.createElement('div');
+        messageElement.textContent = message;
+        messageElement.className = `reward-message ${className}`;
+        
+        rewardsDisplay.appendChild(messageElement);
+        rewardsDisplay.scrollTop = rewardsDisplay.scrollHeight;
+        
+        // Keep only the last 20 messages to prevent overflow
+        const messages = rewardsDisplay.querySelectorAll('.reward-message');
+        if (messages.length > 20) {
+            messages[0].remove();
+        }
     }
-
-    const messageElement = document.createElement('div');
-    messageElement.textContent = message;
-    messageElement.className = `progression-message ${className}`;
     
-    output.appendChild(messageElement);
-    output.scrollTop = output.scrollHeight;
-    
-    // Also add to main game output
-    addToGameOutput(message, className);
+    // Still add important messages to main game output
+    if (className === 'milestone' || className === 'level-up') {
+        addToGameOutput(message, className);
+    }
 }
 
 // Initialize progression button event listeners
