@@ -96,7 +96,7 @@ async function validateNameAvailability(name) {
   if (name === lastValidatedName) return;
   
   try {
-    const response = await fetch('/api/character-creation/validate-name', {
+    const response = await fetch('/game/api/character-creation/validate-name', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name })

@@ -92,7 +92,7 @@
         function proceedToNextStep(stepData) {
             showLoading();
             
-            fetch('/api/character-creation/step', {
+            fetch('/game/api/character-creation/step', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

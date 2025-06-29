@@ -240,7 +240,7 @@ async function createCharacter() {
   btnLoading.style.display = 'inline';
   
   try {
-    const response = await fetch('/api/character-creation/create', {
+    const response = await fetch('/game/api/character-creation/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' }
     });
