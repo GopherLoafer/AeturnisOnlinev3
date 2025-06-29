@@ -4,6 +4,10 @@
 
 class PerformanceManager {
     constructor() {
+        this.memoryThreshold = 15 * 1024 * 1024; // 15MB
+        this.fpsThreshold = 30;
+        this.lastWarningTime = 0;
+        this.warningCooldown = 5000; // 5 seconds
         this.init();
     }
     
@@ -12,6 +16,97 @@ class PerformanceManager {
         this.setupIntersectionObservers();
         this.optimizeAnimations();
         this.setupNetworkDetection();
+        this.setupPerformanceMonitoring();
+    }
+    
+    setupPerformanceMonitoring() {
+        // Monitor memory usage
+        if ('memory' in performance) {
+            setInterval(() => {
+                this.checkMemoryUsage();
+            }, 10000); // Check every 10 seconds
+        }
+        
+        // Monitor FPS
+        this.setupFPSMonitoring();
+        
+        // Monitor long tasks
+        if ('PerformanceObserver' in window) {
+            const observer = new PerformanceObserver((list) => {
+                list.getEntries().forEach((entry) => {
+                    if (entry.duration > 50) { // Tasks longer than 50ms
+                        this.throttledWarn(`Long task detected: ${Math.round(entry.duration)}ms`);
+                    }
+                });
+            });
+            observer.observe({ entryTypes: ['longtask'] });
+        }
+    }
+    
+    checkMemoryUsage() {
+        if ('memory' in performance) {
+            const memory = performance.memory;
+            const usedMB = Math.round(memory.usedJSHeapSize / 1024 / 1024);
+            const totalMB = Math.round(memory.totalJSHeapSize / 1024 / 1024);
+            
+            if (memory.usedJSHeapSize > this.memoryThreshold) {
+                this.throttledWarn(`High memory usage: ${usedMB}MB / ${totalMB}MB`);
+                this.performMemoryCleanup();
+            }
+        }
+    }
+    
+    setupFPSMonitoring() {
+        let lastTime = performance.now();
+        let frameCount = 0;
+        
+        const measureFPS = () => {
+            const currentTime = performance.now();
+            frameCount++;
+            
+            if (currentTime - lastTime >= 1000) {
+                const fps = Math.round(frameCount * 1000 / (currentTime - lastTime));
+                
+                if (fps < this.fpsThreshold) {
+                    this.throttledWarn(`Low FPS detected: ${fps}`);
+                }
+                
+                frameCount = 0;
+                lastTime = currentTime;
+            }
+            
+            requestAnimationFrame(measureFPS);
+        };
+        
+        requestAnimationFrame(measureFPS);
+    }
+    
+    performMemoryCleanup() {
+        // Clean up chat messages
+        const chatMessages = document.querySelector('.chat-messages');
+        if (chatMessages && chatMessages.children.length > 50) {
+            const toRemove = chatMessages.children.length - 50;
+            for (let i = 0; i < toRemove; i++) {
+                chatMessages.removeChild(chatMessages.firstChild);
+            }
+        }
+        
+        // Clean up game output
+        const gameOutput = document.querySelector('.game-output');
+        if (gameOutput && gameOutput.children.length > 100) {
+            const toRemove = gameOutput.children.length - 100;
+            for (let i = 0; i < toRemove; i++) {
+                gameOutput.removeChild(gameOutput.firstChild);
+            }
+        }
+    }
+    
+    throttledWarn(message) {
+        const now = Date.now();
+        if (now - this.lastWarningTime > this.warningCooldown) {
+            console.warn(message);
+            this.lastWarningTime = now;
+        }
     }
     
     setupLazyLoading() {
