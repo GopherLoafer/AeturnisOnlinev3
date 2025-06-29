@@ -58,4 +58,75 @@ body {
 img, video {
     max-width: 100%;
     height: auto;
+    display: block;
+}
+
+/* === Responsive Images & Media Optimization === */
+
+/* Lazy loading image styles */
+img[data-src] {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    background-color: var(--bg-darker);
+    border-radius: 4px;
+    min-height: 100px;
+}
+
+img[data-src].loaded {
+    opacity: 1;
+}
+
+/* Responsive background image styles */
+[data-bg-mobile],
+[data-bg-desktop] {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.3s ease;
+}
+
+/* Image loading placeholder */
+.image-placeholder {
+    background: linear-gradient(90deg, var(--bg-darker) 25%, transparent 50%, var(--bg-darker) 75%);
+    background-size: 200% 100%;
+    animation: loading-shimmer 1.5s infinite;
+    border-radius: 4px;
+    min-height: 100px;
+}
+
+@keyframes loading-shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Performance optimizations for images */
+@media (max-width: 768px) {
+    /* Reduce image quality on mobile for performance */
+    img {
+        image-rendering: auto;
+    }
+    
+    /* Simplify background attachments */
+    [data-bg-mobile],
+    [data-bg-desktop] {
+        background-attachment: scroll;
+    }
+}
+
+/* Responsive image utilities */
+.responsive-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.responsive-avatar {
+    width: clamp(40px, 8vw, 60px);
+    height: clamp(40px, 8vw, 60px);
+    border-radius: 50%;
+    object-fit: cover;
 }
