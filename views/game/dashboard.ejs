@@ -158,6 +158,113 @@
             margin-top: 4px;
         }
 
+        /* Modular Left Panel Blocks */
+        .character-block, .stats-block, .reports-block {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .block-title {
+            color: #10b981;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        /* Left Panel Tabs */
+        .left-panel-tabs {
+            display: flex;
+            margin-bottom: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .left-tab-button {
+            flex: 1;
+            padding: 8px 4px;
+            font-size: 10px;
+            color: #999;
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .left-tab-button.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .left-tab-button:hover {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .left-tab-content {
+            display: none;
+        }
+
+        .left-tab-content.active {
+            display: block;
+        }
+
+        .progression-info, .battle-stats-info, .achievements-info {
+            font-size: 11px;
+        }
+
+        .progression-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: #ccc;
+        }
+
+        .stats-placeholder {
+            text-align: center;
+            color: #888;
+        }
+
+        .stats-placeholder p {
+            margin: 8px 0;
+            color: #10b981;
+        }
+
+        .placeholder-items {
+            margin-top: 12px;
+            text-align: left;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .placeholder-items div {
+            margin-bottom: 4px;
+        }
+
+        /* Minimap Block Styling */
+        .minimap-block {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .tabs-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 0;
+            backdrop-filter: blur(10px);
+        }
+
         .stat-bars {
             margin-bottom: 10px;
         }
@@ -1159,60 +1266,62 @@
     <div class="game-container">
 
 
-        <!-- Left Panel - Character Info -->
+        <!-- Left Panel - Modular Blocks -->
         <aside class="left-panel">
-            <div class="character-info">
+            <!-- Character Info Block -->
+            <div class="character-block">
                 <div class="character-title"><%= character.race_name %></div>
-                
-                <div class="stat-bars">
-                    <div class="character-name-small">
-                        <%= character.name %> - Level <span id="character-level"><%= character.level %></span>
-                        <% if (character.prestige_marker) { %>
-                            <span class="prestige-marker <%= character.prestige_marker %>">
-                                <% if (character.prestige_marker === 'bronze') { %>🥉<% } %>
-                                <% if (character.prestige_marker === 'silver') { %>🥈<% } %>
-                                <% if (character.prestige_marker === 'gold') { %>🥇<% } %>
-                                <% if (character.prestige_marker === 'platinum') { %>💎<% } %>
-                                <% if (character.prestige_marker === 'diamond') { %>💠<% } %>
-                                <% if (character.prestige_marker === 'legendary') { %>⭐<% } %>
-                            </span>
-                        <% } %>
+                <div class="character-name-small">
+                    <%= character.name %> - Level <span id="character-level"><%= character.level %></span>
+                    <% if (character.prestige_marker) { %>
+                        <span class="prestige-marker <%= character.prestige_marker %>">
+                            <% if (character.prestige_marker === 'bronze') { %>🥉<% } %>
+                            <% if (character.prestige_marker === 'silver') { %>🥈<% } %>
+                            <% if (character.prestige_marker === 'gold') { %>🥇<% } %>
+                            <% if (character.prestige_marker === 'platinum') { %>💎<% } %>
+                            <% if (character.prestige_marker === 'diamond') { %>💠<% } %>
+                            <% if (character.prestige_marker === 'legendary') { %>⭐<% } %>
+                        </span>
+                    <% } %>
+                </div>
+                <div class="stat-bar">
+                    <div class="stat-label">
+                        <span>Health</span>
+                        <span id="health-display"><%= character.health_current %>/<%= character.health_max %></span>
                     </div>
-                    <div class="stat-bar">
-                        <div class="stat-label">
-                            <span>Health</span>
-                            <span id="health-display"><%= character.health_current %>/<%= character.health_max %></span>
-                        </div>
-                        <div class="bar-container">
-                            <div class="bar-fill hp-bar" id="health-bar" style="width: <%= (character.health_current / character.health_max * 100) %>%"></div>
-                            <div class="bar-text" id="health-text"><%= Math.round((character.health_current / character.health_max * 100)) %>%</div>
-                        </div>
-                    </div>
-                    <div class="stat-bar">
-                        <div class="stat-label">
-                            <span>Mana</span>
-                            <span id="mana-display"><%= character.mana_current %>/<%= character.mana_max %></span>
-                        </div>
-                        <div class="bar-container">
-                            <div class="bar-fill mp-bar" id="mana-bar" style="width: <%= (character.mana_current / character.mana_max * 100) %>%"></div>
-                            <div class="bar-text" id="mana-text"><%= Math.round((character.mana_current / character.mana_max * 100)) %>%</div>
-                        </div>
-                    </div>
-                    <div class="stat-bar">
-                        <div class="stat-label">
-                            <span>Experience</span>
-                            <span><%= progression.progressPercentage %>% to next</span>
-                        </div>
-                        <div class="bar-container">
-                            <div class="bar-fill exp-bar" id="exp-bar" style="width: <%= progression.progressPercentage %>%"></div>
-                            <div class="bar-text" id="exp-text"><%= progression.progressPercentage %>%</div>
-                        </div>
-                    </div>
-                    <div class="gold-display">
-                        💰 <%= character.gold.toLocaleString() %> Gold
+                    <div class="bar-container">
+                        <div class="bar-fill health-bar" id="health-bar" style="width: <%= (character.health_current / character.health_max) * 100 %>%"></div>
+                        <div class="bar-text" id="health-text"><%= Math.round((character.health_current / character.health_max) * 100) %>%</div>
                     </div>
                 </div>
+                <div class="stat-bar">
+                    <div class="stat-label">
+                        <span>Mana</span>
+                        <span id="mana-display"><%= character.mana_current %>/<%= character.mana_max %></span>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar-fill mana-bar" id="mana-bar" style="width: <%= (character.mana_current / character.mana_max) * 100 %>%"></div>
+                        <div class="bar-text" id="mana-text"><%= Math.round((character.mana_current / character.mana_max) * 100) %>%</div>
+                    </div>
+                </div>
+                <div class="stat-bar">
+                    <div class="stat-label">
+                        <span>Experience</span>
+                        <span><%= progression.progressPercentage %>% to next</span>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar-fill exp-bar" id="exp-bar" style="width: <%= progression.progressPercentage %>%"></div>
+                        <div class="bar-text" id="exp-text"><%= progression.progressPercentage %>%</div>
+                    </div>
+                </div>
+                <div class="gold-display">
+                    💰 <%= character.gold.toLocaleString() %> Gold
+                </div>
+            </div>
 
+            <!-- Stats Block -->
+            <div class="stats-block">
+                <h3 class="block-title">Character Stats</h3>
                 <div class="stats-grid">
                     <div class="stat-item">
                         <span>STR</span>
@@ -1235,25 +1344,71 @@
                         <span class="stat-value" id="stat-wis"><%= character.wis_total %></span>
                     </div>
                     <div class="stat-item">
-                        <span>TOTAL</span>
-                        <span class="stat-value" id="stat-total"><%= character.str_total + character.int_total + character.vit_total + character.dex_total + character.wis_total %></span>
+                        <span>LUK</span>
+                        <span class="stat-value" id="stat-luk"><%= character.luk_total %></span>
                     </div>
                 </div>
             </div>
 
-            <div class="progress-section">
-                <h4>Character Progression</h4>
-                <div class="progress-buttons">
-                    <button class="progress-btn" onclick="gainExperience(100)">+100 EXP</button>
-                    <button class="progress-btn" onclick="gainExperience(1000)">+1K EXP</button>
-                    <button class="progress-btn" onclick="gainExperience(10000)">+10K EXP</button>
+            <!-- Reports Tabs Block -->
+            <div class="reports-block">
+                <div class="left-panel-tabs">
+                    <button class="left-tab-button active" onclick="switchLeftTab('progression')">Progression</button>
+                    <button class="left-tab-button" onclick="switchLeftTab('battle-stats')">Battle Stats</button>
+                    <button class="left-tab-button" onclick="switchLeftTab('achievements')">Achievements</button>
                 </div>
-                <div class="progress-messages" id="progression-messages">
-                    <div class="progression-message success">Start gaining experience to see rewards!</div>
+
+                <!-- Progression Tab -->
+                <div id="left-progression" class="left-tab-content active">
+                    <div class="progression-info">
+                        <div class="progression-item">
+                            <span>Current Level:</span>
+                            <span><%= character.level %></span>
+                        </div>
+                        <div class="progression-item">
+                            <span>Total Experience:</span>
+                            <span><%= progression.totalExperience.toLocaleString() %></span>
+                        </div>
+                        <div class="progression-item">
+                            <span>Next Level Req:</span>
+                            <span><%= progression.experienceToNext.toLocaleString() %></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Battle Stats Tab -->
+                <div id="left-battle-stats" class="left-tab-content">
+                    <div class="battle-stats-info">
+                        <div class="stats-placeholder">
+                            <p>📊 Battle Statistics</p>
+                            <p>Coming Soon...</p>
+                            <div class="placeholder-items">
+                                <div>• Enemies Defeated</div>
+                                <div>• Damage Dealt</div>
+                                <div>• Damage Taken</div>
+                                <div>• Combat Efficiency</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements Tab -->
+                <div id="left-achievements" class="left-tab-content">
+                    <div class="achievements-info">
+                        <div class="stats-placeholder">
+                            <p>🏆 Achievement Tracker</p>
+                            <p>Coming Soon...</p>
+                            <div class="placeholder-items">
+                                <div>• Milestone Rewards</div>
+                                <div>• Exploration Progress</div>
+                                <div>• Special Accomplishments</div>
+                                <div>• Rare Item Discoveries</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </aside>
-
         <!-- Main Game Area -->
         <main class="main-panel">
             <div class="game-output" id="game-output">
@@ -1281,27 +1436,33 @@
             </div>
         </main>
 
-        <!-- Right Panel - Tabs -->
+        <!-- Right Panel - Minimap and Tabs -->
         <aside class="right-panel">
-            <div class="panel-tabs">
-                <button class="tab-button active" onclick="switchTab('equipment')">Equipment</button>
-                <button class="tab-button" onclick="switchTab('inventory')">Inventory</button>
-                <button class="tab-button" onclick="switchTab('affinities')">Affinities</button>
-                <button class="tab-button" onclick="switchTab('abilities')">Abilities</button>
-                <div class="settings-dropdown">
-                    <button class="tab-button settings-btn" onclick="toggleSettingsDropdown()">⚙️</button>
-                    <div class="dropdown-menu" id="settings-dropdown">
-                        <% if (user.is_admin) { %>
-                            <a href="/admin" class="dropdown-item">Admin Panel</a>
-                        <% } %>
-                        <a href="/logout" class="dropdown-item">Logout</a>
+            <!-- Standalone Minimap Block -->
+            <div class="minimap-block">
+                <div class="map-location-header">
+                    🌋 <%= character.location_zone.replace('_', ' ').toUpperCase() %>
+                </div>
+                <div class="map-grid">
+                    <div class="map-cell"></div>
+                    <div class="map-cell npc">🏪</div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell enemy">!</div>
+                    <div class="map-cell"></div>
+                        <button class="tab-button settings-btn" onclick="toggleSettingsDropdown()">⚙️</button>
+                        <div class="dropdown-menu" id="settings-dropdown">
+                            <% if (user.is_admin) { %>
+                                <a href="/admin" class="dropdown-item">Admin Panel</a>
+                            <% } %>
+                            <a href="/logout" class="dropdown-item">Logout</a>
+                        </div>
                     </div>
                 </div>
-            </div>
 
             <!-- Equipment Tab -->
             <div id="equipment" class="tab-content active">
-                <div class="mini-map">
+
                     <div class="map-location-header">
                         🌋 <%= character.location_zone.replace('_', ' ').toUpperCase() %>
                     </div>
@@ -1644,6 +1805,38 @@
                 dropdown.classList.remove('show');
             }
         });
+
+        // Left panel tab switching
+        function switchLeftTab(tabName) {
+            // Hide all left tab content
+            const leftTabContents = document.querySelectorAll('.left-tab-content');
+            leftTabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all left tab buttons
+            const leftTabButtons = document.querySelectorAll('.left-tab-button');
+            leftTabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show the selected tab content
+            const selectedContent = document.getElementById(`left-${tabName}`);
+            if (selectedContent) {
+                selectedContent.classList.add('active');
+            }
+
+            // Add active class to the clicked button (using event.target if available)
+            if (typeof event !== 'undefined' && event.target) {
+                event.target.classList.add('active');
+            } else {
+                // Fallback: find the button based on tabName
+                const targetButton = document.querySelector(`[onclick="switchLeftTab('${tabName}')"]`);
+                if (targetButton) {
+                    targetButton.classList.add('active');
+                }
+            }
+        }
     </script>
 </body>
 </html>
