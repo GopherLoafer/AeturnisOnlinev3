@@ -186,7 +186,9 @@ router.get('/character-creation-wizard', async (req, res) => {
       session = await characterCreationService.getSession(req.session.userId);
     }
     
-    const sessionData = JSON.parse(session.session_data || '{}');
+    const sessionData = typeof session.session_data === 'string' 
+      ? JSON.parse(session.session_data || '{}') 
+      : (session.session_data || {});
     const stepConfig = characterCreationService.getStep(step);
     
     // Get data needed for current step
@@ -338,7 +340,9 @@ router.post('/api/character-creation/create', async (req, res) => {
       return res.json({ success: false, error: 'Character creation not complete' });
     }
     
-    const sessionData = JSON.parse(session.session_data);
+    const sessionData = typeof session.session_data === 'string' 
+      ? JSON.parse(session.session_data) 
+      : session.session_data;
     
     // Validate all required data
     if (!sessionData.name || !sessionData.raceId || !sessionData.backgroundId || !sessionData.statAllocation) {

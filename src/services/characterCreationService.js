@@ -67,7 +67,9 @@ class CharacterCreationService {
         throw new Error('No active creation session found');
       }
 
-      const sessionData = JSON.parse(session.session_data || '{}');
+      const sessionData = typeof session.session_data === 'string' 
+        ? JSON.parse(session.session_data || '{}') 
+        : (session.session_data || {});
       Object.assign(sessionData, stepData);
 
       const step = nextStep || session.step;
