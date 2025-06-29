@@ -25,11 +25,10 @@
         .game-container {
             display: grid;
             grid-template-areas:
-                "header header header"
                 "left-panel main right-panel"
                 "bottom-panel bottom-panel bottom-panel";
             grid-template-columns: 280px 1fr 280px;
-            grid-template-rows: 80px 1fr 200px;
+            grid-template-rows: 1fr 200px;
             height: 100vh;
             gap: 2px;
             background: #1a1a1a;
@@ -663,6 +662,149 @@
             }
         }
 
+        /* Character Name Header */
+        .character-name-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 10px;
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 8px;
+        }
+
+        .resource-display {
+            font-size: 12px;
+            color: #00ff41;
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 5px;
+            background: rgba(0, 255, 65, 0.1);
+            border-radius: 4px;
+        }
+
+        /* Settings Dropdown */
+        .settings-dropdown {
+            position: relative;
+            margin-left: auto;
+        }
+
+        .settings-btn {
+            background: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            min-width: 120px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 8px 12px;
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 12px;
+            border-bottom: 1px solid #333;
+            transition: background 0.2s;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(0, 255, 65, 0.1);
+            color: #00ff41;
+        }
+
+        /* Minimap */
+        .minimap-section {
+            margin-top: 20px;
+        }
+
+        .minimap-section h4 {
+            color: #FFD700;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .minimap {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        .minimap-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            max-width: 120px;
+            margin: 0 auto;
+        }
+
+        .minimap-cell {
+            aspect-ratio: 1;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .minimap-cell.direction-btn {
+            background: #2a2a2a;
+            color: #00ff41;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .minimap-cell.direction-btn:hover {
+            background: rgba(0, 255, 65, 0.2);
+            border-color: #00ff41;
+        }
+
+        .minimap-cell.player-position {
+            background: #FFD700;
+            color: #000;
+            font-weight: bold;
+        }
+
+        /* Combat Actions */
+        .combat-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn.primary {
+            background: rgba(255, 69, 69, 0.2);
+            border-color: #ff4545;
+            color: #ff4545;
+            font-weight: bold;
+        }
+
+        .action-btn.secondary {
+            background: rgba(138, 43, 226, 0.2);
+            border-color: #8a2be2;
+            color: #8a2be2;
+        }
+
         /* Race Abilities */
         .ability-item {
             background: rgba(0, 50, 0, 0.2);
@@ -734,10 +876,12 @@
 </head>
 <body>
     <div class="game-container">
-        <!-- Header Bar -->
-        <header class="header">
-            <div class="resource-bar">
-                <div class="character-name-display">
+
+
+        <!-- Left Panel - Character Info -->
+        <aside class="left-panel">
+            <div class="character-info">
+                <div class="character-name-header">
                     <%= character.name %>
                     <% if (character.prestige_marker) { %>
                         <span class="prestige-marker <%= character.prestige_marker %>">
@@ -750,34 +894,11 @@
                         </span>
                     <% } %>
                 </div>
-                <div class="resource">
-                    <div class="resource-icon gold-icon"></div>
-                    <span><%= character.gold.toLocaleString() %></span>
-                </div>
-                <div class="resource">
-                    <div class="resource-icon exp-icon"></div>
-                    <span>Lv <%= character.level %> (<%= progression.progressPercentage %>%)</span>
-                </div>
-                <div class="resource">
-                    <div class="resource-icon hp-icon"></div>
-                    <span><%= character.health_current %>/<%= character.health_max %></span>
-                </div>
-                <div class="resource">
-                    <div class="resource-icon mp-icon"></div>
-                    <span><%= character.mana_current %>/<%= character.mana_max %></span>
-                </div>
-            </div>
-            <% if (user.is_admin) { %>
-                <button class="action-btn special" onclick="window.location.href='/admin'">ADMIN</button>
-            <% } %>
-            <button class="action-btn special" onclick="window.location.href='/logout'">LOGOUT</button>
-        </header>
-
-        <!-- Left Panel - Character Info -->
-        <aside class="left-panel">
-            <div class="character-info">
                 <div class="character-title"><%= character.race_name %> - Level <span id="character-level"><%= character.level %></span></div>
                 <div class="character-title">📍 <%= character.location_zone.replace('_', ' ').toUpperCase() %></div>
+                <div class="resource-display">
+                    💰 <%= character.gold.toLocaleString() %> | ⚡ Lv <%= character.level %> (<%= progression.progressPercentage %>%)
+                </div>
                 
                 <div class="stat-bars">
                     <div class="stat-bar">
@@ -873,15 +994,10 @@
             </div>
 
             <div class="action-panel">
-                <div class="quick-actions">
-                    <button class="action-btn movement" onclick="move('north')">North</button>
-                    <button class="action-btn movement" onclick="move('south')">South</button>
-                    <button class="action-btn movement" onclick="move('east')">East</button>
-                    <button class="action-btn movement" onclick="move('west')">West</button>
-                    <button class="action-btn combat" onclick="performAction('fight')">Fight</button>
-                    <button class="action-btn combat" onclick="performAction('cast')">Cast</button>
-                    <button class="action-btn special" onclick="performAction('rest')">Rest</button>
-                    <button class="action-btn special" onclick="performAction('map')">Map</button>
+                <div class="combat-actions">
+                    <button class="action-btn combat primary" onclick="performAction('fight')">⚔️ Fight</button>
+                    <button class="action-btn combat secondary" onclick="performAction('cast')">🔮 Cast</button>
+                    <button class="action-btn special" onclick="performAction('rest')">💤 Rest</button>
                 </div>
             </div>
         </main>
@@ -893,6 +1009,15 @@
                 <button class="tab-button" onclick="switchTab('inventory')">Inventory</button>
                 <button class="tab-button" onclick="switchTab('affinities')">Affinities</button>
                 <button class="tab-button" onclick="switchTab('abilities')">Abilities</button>
+                <div class="settings-dropdown">
+                    <button class="tab-button settings-btn" onclick="toggleSettingsDropdown()">⚙️</button>
+                    <div class="dropdown-menu" id="settings-dropdown">
+                        <% if (user.is_admin) { %>
+                            <a href="/admin" class="dropdown-item">Admin Panel</a>
+                        <% } %>
+                        <a href="/logout" class="dropdown-item">Logout</a>
+                    </div>
+                </div>
             </div>
 
             <!-- Equipment Tab -->
@@ -909,6 +1034,23 @@
                         <div class="equipment-slot equipped">💍</div>
                         <div class="equipment-slot equipped">💍</div>
                         <div class="equipment-slot">📿</div>
+                    </div>
+                </div>
+                
+                <div class="minimap-section">
+                    <h4>Minimap</h4>
+                    <div class="minimap">
+                        <div class="minimap-grid">
+                            <div class="minimap-cell"></div>
+                            <div class="minimap-cell direction-btn" onclick="move('north')">N</div>
+                            <div class="minimap-cell"></div>
+                            <div class="minimap-cell direction-btn" onclick="move('west')">W</div>
+                            <div class="minimap-cell player-position">●</div>
+                            <div class="minimap-cell direction-btn" onclick="move('east')">E</div>
+                            <div class="minimap-cell"></div>
+                            <div class="minimap-cell direction-btn" onclick="move('south')">S</div>
+                            <div class="minimap-cell"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1127,6 +1269,22 @@
             const randomMessage = messages[Math.floor(Math.random() * messages.length)];
             updateGameText(`<span class="system-text">${randomMessage}</span>`);
         }, 30000); // Every 30 seconds
+
+        // Settings dropdown functionality
+        function toggleSettingsDropdown() {
+            const dropdown = document.getElementById('settings-dropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const settingsDropdown = document.querySelector('.settings-dropdown');
+            const dropdown = document.getElementById('settings-dropdown');
+            
+            if (settingsDropdown && !settingsDropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
     </script>
 </body>
 </html>
