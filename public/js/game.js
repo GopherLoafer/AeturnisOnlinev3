@@ -244,17 +244,24 @@ function updateExperienceBar(expData) {
     console.log('updateExperienceBar called with:', expData);
     const expBar = document.getElementById('exp-bar');
     const expText = document.getElementById('exp-text');
+    const expLabel = document.querySelector('.stat-label span:last-child');
     
     if (expBar && expData.current !== undefined && expData.required !== undefined) {
-        const expPercent = (expData.current / expData.required) * 100;
+        const expPercent = Math.floor((expData.current / expData.required) * 100);
         console.log('Experience percent calculated:', expPercent, '% (', expData.current, '/', expData.required, ')');
         expBar.style.width = `${expPercent}%`;
         
         if (expText) {
+            // Show current/required format
             expText.textContent = `${formatNumber(expData.current)}/${formatNumber(expData.required)}`;
         }
+        
+        if (expLabel) {
+            // Update the percentage label
+            expLabel.textContent = `${expPercent}% to next`;
+        }
     } else {
-        console.log('Missing exp data or elements - expBar:', !!expBar, 'current:', expData.current, 'required:', expData.required);
+        console.log('Missing exp data or elements - expBar:', !!expBar, 'expText:', !!expText, 'current:', expData.current, 'required:', expData.required);
     }
 }
 
