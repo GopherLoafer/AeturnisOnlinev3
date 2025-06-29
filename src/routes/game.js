@@ -261,7 +261,7 @@ router.post('/character-select', async (req, res) => {
 });
 
 // API endpoint for game state
-router.get('/api/game/state', requireCharacter, async (req, res) => {
+router.get('/state', requireCharacter, async (req, res) => {
   try {
     const result = await db.query(`
       SELECT c.*, r.name as race_name, r.str_modifier, r.int_modifier, 
@@ -300,7 +300,7 @@ router.get('/api/game/state', requireCharacter, async (req, res) => {
 });
 
 // API endpoint for movement
-router.post('/api/game/move', requireCharacter, async (req, res) => {
+router.post('/move', requireCharacter, async (req, res) => {
   try {
     const { direction } = req.body;
     // Basic movement response - can be expanded later
@@ -316,7 +316,7 @@ router.post('/api/game/move', requireCharacter, async (req, res) => {
 });
 
 // API endpoint for actions
-router.post('/api/game/action', requireCharacter, async (req, res) => {
+router.post('/action', requireCharacter, async (req, res) => {
   try {
     const { action } = req.body;
     let message = `You attempt to ${action}.`;
@@ -348,7 +348,7 @@ router.post('/api/game/action', requireCharacter, async (req, res) => {
 });
 
 // API endpoint for chat
-router.post('/api/game/chat', requireCharacter, async (req, res) => {
+router.post('/chat', requireCharacter, async (req, res) => {
   try {
     const { message, channel } = req.body;
     // Basic chat response - can be expanded later
