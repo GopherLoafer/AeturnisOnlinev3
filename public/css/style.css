@@ -956,6 +956,74 @@ body {
     flex-direction: column;
 }
 
+/* New Layout Structure */
+.game-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.left-sidebar {
+    width: 300px;
+    min-width: 300px;
+    background: rgba(0, 0, 0, 0.8);
+    border-right: 2px solid #00ff41;
+    overflow-y: auto;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: rgba(0, 30, 0, 0.9);
+}
+
+/* Main Tab Navigation */
+.main-tabs {
+    display: flex;
+    background: rgba(0, 0, 0, 0.5);
+    border-bottom: 2px solid #00ff41;
+    padding: 0;
+}
+
+.main-tab-btn {
+    background: transparent;
+    border: none;
+    color: #00ff41;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    border-right: 1px solid #333;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.main-tab-btn:hover {
+    background: rgba(0, 255, 65, 0.1);
+}
+
+.main-tab-btn.active {
+    background: rgba(0, 255, 65, 0.2);
+    border-bottom: 2px solid #00ff41;
+}
+
+.main-tab-btn:last-child {
+    border-right: none;
+}
+
+/* Sidebar Content */
+.sidebar-content {
+    padding: 1rem;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
 .status-bar {
     background: rgba(0, 0, 0, 0.9);
     border-bottom: 2px solid #00ff41;

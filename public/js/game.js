@@ -40,12 +40,24 @@ function refreshGameState() {
 }
 
 function initializeTabs() {
-    // Add click handlers for tab buttons
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    tabButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const tabName = this.getAttribute('data-tab');
-            showTab(tabName);
+    // Initialize main tabs (above center panel)
+    const mainTabButtons = document.querySelectorAll('.main-tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    mainTabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetTab = button.getAttribute('data-tab');
+
+            // Remove active class from all buttons and contents
+            mainTabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Add active class to clicked button and corresponding content
+            button.classList.add('active');
+            const targetContent = document.getElementById(targetTab);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
         });
     });
 }

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="game-dashboard" data-character-id="<%= character.id %>">
+    <!-- Top Status Bar -->
+    <div class="status-bar">
+        <div class="status-left">
+            <span class="gold">💰 <%= character.gold.toLocaleString() %></span>
+            <span class="health">❤️ <%= character.health_current %>/<%= character.health_max %></span>
+            <span class="mana">🔵 <%= character.mana_current %>/<%= character.mana_max %></span>
+        </div>
+        <div class="status-center">
+            <span class="location">📍 <%= character.location_zone.replace('_', ' ').toUpperCase() %></span>
+        </div>
+        <div class="status-right">
+            <% if (user && user.is_admin) { %>
+                <a href="/admin" class="admin-link">ADMIN PANEL</a>
+            <% } %>
+            <button class="menu-btn" id="menu-btn">MENU</button>
+        </div>
+    </div>
+
+    <!-- Main Game Interface -->
+    <div class="game-container">
+        <!-- Character Panel -->
+        <div class="panel character-panel">
+            <h3><%= character.name %></h3>
+            <div class="character-info">
+                <p><strong>Race:</strong> <%= character.race_name %>
+                    <% if (character.prestige_marker) { %>
+                        <span class="prestige-marker <%= character.prestige_marker %>">
+                            <% if (character.prestige_marker === 'bronze') { %>🥉<% } %>
+                            <% if (character.prestige_marker === 'silver') { %>🥈<% } %>
+                            <% if (character.prestige_marker === 'gold') { %>🥇<% } %>
+                            <% if (character.prestige_marker === 'platinum') { %>💎<% } %>
+                            <% if (character.prestige_marker === 'diamond') { %>💠<% } %>
+                            <% if (character.prestige_marker === 'legendary') { %>⭐<% } %>
+                        </span>
+                    <% } %>
+                </p>
+                <p><strong>Level:</strong> <%= character.level %></p>
+                <div class="experience-section">
+                    <p><strong>Experience:</strong> <%= character.experience.toLocaleString() %></p>
+                    <div class="exp-progress">
+                        <div class="exp-bar">
+                            <div class="exp-fill" style="width: <%= progression.progressPercentage %>%"></div>
+                        </div>
+                        <div class="exp-text">
+                            <%= progression.currentLevelProgress.toLocaleString() %> / <%= progression.expNeededForNext.toLocaleString() %> (<%= progression.progressPercentage %>%)
+                        </div>
+                    </div>
+                    <% if (progression.nextMilestone && progression.nextMilestone.levelsRemaining) { %>
+                        <div class="next-milestone">
+                            <small>Next Milestone: Level <%= progression.nextMilestone.level %> (<%= progression.nextMilestone.levelsRemaining %> levels)</small>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-row">
+                    <span class="stat-label">STR</span>
+                    <span class="stat-value"><%= character.str_base %></span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">INT</span>
+                    <span class="stat-value"><%= character.int_base %></span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">VIT</span>
+                    <span class="stat-value"><%= character.vit_base %></span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">DEX</span>
+                    <span class="stat-value"><%= character.dex_base %></span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">WIS</span>
+                    <span class="stat-value"><%= character.wis_base %></span>
+                </div>
+            </div>
+
+            <!-- Equipment Grid -->
+            <div class="equipment-section">
+                <h4>Equipment</h4>
+                <div class="equipment-grid">
+                    <div class="equipment-slot helmet">🎩</div>
+                    <div class="equipment-slot weapon">⚔️</div>
+                    <div class="equipment-slot armor">🛡️</div>
+                    <div class="equipment-slot shield">🛡️</div>
+                    <div class="equipment-slot boots">👢</div>
+                    <div class="equipment-slot gloves">🧤</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Text Area -->
+        <div class="panel game-text-panel">
+            <div class="game-output" id="game-output">
+                <div class="location-header">
+                    <h3><%= character.location_zone.replace('_', ' ').toUpperCase() %> - Level <%= character.level %> Zone</h3>
+                </div>
+                <p>You find yourself in the <%= character.location_zone.replace('_', ' ') %>, blocking out most of the sunlight. You hear strange noises in the distance.</p>
+                <p>You move north.</p>
+                <p>A Wild Dire Wolf (Level 42) appears!</p>
+                <p>You attack with your legendary Shadowfang blade!</p>
+                <p class="combat-result success">The Dire Wolf strikes back with its claws!</p>
+                <p class="combat-result damage">You take 158 damage!</p>
+                <p class="combat-result success">You cast Fireball!</p>
+                <p class="combat-result success">You deal 287 fire damage!</p>
+                <p class="combat-result victory">You have defeated the Dire Wolf!</p>
+                <p class="loot">You gain 1,250 experience points!</p>
+                <p class="loot">You loot: 127 gold, Wolf Pelt (x2), Health Potion</p>
+                <p class="inventory-full">Your sword mastery increases! (47/100)</p>
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="panel right-sidebar">
+            <!-- Inventory/Skills/Quests Tabs -->
+            <div class="tab-container">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="inventory">Inventory</button>
+                    <button class="tab-btn" data-tab="skills">Skills</button>
+                    <button class="tab-btn" data-tab="progression">Progress</button>
+                    <button class="tab-btn" data-tab="rewards">Rewards</button>
+                </div>
+                
+                <div id="inventory" class="tab-content active">
+                    <div class="inventory-grid">
+                        <div class="inventory-slot filled">⚔️</div>
+                        <div class="inventory-slot filled">🗡️</div>
+                        <div class="inventory-slot filled">🔥</div>
+                        <div class="inventory-slot filled">🧪</div>
+                        <div class="inventory-slot empty"></div>
+                        <div class="inventory-slot empty"></div>
+                        <div class="inventory-slot empty"></div>
+                        <div class="inventory-slot empty"></div>
+                        <div class="inventory-slot empty"></div>
+                    </div>
+                </div>
+                
+                <div id="skills" class="tab-content">
+                    <div class="skills-section">
+                        <h4>Race Abilities</h4>
+                        <div class="race-abilities-list" id="race-abilities">
+                            <div class="loading">Loading abilities...</div>
+                        </div>
+                        
+                        <h4>Weapon Affinities</h4>
+                        <% weaponAffinities.forEach(affinity => { %>
+                        <div class="skill-row">
+                            <span class="skill-name"><%= affinity.weapon_type %></span>
+                            <span class="skill-value"><%= parseFloat(affinity.affinity_percentage).toFixed(2) %>%</span>
+                        </div>
+                        <% }); %>
+                        
+                        <h4>Magic Affinities</h4>
+                        <% magicAffinities.forEach(affinity => { %>
+                        <div class="skill-row">
+                            <span class="skill-name"><%= affinity.magic_school %></span>
+                            <span class="skill-value"><%= parseFloat(affinity.affinity_percentage).toFixed(2) %>%</span>
+                        </div>
+                        <% }); %>
+                    </div>
+                </div>
+
+                <div id="progression" class="tab-content">
+                    <div class="progression-section">
+                        <div class="progression-info">
+                            <div class="stat-row">
+                                <span class="stat-label">Level</span>
+                                <span class="stat-value level"><%= character.level %></span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Experience</span>
+                                <span class="stat-value"><%= character.experience.toLocaleString() %></span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: <%= progression.progressPercentage %>%"></div>
+                                <span class="progress-text"><%= progression.progressPercentage %>%</span>
+                            </div>
+                            <% if (progression.nextMilestone && progression.nextMilestone.levelsRemaining) { %>
+                            <div class="milestone-info">
+                                <span class="milestone-label">Next Milestone:</span>
+                                <span class="milestone-value">Level <%= progression.nextMilestone.level %></span>
+                            </div>
+                            <% } %>
+                        </div>
+
+                        <div class="progression-actions">
+                            <button id="gain-100-exp" class="progression-btn small">+100 EXP</button>
+                            <button id="gain-1000-exp" class="progression-btn small">+1K EXP</button>
+                            <button id="simulate-levelup" class="progression-btn">Level Test</button>
+                            <button id="view-leaderboard" class="progression-btn">Leaderboard</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="rewards" class="tab-content">
+                    <div class="rewards-section">
+                        <h4>Recent Rewards</h4>
+                        <div id="rewards-display" class="rewards-display">
+                            <div class="reward-message info">Start gaining experience to see rewards!</div>
+                        </div>
+                        
+                        <div class="milestone-preview">
+                            <h5>Upcoming Milestones</h5>
+                            <div class="milestone-list">
+                                <div class="milestone-item">Level 1,000 - "Ascendant"</div>
+                                <div class="milestone-item">Level 5,000 - "Transcendent"</div>
+                                <div class="milestone-item">Level 15,000 - "Apex Warrior"</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="quests" class="tab-content">
+                    <div class="quest-item">
+                        <h4>Slay the Dire Wolf</h4>
+                        <p>Hunt down the Dire Wolf terrorizing the forest paths.</p>
+                        <span class="quest-reward">Reward: 500 XP, 50 Gold</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Movement Controls -->
+    <div class="movement-controls">
+        <form method="POST" action="/game/move" class="movement-form">
+            <button type="submit" name="direction" value="north" class="move-btn">NORTH</button>
+            <button type="submit" name="direction" value="south" class="move-btn">SOUTH</button>
+            <button type="submit" name="direction" value="east" class="move-btn">EAST</button>
+            <button type="submit" name="direction" value="west" class="move-btn">WEST</button>
+        </form>
+        <form method="POST" action="/game/action" class="action-form">
+            <button type="submit" name="action" value="fight" class="action-btn">FIGHT</button>
+            <button type="submit" name="action" value="cast" class="action-btn">CAST</button>
+            <button type="submit" name="action" value="rest" class="action-btn">REST</button>
+            <button type="submit" name="action" value="map" class="action-btn">MAP</button>
+        </form>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-area">
+        <div class="chat-tabs">
+            <button class="chat-tab active" data-chat="all">All</button>
+            <button class="chat-tab" data-chat="global">Global</button>
+            <button class="chat-tab" data-chat="guild">Guild</button>
+            <button class="chat-tab" data-chat="party">Party</button>
+            <button class="chat-tab" data-chat="combat">Combat</button>
+        </div>
+        
+        <div class="chat-messages" id="chat-messages">
+            <div class="chat-message system">
+                <span class="chat-author">DragonSlayer</span>
+                <span class="chat-text">Anyone want to group for Demon Tower?</span>
+            </div>
+            <div class="chat-message global">
+                <span class="chat-author">ElfMage</span>
+                <span class="chat-text">Cold raid starts in 30 minutes!</span>
+            </div>
+            <div class="chat-message combat">
+                <span class="chat-author">System</span>
+                <span class="chat-text">The mobile level 19 gnom bought a 1000 Sign-up at any store!</span>
+            </div>
+        </div>
+        
+        <form method="POST" action="/game/chat" class="chat-form">
+            <input type="text" name="message" placeholder="Enter command (type 'help' for commands)" maxlength="200" required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script src="/js/game.js"></script>
+</body>
+</html>
