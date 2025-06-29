@@ -2311,7 +2311,7 @@
         <!-- Bottom Panel - Chat -->
         <section class="chat-panel">
             <!-- Mobile chat header for expand/collapse -->
-            <div class="chat-header" onclick="toggleChatPanel()">
+            <div class="chat-header">
                 <span class="chat-title">Chat</span>
                 <span class="chat-expand-icon">▲</span>
             </div>
@@ -2483,23 +2483,7 @@
             dropdown.classList.toggle('show');
         }
 
-        // Mobile chat panel toggle functionality
-        function toggleChatPanel() {
-            const chatPanel = document.querySelector('.chat-panel');
-            if (chatPanel) {
-                chatPanel.classList.toggle('expanded');
-                
-                // Auto-scroll to bottom when expanded
-                if (chatPanel.classList.contains('expanded')) {
-                    setTimeout(() => {
-                        const chatMessages = document.getElementById('chat-messages');
-                        if (chatMessages) {
-                            chatMessages.scrollTop = chatMessages.scrollHeight;
-                        }
-                    }, 300); // Wait for expansion animation
-                }
-            }
-        }
+        // Mobile chat functionality now handled by ChatHandler class in mobile-navigation.js
 
         // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {

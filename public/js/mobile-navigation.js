@@ -111,9 +111,124 @@ class MobileNavigation {
     }
 }
 
+/**
+ * ChatHandler - Manages mobile chat expansion functionality
+ * Based on responsive-mmorpg-plan.md Phase 4.2
+ */
+class ChatHandler {
+    constructor() {
+        this.chatPanel = document.querySelector('.chat-panel');
+        this.mainPanel = document.querySelector('.main-panel');
+        this.init();
+    }
+    
+    init() {
+        if (window.innerWidth <= 767) {
+            this.bindEvents();
+            this.restoreState();
+        }
+    }
+    
+    bindEvents() {
+        const header = this.chatPanel?.querySelector('.chat-header');
+        
+        // Toggle chat on header click
+        header?.addEventListener('click', () => {
+            this.toggleChat();
+        });
+        
+        // Prevent closing when interacting with chat content
+        this.chatPanel?.addEventListener('click', (e) => {
+            if (e.target.closest('.chat-messages') || 
+                e.target.closest('.chat-input-container') ||
+                e.target.closest('.chat-tabs')) {
+                e.stopPropagation();
+            }
+        });
+        
+        // Close chat when clicking outside
+        document.addEventListener('click', (e) => {
+            if (this.chatPanel?.classList.contains('expanded') && 
+                !e.target.closest('.chat-panel') &&
+                window.innerWidth <= 767) {
+                this.closeChat();
+            }
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 767) {
+                this.resetChat();
+            }
+        });
+    }
+    
+    toggleChat() {
+        const isExpanded = this.chatPanel?.classList.toggle('expanded');
+        
+        // Save state
+        localStorage.setItem('chatExpanded', isExpanded.toString());
+        
+        // Adjust main content area for mobile
+        this.adjustMainContent(isExpanded);
+        
+        // Auto-scroll to bottom when expanded
+        if (isExpanded) {
+            setTimeout(() => {
+                const chatMessages = document.getElementById('chat-messages');
+                if (chatMessages) {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            }, 300); // Wait for expansion animation
+        }
+    }
+    
+    closeChat() {
+        this.chatPanel?.classList.remove('expanded');
+        localStorage.setItem('chatExpanded', 'false');
+        this.adjustMainContent(false);
+    }
+    
+    expandChat() {
+        this.chatPanel?.classList.add('expanded');
+        localStorage.setItem('chatExpanded', 'true');
+        this.adjustMainContent(true);
+    }
+    
+    adjustMainContent(isExpanded) {
+        if (window.innerWidth <= 767 && this.mainPanel) {
+            if (isExpanded) {
+                // Account for expanded chat height (60vh max 500px)
+                const chatHeight = Math.min(window.innerHeight * 0.6, 500);
+                this.mainPanel.style.marginBottom = `${chatHeight}px`;
+            } else {
+                // Account for collapsed chat height (60px)
+                this.mainPanel.style.marginBottom = '60px';
+            }
+        }
+    }
+    
+    restoreState() {
+        const wasExpanded = localStorage.getItem('chatExpanded') === 'true';
+        if (wasExpanded && this.chatPanel) {
+            this.chatPanel.classList.add('expanded');
+            this.adjustMainContent(true);
+        }
+    }
+    
+    resetChat() {
+        // Reset mobile-specific styles when switching to desktop
+        if (this.mainPanel) {
+            this.mainPanel.style.marginBottom = '';
+        }
+        this.chatPanel?.classList.remove('expanded');
+    }
+}
+
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', () => {
     if (document.querySelector('.game-container')) {
         new MobileNavigation();
+        new ChatHandler();
     }
 });
