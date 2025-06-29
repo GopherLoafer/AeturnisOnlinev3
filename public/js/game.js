@@ -14,6 +14,9 @@ let gameState = {
     cooldowns: {}
 };
 
+// Timeout for debouncing game state refreshes
+let gameStateRefreshTimeout;
+
 // ===== Tab System for Sidebar =====
 
 function switchTab(tabName) {
@@ -220,7 +223,7 @@ function updateHealthMana(health, mana) {
         const healthPercent = (health.current / health.max) * 100;
         healthBar.style.width = `${healthPercent}%`;
         if (healthText) {
-            healthText.textContent = `${health.current}/${health.max}`;
+            healthText.textContent = `${Math.round(healthPercent)}%`;
         }
     }
     
@@ -228,7 +231,7 @@ function updateHealthMana(health, mana) {
         const manaPercent = (mana.current / mana.max) * 100;
         manaBar.style.width = `${manaPercent}%`;
         if (manaText) {
-            manaText.textContent = `${mana.current}/${mana.max}`;
+            manaText.textContent = `${Math.round(manaPercent)}%`;
         }
     }
 }
@@ -258,14 +261,14 @@ function updateExperience(expData) {
 function updateExperienceBar(expData) {
     const expBar = document.getElementById('exp-bar');
     const expText = document.getElementById('exp-text');
-    const expLabel = document.querySelector('.stat-label span:last-child');
+    const expLabel = document.querySelector('#exp-bar').closest('.stat-bar').querySelector('.stat-label span:last-child');
     
     if (expBar && expData.current !== undefined && expData.required !== undefined) {
         const expPercent = Math.floor((expData.current / expData.required) * 100);
         expBar.style.width = `${expPercent}%`;
         
         if (expText) {
-            expText.textContent = `${formatNumber(expData.current)}/${formatNumber(expData.required)}`;
+            expText.textContent = `${expPercent}%`;
         }
         
         if (expLabel) {
@@ -471,7 +474,6 @@ function initializeProgressionButtons() {
 
 // ===== Game State Refresh =====
 
-let gameStateRefreshTimeout;
 function refreshGameState() {
     // Debounce rapid successive calls
     clearTimeout(gameStateRefreshTimeout);
