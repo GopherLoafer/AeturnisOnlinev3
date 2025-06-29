@@ -4,6 +4,7 @@
  */
 
 const db = require('../database');
+const startingZonesService = require('./startingZonesService');
 
 class CharacterCreationService {
   constructor() {
@@ -272,6 +273,9 @@ class CharacterCreationService {
         `, [characterId, quest.id]);
       }
       
+      // Phase 2.5: Initialize starting zone features
+      await this.initializeStartingZoneFeatures(client, characterId, sessionData.raceId, race.starting_zone);
+      
       // Apply first-time player bonuses
       await this.applyFirstTimePlayerBonuses(client, characterId);
       
@@ -316,6 +320,24 @@ class CharacterCreationService {
     } catch (error) {
       console.error('Error applying first-time bonuses:', error);
       // Don't throw - bonuses are nice to have but not essential
+    }
+  }
+
+  /**
+   * Phase 2.5: Initialize starting zone features for new character
+   */
+  async initializeStartingZoneFeatures(client, characterId, raceId, zoneName) {
+    try {
+      // Grant starting equipment
+      await startingZonesService.grantStartingEquipment(characterId, raceId);
+      
+      // Assign racial quests
+      await startingZonesService.assignRacialQuests(characterId, raceId, zoneName);
+      
+      console.log(`Initialized starting zone features for character ${characterId} in ${zoneName}`);
+    } catch (error) {
+      console.error('Error initializing starting zone features:', error);
+      // Don't throw - starting zone features are nice to have but not essential for character creation
     }
   }
 

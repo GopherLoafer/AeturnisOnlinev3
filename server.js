@@ -13,6 +13,7 @@ const gameRoutes = require('./src/routes/game');
 const adminRoutes = require('./src/routes/admin');
 const abilitiesRoutes = require('./src/routes/abilities');
 const progressionRoutes = require('./src/routes/progression');
+const startingZonesRoutes = require('./src/routes/startingZones');
 const { requireAuth, requireAdmin } = require('./src/middleware/auth');
 
 const app = express();
@@ -84,6 +85,7 @@ app.use('/api/abilities', requireAuth, abilitiesRoutes);
 app.use('/api/progression', requireAuth, progressionRoutes);
 app.use('/api/affinity', requireAuth, require('./src/routes/affinity'));
 app.use('/api/game', requireAuth, gameRoutes);
+app.use('/', startingZonesRoutes);
 
 // Home route
 app.get('/', (req, res) => {
