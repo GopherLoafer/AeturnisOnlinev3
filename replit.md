@@ -179,6 +179,15 @@ A classic text-based MMORPG with infinite progression, racial diversity, and aff
 - Reference UIMOCKUP.png for UI design decisions
 
 ## Recent Changes
+- June 29, 2025: **Phase 5.1 Auth Pages Responsiveness Implementation Completed**
+  - **Responsive auth containers**: Updated login.ejs and register.ejs with 90% width, clamp() padding, and CSS custom properties
+  - **Fluid typography**: Converted all auth headers and labels to responsive clamp() functions for optimal scaling
+  - **Form responsiveness**: Implemented flexbox layouts with gap spacing for consistent form element positioning
+  - **Touch-friendly inputs**: Added 44px minimum height, clamp() padding, and responsive font sizing for all form inputs
+  - **Mobile-optimized buttons**: Enhanced with clamp() padding, responsive typography, and proper touch targets
+  - **Mobile adjustments**: Full viewport height centering on ≤480px screens with edge-to-edge layout
+  - **Landscape mobile support**: Optimized spacing and overflow handling for landscape orientation ≤767px
+  - **Consistent design**: Maintained glass-morphism aesthetic while ensuring mobile accessibility standards
 - June 29, 2025: **Phase 4.2 Chat Expansion Handler Implementation Completed**
   - **ChatHandler class**: Created comprehensive mobile chat management system in mobile-navigation.js
   - **Event binding system**: Toggle, prevent content interaction closure, outside click handling, and window resize

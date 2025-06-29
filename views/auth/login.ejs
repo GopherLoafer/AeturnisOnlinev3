@@ -23,23 +23,25 @@
             justify-content: center;
         }
         
+        /* Responsive auth container */
         .auth-container {
             background: linear-gradient(145deg, rgba(15, 20, 25, 0.95) 0%, rgba(20, 25, 35, 0.95) 100%);
             border: 1px solid rgba(59, 130, 246, 0.3);
             border-radius: 16px;
-            padding: 3rem;
+            padding: clamp(1.5rem, 5vw, 3rem);
             backdrop-filter: blur(20px);
             box-shadow: 
                 0 8px 32px rgba(0, 0, 0, 0.4),
                 0 0 0 1px rgba(255, 255, 255, 0.05);
-            width: 100%;
+            width: 90%;
             max-width: 400px;
+            margin: var(--spacing-md) auto;
         }
         
         .auth-header h1 a {
             color: #10b981;
             text-decoration: none;
-            font-size: 2rem;
+            font-size: clamp(1.5rem, 4vw, 2rem);
             font-weight: 700;
             background: linear-gradient(135deg, #10b981, #3b82f6);
             -webkit-background-clip: text;
@@ -49,7 +51,7 @@
         
         .auth-header h2 {
             color: #94a3b8;
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
             font-weight: 500;
             margin-top: 0.5rem;
             margin-bottom: 2rem;
@@ -74,8 +76,15 @@
             color: #6ee7b7;
         }
         
+        /* Form responsiveness */
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 0; /* Using gap instead */
         }
         
         .form-group label {
@@ -83,17 +92,20 @@
             color: #10b981;
             font-weight: 500;
             margin-bottom: 0.5rem;
+            font-size: var(--font-sm);
         }
         
         .form-group input {
             width: 100%;
-            padding: 12px 16px;
+            padding: clamp(10px, 2vw, 12px) clamp(12px, 3vw, 16px);
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(100, 116, 139, 0.3);
             border-radius: 8px;
             color: #e5e7eb;
-            font-size: 1rem;
+            font-size: var(--font-base);
             transition: all 0.3s ease;
+            height: auto;
+            min-height: 44px;
         }
         
         .form-group input:focus {
@@ -106,22 +118,24 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0; /* Using form gap instead */
         }
         
         .checkbox-group input[type="checkbox"] {
             width: auto;
+            min-height: 20px;
         }
         
         .checkbox-group label {
             margin: 0;
             color: #94a3b8;
-            font-size: 0.9rem;
+            font-size: var(--font-sm);
         }
         
+        /* Responsive button */
         .btn {
             width: 100%;
-            padding: 12px 24px;
+            padding: clamp(10px, 2vw, 12px) clamp(20px, 4vw, 24px);
             border-radius: 12px;
             font-weight: 600;
             text-decoration: none;
@@ -130,7 +144,8 @@
             cursor: pointer;
             display: inline-block;
             text-align: center;
-            font-size: 1rem;
+            font-size: var(--font-base);
+            min-height: 44px;
         }
         
         .btn-primary {
@@ -158,6 +173,39 @@
         
         .auth-links a:hover {
             color: #60a5fa;
+        }
+        
+        /* Mobile adjustments */
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: var(--spacing-md);
+                border-radius: 0;
+                margin: 0;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            
+            .auth-header h1 a {
+                font-size: var(--font-xl);
+            }
+            
+            .auth-header h2 {
+                font-size: var(--font-base);
+            }
+        }
+        
+        /* Landscape mobile */
+        @media (max-width: 767px) and (orientation: landscape) {
+            .auth-container {
+                padding: var(--spacing-sm);
+            }
+            
+            .auth-page {
+                max-height: 90vh;
+                overflow-y: auto;
+            }
         }
     </style>
 </head>
