@@ -999,16 +999,7 @@
 
     <script src="/js/game.js"></script>
     <script>
-        // Tab switching functionality
-        function switchTab(tabName) {
-            // Remove active class from all tabs and content
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            // Add active class to selected tab and content
-            event.target.classList.add('active');
-            document.getElementById(`${tabName}-tab`).classList.add('active');
-        }
+        // Tab switching is handled by game.js
 
         // Chat functionality
         function sendChatMessage() {

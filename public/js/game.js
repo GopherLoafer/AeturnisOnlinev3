@@ -17,26 +17,41 @@ let gameState = {
 // ===== Tab System for Sidebar =====
 
 function switchTab(tabName) {
-    // Hide all tab contents
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.style.display = 'none';
-    });
-    
-    // Remove active class from all tab buttons
-    document.querySelectorAll('.tab-button').forEach(button => {
-        button.classList.remove('active');
-    });
-    
-    // Show the selected tab
-    const selectedTab = document.getElementById(tabName);
-    if (selectedTab) {
-        selectedTab.style.display = 'block';
-    }
-    
-    // Add active class to the clicked button
-    const activeButton = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
-    if (activeButton) {
-        activeButton.classList.add('active');
+    try {
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            if (tab) {
+                tab.style.display = 'none';
+                tab.classList.remove('active');
+            }
+        });
+        
+        // Remove active class from all tab buttons
+        document.querySelectorAll('.tab-button').forEach(button => {
+            if (button && button.classList) {
+                button.classList.remove('active');
+            }
+        });
+        
+        // Show the selected tab
+        const selectedTab = document.getElementById(tabName);
+        if (selectedTab) {
+            selectedTab.style.display = 'block';
+            selectedTab.classList.add('active');
+        }
+        
+        // Add active class to the clicked button by finding button containing the tabName
+        const buttons = document.querySelectorAll('.tab-button');
+        buttons.forEach(button => {
+            if (button && button.textContent && button.textContent.toLowerCase().includes(tabName.toLowerCase())) {
+                if (button.classList) {
+                    button.classList.add('active');
+                }
+            }
+        });
+        
+    } catch (error) {
+        console.error('Tab switching error:', error);
     }
 }
 
