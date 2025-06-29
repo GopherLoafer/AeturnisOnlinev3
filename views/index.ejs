@@ -20,21 +20,22 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
+        /* Responsive hero */
         .hero-section {
+            padding: var(--spacing-md);
             min-height: 100vh;
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 2rem;
         }
         
         .hero-content {
+            padding: clamp(2rem, 5vw, 4rem);
+            width: 100%;
             max-width: 1000px;
             text-align: center;
             background: linear-gradient(145deg, rgba(15, 20, 25, 0.95) 0%, rgba(20, 25, 35, 0.95) 100%);
             border: 1px solid rgba(59, 130, 246, 0.3);
             border-radius: 24px;
-            padding: 4rem;
             backdrop-filter: blur(20px);
             box-shadow: 
                 0 16px 64px rgba(0, 0, 0, 0.4),
@@ -42,28 +43,36 @@
         }
         
         .game-title {
-            font-size: 4rem;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            margin-bottom: var(--spacing-md);
             font-weight: 700;
             background: linear-gradient(135deg, #10b981, #3b82f6, #8b5cf6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 1rem;
             line-height: 1.1;
         }
         
         .game-subtitle {
-            font-size: 1.5rem;
+            font-size: clamp(1.125rem, 3vw, 1.5rem);
+            margin-bottom: var(--spacing-lg);
             color: #94a3b8;
-            margin-bottom: 3rem;
             line-height: 1.6;
         }
         
+        /* Feature grid */
         .game-features {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        @media (max-width: 640px) {
+            .game-features {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+            }
         }
         
         .feature {
@@ -92,11 +101,24 @@
             line-height: 1.5;
         }
         
+        /* Action buttons */
         .action-buttons {
             display: flex;
-            gap: 1.5rem;
-            justify-content: center;
             flex-wrap: wrap;
+            gap: var(--spacing-md);
+            justify-content: center;
+        }
+
+        @media (max-width: 480px) {
+            .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
         }
         
         .btn {
@@ -150,21 +172,7 @@
                 0 0 0 1px rgba(255, 255, 255, 0.05);
         }
         
-        @media (max-width: 768px) {
-            .game-title {
-                font-size: 2.5rem;
-            }
-            .hero-content {
-                padding: 2rem;
-            }
-            .game-features {
-                grid-template-columns: 1fr;
-            }
-            .action-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
+
     </style>
 </head>
 <body class="landing-page">
