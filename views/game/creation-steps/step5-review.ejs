@@ -1,0 +1,275 @@
+<div class="creation-step" id="step-review">
+  <div class="step-header">
+    <h2>Final Review</h2>
+    <p class="step-description">Review your character before entering the world of Aeturnis.</p>
+  </div>
+  
+  <div class="step-content">
+    <div class="character-review">
+      <div class="character-card">
+        <div class="character-header">
+          <h3 class="character-name"><%= sessionData.name || 'Character Name' %></h3>
+          <div class="character-subtitle">
+            <span class="race-name" id="review-race">Race</span>
+            <span class="background-name" id="review-background">Background</span>
+          </div>
+        </div>
+        
+        <div class="character-stats">
+          <h4>Final Statistics</h4>
+          <div class="stats-grid" id="review-stats">
+            <!-- Stats will be populated by JavaScript -->
+          </div>
+          
+          <div class="derived-stats" id="review-derived">
+            <!-- Health/Mana will be populated by JavaScript -->
+          </div>
+        </div>
+        
+        <div class="character-bonuses" id="review-bonuses">
+          <!-- Racial and background bonuses will be populated by JavaScript -->
+        </div>
+        
+        <div class="starting-resources" id="review-resources">
+          <!-- Starting gold and items will be populated by JavaScript -->
+        </div>
+        
+        <div class="tutorial-info">
+          <h4>Tutorial Quests</h4>
+          <p>You will begin with <%= tutorialQuests.length %> tutorial quests to help you learn the game:</p>
+          <ul class="tutorial-list">
+            <% tutorialQuests.forEach(quest => { %>
+            <li class="tutorial-quest">
+              <strong><%= quest.name %></strong>
+              <br><small><%= quest.description %></small>
+            </li>
+            <% }); %>
+          </ul>
+        </div>
+        
+        <div class="first-time-bonus" id="first-time-bonus" style="display: none;">
+          <h4>🎉 First Character Bonus!</h4>
+          <div class="bonus-list">
+            <div class="bonus-item">+200 Gold Welcome Bonus</div>
+            <div class="bonus-item">+100 Experience Head Start</div>
+            <div class="bonus-item">Tutorial Quest Rewards</div>
+          </div>
+        </div>
+        
+        <div class="starting-location" id="review-location">
+          <!-- Starting location will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+    
+    <div class="creation-warning">
+      <div class="warning-box">
+        <h4>⚠️ Important Notice</h4>
+        <ul>
+          <li>Character names cannot be changed after creation</li>
+          <li>Race selection is permanent and affects your entire journey</li>
+          <li>You can earn additional stat points through leveling and progression</li>
+          <li>Tutorial quests will guide you through your first steps</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-navigation">
+    <button type="button" class="btn btn-secondary" onclick="goToPreviousStep()">Previous</button>
+    <button type="button" class="btn btn-success" id="create-character-btn" onclick="createCharacter()">
+      <span class="btn-text">Create Character</span>
+      <span class="btn-loading" style="display: none;">Creating...</span>
+    </button>
+  </div>
+</div>
+
+<script>
+const raceData = <%- JSON.stringify(races.find(r => r.id == sessionData.raceId) || {}) %>;
+const backgroundData = <%- JSON.stringify(backgrounds.find(b => b.id == sessionData.backgroundId) || {}) %>;
+const sessionData = <%- JSON.stringify(sessionData) %>;
+const isFirstCharacter = <%= isFirstCharacter ? 'true' : 'false' %>;
+
+function initializeReview() {
+  // Update character info
+  document.getElementById('review-race').textContent = raceData.name || 'Race';
+  document.getElementById('review-background').textContent = backgroundData.name || 'Background';
+  
+  // Calculate final stats
+  const baseStats = {
+    str: 10 + (raceData.str_modifier || 0),
+    int: 10 + (raceData.int_modifier || 0),
+    vit: 10 + (raceData.vit_modifier || 0),
+    dex: 10 + (raceData.dex_modifier || 0),
+    wis: 10 + (raceData.wis_modifier || 0)
+  };
+  
+  // Apply background bonuses
+  const backgroundBonuses = backgroundData.stat_bonuses || {};
+  Object.keys(baseStats).forEach(stat => {
+    baseStats[stat] += backgroundBonuses[stat] || 0;
+  });
+  
+  // Apply allocated points
+  const allocation = sessionData.statAllocation || {};
+  const finalStats = {};
+  Object.keys(baseStats).forEach(stat => {
+    finalStats[stat] = baseStats[stat] + (allocation[stat] || 0);
+  });
+  
+  // Update stats display
+  document.getElementById('review-stats').innerHTML = `
+    <div class="stat-item">
+      <span class="stat-label">STR</span>
+      <span class="stat-value">${finalStats.str}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">INT</span>
+      <span class="stat-value">${finalStats.int}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">VIT</span>
+      <span class="stat-value">${finalStats.vit}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">DEX</span>
+      <span class="stat-value">${finalStats.dex}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">WIS</span>
+      <span class="stat-value">${finalStats.wis}</span>
+    </div>
+  `;
+  
+  // Update derived stats
+  const health = finalStats.vit * 10;
+  const mana = Math.floor(finalStats.int * 5);
+  
+  document.getElementById('review-derived').innerHTML = `
+    <div class="derived-stat">Health: ${health}</div>
+    <div class="derived-stat">Mana: ${mana}</div>
+  `;
+  
+  // Update bonuses
+  let bonusesHtml = '<h4>Racial & Background Bonuses</h4><div class="bonus-grid">';
+  
+  if (raceData.experience_bonus && Math.abs(raceData.experience_bonus) > 0) {
+    bonusesHtml += `<div class="bonus-item">Experience: ${raceData.experience_bonus >= 0 ? '+' : ''}${Math.round(raceData.experience_bonus * 100)}%</div>`;
+  }
+  
+  if (raceData.magic_affinity_bonus && raceData.magic_affinity_bonus > 0) {
+    bonusesHtml += `<div class="bonus-item">Magic Affinity: +${Math.round(raceData.magic_affinity_bonus * 100)}%</div>`;
+  }
+  
+  if (raceData.weapon_affinity_bonus && raceData.weapon_affinity_bonus > 0) {
+    bonusesHtml += `<div class="bonus-item">Weapon Affinity: +${Math.round(raceData.weapon_affinity_bonus * 100)}%</div>`;
+  }
+  
+  if (backgroundBonuses.dodge_bonus) {
+    bonusesHtml += `<div class="bonus-item">Dodge Chance: +${backgroundBonuses.dodge_bonus}%</div>`;
+  }
+  
+  if (backgroundBonuses.magic_affinity_bonus) {
+    bonusesHtml += `<div class="bonus-item">Magic Affinity: +${backgroundBonuses.magic_affinity_bonus}%</div>`;
+  }
+  
+  if (backgroundBonuses.weapon_affinity_bonus) {
+    bonusesHtml += `<div class="bonus-item">Weapon Affinity: +${backgroundBonuses.weapon_affinity_bonus}%</div>`;
+  }
+  
+  bonusesHtml += '</div>';
+  document.getElementById('review-bonuses').innerHTML = bonusesHtml;
+  
+  // Update starting resources
+  const baseGold = 100;
+  const backgroundGold = backgroundData.starting_gold || 0;
+  const goldBonus = backgroundBonuses.gold_bonus || 0;
+  const totalGold = baseGold + backgroundGold + goldBonus + (isFirstCharacter ? 200 : 0);
+  
+  let resourcesHtml = `
+    <h4>Starting Resources</h4>
+    <div class="resource-item">
+      <strong>Gold: ${totalGold}</strong>
+      <small>Base: ${baseGold} + Background: ${backgroundGold}`;
+  
+  if (goldBonus > 0) {
+    resourcesHtml += ` + Bonus: ${goldBonus}`;
+  }
+  
+  if (isFirstCharacter) {
+    resourcesHtml += ` + First Character: 200`;
+  }
+  
+  resourcesHtml += `</small>
+    </div>
+    <div class="starting-items">
+      <strong>Starting Equipment:</strong>
+      <ul class="item-list">`;
+  
+  backgroundData.starting_items.forEach(item => {
+    resourcesHtml += `<li>${item.name}${item.quantity > 1 ? ` (x${item.quantity})` : ''}</li>`;
+  });
+  
+  resourcesHtml += `</ul>
+    </div>`;
+  
+  document.getElementById('review-resources').innerHTML = resourcesHtml;
+  
+  // Update starting location
+  const locationName = raceData.starting_zone ? raceData.starting_zone.replace(/_/g, ' ').toUpperCase() : 'Unknown';
+  document.getElementById('review-location').innerHTML = `
+    <h4>Starting Location</h4>
+    <div class="location-name">${locationName}</div>
+    <small>Your racial homeland where your adventure begins</small>
+  `;
+  
+  // Show first character bonus if applicable
+  if (isFirstCharacter) {
+    document.getElementById('first-time-bonus').style.display = 'block';
+  }
+}
+
+async function createCharacter() {
+  const createBtn = document.getElementById('create-character-btn');
+  const btnText = createBtn.querySelector('.btn-text');
+  const btnLoading = createBtn.querySelector('.btn-loading');
+  
+  // Disable button and show loading
+  createBtn.disabled = true;
+  btnText.style.display = 'none';
+  btnLoading.style.display = 'inline';
+  
+  try {
+    const response = await fetch('/api/character-creation/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      // Character created successfully
+      window.location.href = '/game/dashboard';
+    } else {
+      // Handle error
+      alert('Error creating character: ' + (result.error || 'Unknown error'));
+      
+      // Re-enable button
+      createBtn.disabled = false;
+      btnText.style.display = 'inline';
+      btnLoading.style.display = 'none';
+    }
+  } catch (error) {
+    console.error('Character creation error:', error);
+    alert('Network error creating character. Please try again.');
+    
+    // Re-enable button
+    createBtn.disabled = false;
+    btnText.style.display = 'inline';
+    btnLoading.style.display = 'none';
+  }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', initializeReview);
+</script>

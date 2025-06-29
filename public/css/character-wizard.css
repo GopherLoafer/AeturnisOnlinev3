@@ -1,0 +1,1044 @@
+/* Character Creation Wizard Styles */
+
+.character-creation-wizard {
+    background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+    min-height: 100vh;
+    color: #00ff41;
+    font-family: 'Courier New', monospace;
+}
+
+.wizard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Wizard Header */
+.wizard-header h1 {
+    text-align: center;
+    color: #00ff41;
+    text-shadow: 0 0 10px #00ff41;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+}
+
+/* Step Indicator */
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.step-indicator-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.step-indicator-item.active {
+    opacity: 1;
+    color: #00ff41;
+}
+
+.step-indicator-item.completed {
+    opacity: 0.8;
+    color: #66ff66;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.step-indicator-item.active .step-number {
+    background-color: #00ff41;
+    color: #000;
+    box-shadow: 0 0 15px #00ff41;
+}
+
+.step-indicator-item.completed .step-number {
+    background-color: #66ff66;
+    color: #000;
+}
+
+.step-name {
+    font-size: 0.8rem;
+    text-align: center;
+    max-width: 80px;
+}
+
+.step-connector {
+    width: 60px;
+    height: 2px;
+    background-color: #333;
+    margin: 0 1rem;
+}
+
+.step-indicator-item.completed + .step-connector {
+    background-color: #66ff66;
+}
+
+/* Creation Steps */
+.creation-step {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #00ff41;
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.step-header h2 {
+    color: #00ff41;
+    margin-bottom: 0.5rem;
+    font-size: 1.8rem;
+}
+
+.step-description {
+    color: #ccc;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+/* Name Step */
+.form-section {
+    margin-bottom: 2rem;
+}
+
+.form-section label {
+    display: block;
+    color: #00ff41;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.form-section input {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px;
+    background-color: #222;
+    border: 2px solid #555;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-section input:focus {
+    outline: none;
+    border-color: #00ff41;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+}
+
+.name-feedback {
+    margin-top: 0.5rem;
+    min-height: 1.5rem;
+}
+
+.name-feedback .error {
+    color: #ff4444;
+}
+
+.name-feedback .success {
+    color: #44ff44;
+}
+
+.name-feedback .checking {
+    color: #ffaa44;
+}
+
+.form-help {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.name-preview {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: rgba(0, 255, 65, 0.1);
+    border: 1px solid #00ff41;
+    border-radius: 4px;
+}
+
+.character-nameplate {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.name-display {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #00ff41;
+}
+
+.level-display {
+    color: #aaa;
+    font-size: 0.9rem;
+}
+
+/* Race Step */
+.race-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.race-card {
+    border: 2px solid #555;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.race-card:hover {
+    border-color: #00ff41;
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+}
+
+.race-card.selected {
+    border-color: #00ff41;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+}
+
+.race-card input[type="radio"] {
+    display: none;
+}
+
+.race-card-content {
+    display: block;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+}
+
+.race-header h3 {
+    color: #00ff41;
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+}
+
+.race-zone {
+    color: #aaa;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.race-description {
+    color: #ccc;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.race-stats h4 {
+    color: #00ff41;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.stat-item.positive {
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid #00aa00;
+}
+
+.stat-item.negative {
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid #aa0000;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #aaa;
+}
+
+.stat-value {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.stat-item.positive .stat-value {
+    color: #44ff44;
+}
+
+.stat-item.negative .stat-value {
+    color: #ff4444;
+}
+
+.race-bonuses {
+    margin-bottom: 1rem;
+}
+
+.bonus-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.bonus-item {
+    padding: 0.25rem 0.5rem;
+    background: rgba(0, 255, 65, 0.1);
+    border: 1px solid #00ff41;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.bonus-item.positive {
+    background: rgba(0, 255, 0, 0.1);
+    border-color: #00aa00;
+    color: #44ff44;
+}
+
+.bonus-item.negative {
+    background: rgba(255, 0, 0, 0.1);
+    border-color: #aa0000;
+    color: #ff4444;
+}
+
+.bonus-item.special {
+    background: rgba(255, 165, 0, 0.1);
+    border-color: #ffaa00;
+    color: #ffcc44;
+}
+
+.race-abilities {
+    margin-top: 1rem;
+}
+
+.ability-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.ability-tag {
+    padding: 0.25rem 0.5rem;
+    background: rgba(255, 165, 0, 0.1);
+    border: 1px solid #ffaa00;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    color: #ffcc44;
+}
+
+/* Background Step */
+.background-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.background-card {
+    border: 2px solid #555;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.background-card:hover {
+    border-color: #00ff41;
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+}
+
+.background-card.selected {
+    border-color: #00ff41;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+}
+
+.background-card input[type="radio"] {
+    display: none;
+}
+
+.background-card-content {
+    display: block;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+}
+
+.background-header h3 {
+    color: #00ff41;
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+}
+
+.starting-gold {
+    color: #ffaa00;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+.background-description {
+    color: #ccc;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.background-bonuses h4 {
+    color: #00ff41;
+    margin-bottom: 0.5rem;
+}
+
+.bonus-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.stat-bonus {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.stat-bonus.positive {
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid #00aa00;
+    color: #44ff44;
+}
+
+.stat-bonus.gold {
+    background: rgba(255, 165, 0, 0.1);
+    border: 1px solid #ffaa00;
+    color: #ffcc44;
+}
+
+.stat-bonus.special {
+    background: rgba(255, 0, 255, 0.1);
+    border: 1px solid #aa00aa;
+    color: #ff44ff;
+}
+
+.starting-items h4 {
+    color: #00ff41;
+    margin-bottom: 0.5rem;
+}
+
+.item-list {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.item-entry {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.item-name {
+    color: #ccc;
+    font-weight: bold;
+}
+
+.item-type {
+    color: #aaa;
+}
+
+.item-quantity {
+    color: #ffaa00;
+    font-weight: bold;
+}
+
+/* Stats Step */
+.stats-allocation {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.current-stats h3 {
+    color: #00ff41;
+    margin-bottom: 1rem;
+}
+
+.base-stats-display {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.base-stat {
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    text-align: center;
+}
+
+.allocation-section h3 {
+    color: #00ff41;
+    margin-bottom: 1rem;
+}
+
+.points-remaining {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: rgba(0, 255, 65, 0.1);
+    border: 2px solid #00ff41;
+    border-radius: 8px;
+}
+
+.points-label {
+    color: #ccc;
+    margin-right: 1rem;
+}
+
+.points-count {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #00ff41;
+}
+
+.stat-allocators {
+    display: grid;
+    gap: 1rem;
+}
+
+.stat-allocator {
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #555;
+    border-radius: 8px;
+}
+
+.stat-allocator label {
+    display: block;
+    color: #00ff41;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.allocator-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.btn-decrease, .btn-increase {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #00ff41;
+    background: transparent;
+    color: #00ff41;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-decrease:hover, .btn-increase:hover {
+    background: #00ff41;
+    color: #000;
+}
+
+.btn-decrease:disabled, .btn-increase:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.allocated-points {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #00ff41;
+    min-width: 30px;
+    text-align: center;
+}
+
+.stat-total {
+    text-align: center;
+    color: #ccc;
+    margin-bottom: 0.5rem;
+}
+
+.stat-allocator small {
+    color: #aaa;
+    font-size: 0.8rem;
+    text-align: center;
+    display: block;
+}
+
+.allocation-presets h3 {
+    color: #00ff41;
+    margin-bottom: 1rem;
+}
+
+.preset-buttons {
+    display: grid;
+    gap: 0.5rem;
+}
+
+/* Review Step */
+.character-review {
+    margin-bottom: 2rem;
+}
+
+.character-card {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #00ff41;
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+.character-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.character-name {
+    font-size: 2rem;
+    color: #00ff41;
+    text-shadow: 0 0 10px #00ff41;
+    margin-bottom: 0.5rem;
+}
+
+.character-subtitle {
+    color: #ccc;
+    font-size: 1.1rem;
+}
+
+.character-subtitle .race-name,
+.character-subtitle .background-name {
+    color: #ffaa00;
+    font-weight: bold;
+}
+
+.character-stats h4 {
+    color: #00ff41;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(0, 255, 65, 0.1);
+    border: 1px solid #00ff41;
+    border-radius: 8px;
+}
+
+.derived-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.derived-stat {
+    padding: 0.5rem 1rem;
+    background: rgba(255, 165, 0, 0.1);
+    border: 1px solid #ffaa00;
+    border-radius: 4px;
+    color: #ffcc44;
+    font-weight: bold;
+}
+
+.bonus-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.starting-resources {
+    margin-bottom: 2rem;
+}
+
+.resource-item {
+    margin-bottom: 1rem;
+}
+
+.resource-item strong {
+    color: #ffaa00;
+}
+
+.resource-item small {
+    color: #aaa;
+    display: block;
+}
+
+.starting-items strong {
+    color: #00ff41;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.item-list {
+    list-style: none;
+    padding: 0;
+}
+
+.item-list li {
+    padding: 0.25rem 0;
+    color: #ccc;
+}
+
+.tutorial-info {
+    margin-bottom: 2rem;
+}
+
+.tutorial-info h4 {
+    color: #00ff41;
+    margin-bottom: 1rem;
+}
+
+.tutorial-list {
+    list-style: none;
+    padding: 0;
+}
+
+.tutorial-quest {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: rgba(0, 255, 65, 0.05);
+    border: 1px solid #00ff41;
+    border-radius: 4px;
+}
+
+.tutorial-quest strong {
+    color: #00ff41;
+}
+
+.tutorial-quest small {
+    color: #aaa;
+}
+
+.first-time-bonus {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: rgba(255, 215, 0, 0.1);
+    border: 2px solid #ffd700;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.first-time-bonus h4 {
+    color: #ffd700;
+    margin-bottom: 1rem;
+}
+
+.bonus-list {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.bonus-item {
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.starting-location h4 {
+    color: #00ff41;
+    margin-bottom: 0.5rem;
+}
+
+.location-name {
+    font-size: 1.2rem;
+    color: #ffaa00;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.creation-warning {
+    margin-bottom: 2rem;
+}
+
+.warning-box {
+    padding: 1rem;
+    background: rgba(255, 165, 0, 0.1);
+    border: 2px solid #ffaa00;
+    border-radius: 8px;
+}
+
+.warning-box h4 {
+    color: #ffaa00;
+    margin-bottom: 1rem;
+}
+
+.warning-box ul {
+    color: #ccc;
+    list-style-position: inside;
+}
+
+.warning-box li {
+    margin-bottom: 0.5rem;
+}
+
+/* Preview Cards */
+.preview-card {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: rgba(0, 255, 65, 0.05);
+    border: 1px solid #00ff41;
+    border-radius: 8px;
+}
+
+.preview-card h3 {
+    color: #00ff41;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+/* Navigation */
+.step-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #555;
+}
+
+/* Buttons */
+.btn {
+    padding: 12px 24px;
+    border: 2px solid;
+    border-radius: 6px;
+    background: transparent;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-primary {
+    border-color: #00ff41;
+    color: #00ff41;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #00ff41;
+    color: #000;
+    box-shadow: 0 0 15px #00ff41;
+}
+
+.btn-secondary {
+    border-color: #666;
+    color: #666;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #666;
+    color: #000;
+}
+
+.btn-success {
+    border-color: #44ff44;
+    color: #44ff44;
+}
+
+.btn-success:hover:not(:disabled) {
+    background: #44ff44;
+    color: #000;
+    box-shadow: 0 0 15px #44ff44;
+}
+
+.btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.btn-help {
+    background: transparent;
+    border: 1px solid #666;
+    color: #666;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.btn-help:hover {
+    background: #666;
+    color: #000;
+}
+
+/* Help Overlay */
+.help-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.help-content {
+    background: #1a1a1a;
+    border: 2px solid #00ff41;
+    border-radius: 12px;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.help-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #555;
+}
+
+.help-header h3 {
+    color: #00ff41;
+    margin: 0;
+}
+
+.btn-close {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-close:hover {
+    color: #ff4444;
+}
+
+.help-body {
+    padding: 1.5rem;
+}
+
+.help-section {
+    margin-bottom: 1.5rem;
+}
+
+.help-section h4 {
+    color: #00ff41;
+    margin-bottom: 0.5rem;
+}
+
+.help-section p {
+    color: #ccc;
+    line-height: 1.5;
+}
+
+/* Footer */
+.wizard-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid #333;
+    color: #666;
+}
+
+/* Loading State */
+.loading {
+    cursor: wait;
+}
+
+.loading * {
+    pointer-events: none;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .wizard-container {
+        padding: 1rem;
+    }
+    
+    .race-grid, .background-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-allocation {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .step-indicator {
+        gap: 0.5rem;
+    }
+    
+    .step-connector {
+        width: 30px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .derived-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .wizard-header h1 {
+        font-size: 2rem;
+    }
+    
+    .step-navigation {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

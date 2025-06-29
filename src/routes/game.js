@@ -2,6 +2,7 @@ const express = require('express');
 const db = require('../database');
 const { requireCharacter } = require('../middleware/auth');
 const LevelService = require('../levelService');
+const characterCreationService = require('../services/characterCreationService');
 
 const router = express.Router();
 const levelService = new LevelService();
@@ -13,7 +14,7 @@ router.get('/dashboard', async (req, res) => {
     const characters = await db.query('SELECT * FROM characters WHERE user_id = $1', [req.session.userId]);
     
     if (characters.rows.length === 0) {
-      return res.redirect('/game/character-creation');
+      return res.redirect('/game/character-creation-wizard');
     }
 
     // If no character selected, show character selection
@@ -77,33 +78,9 @@ router.get('/dashboard', async (req, res) => {
   }
 });
 
-// Character creation
+// Character creation (legacy - redirects to wizard)
 router.get('/character-creation', async (req, res) => {
-  try {
-    const races = await db.query(`
-      SELECT r.*, 
-             COALESCE(array_agg(ra.ability_name) FILTER (WHERE ra.ability_name IS NOT NULL), '{}') as abilities
-      FROM races r
-      LEFT JOIN race_abilities ra ON r.id = ra.race_id
-      GROUP BY r.id, r.name, r.description, r.str_modifier, r.int_modifier, r.vit_modifier, 
-               r.dex_modifier, r.wis_modifier, r.starting_zone, r.experience_bonus, 
-               r.magic_affinity_bonus, r.weapon_affinity_bonus, r.special_ability, 
-               r.equipment_restrictions, r.regeneration_modifier, r.created_at
-      ORDER BY r.name
-    `);
-    
-    res.render('game/character-creation', {
-      title: 'Create Character - Aeturnis Online',
-      races: races.rows,
-      error: null
-    });
-  } catch (error) {
-    console.error('Character creation page error:', error);
-    res.status(500).render('error', { 
-      title: 'Error',
-      message: 'Unable to load character creation'
-    });
-  }
+  res.redirect('/game/character-creation-wizard');
 });
 
 // Character creation POST
@@ -210,6 +187,200 @@ router.post('/character-creation', async (req, res) => {
       races: races.rows,
       error: 'An error occurred while creating your character'
     });
+  }
+});
+
+// ==============================================
+// Phase 2.4: Character Creation Wizard Routes
+// ==============================================
+
+// Character creation wizard main route
+router.get('/character-creation-wizard', async (req, res) => {
+  try {
+    const step = parseInt(req.query.step) || 1;
+    
+    // Validate step number
+    if (step < 1 || step > 5) {
+      return res.redirect('/game/character-creation-wizard?step=1');
+    }
+    
+    // Get or initialize session
+    let session = await characterCreationService.getSession(req.session.userId);
+    if (!session) {
+      await characterCreationService.initializeSession(req.session.userId);
+      session = await characterCreationService.getSession(req.session.userId);
+    }
+    
+    const sessionData = JSON.parse(session.session_data || '{}');
+    const stepConfig = characterCreationService.getStep(step);
+    
+    // Get data needed for current step
+    let stepData = { sessionData };
+    
+    if (step >= 2) {
+      // Get races for step 2+
+      stepData.races = await characterCreationService.getRaces();
+    }
+    
+    if (step >= 3) {
+      // Get backgrounds for step 3+
+      stepData.backgrounds = await characterCreationService.getBackgrounds();
+    }
+    
+    if (step >= 5) {
+      // Get tutorial quests for step 5
+      stepData.tutorialQuests = await db.query(`
+        SELECT * FROM tutorial_quests 
+        WHERE race_specific = false 
+        ORDER BY order_sequence
+      `).then(result => result.rows);
+      
+      // Check if this is first character
+      const characterCount = await db.query(
+        'SELECT COUNT(*) FROM characters WHERE user_id = $1',
+        [req.session.userId]
+      );
+      stepData.isFirstCharacter = parseInt(characterCount.rows[0].count) === 0;
+    }
+    
+    res.render('game/character-creation-wizard', {
+      title: `Create Character - Step ${step} - Aeturnis Online`,
+      currentStep: step,
+      currentStepTemplate: stepConfig.template,
+      stepNames: ['Name', 'Race', 'Background', 'Stats', 'Review'],
+      ...stepData,
+      error: null
+    });
+    
+  } catch (error) {
+    console.error('Character creation wizard error:', error);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Unable to load character creation wizard'
+    });
+  }
+});
+
+// API: Process wizard step
+router.post('/api/character-creation/step', async (req, res) => {
+  try {
+    const { step, data } = req.body;
+    
+    // Validate step data based on step number
+    let validationError = null;
+    
+    switch (step) {
+      case 1: // Name validation
+        if (!data.name) {
+          validationError = 'Character name is required';
+        } else {
+          const nameValidation = await characterCreationService.validateName(data.name);
+          if (!nameValidation.valid) {
+            validationError = nameValidation.errors.join(', ');
+          }
+        }
+        break;
+        
+      case 2: // Race validation
+        if (!data.raceId) {
+          validationError = 'Race selection is required';
+        } else {
+          const races = await characterCreationService.getRaces();
+          const selectedRace = races.find(r => r.id == data.raceId);
+          if (!selectedRace) {
+            validationError = 'Invalid race selection';
+          }
+        }
+        break;
+        
+      case 3: // Background validation
+        if (!data.backgroundId) {
+          validationError = 'Background selection is required';
+        } else {
+          const backgrounds = await characterCreationService.getBackgrounds();
+          const selectedBackground = backgrounds.find(b => b.id == data.backgroundId);
+          if (!selectedBackground) {
+            validationError = 'Invalid background selection';
+          }
+        }
+        break;
+        
+      case 4: // Stat allocation validation
+        if (!data.statAllocation) {
+          validationError = 'Stat allocation is required';
+        } else {
+          const allocation = data.statAllocation;
+          const totalPoints = Object.values(allocation).reduce((sum, val) => sum + val, 0);
+          if (totalPoints !== 5) {
+            validationError = 'You must allocate exactly 5 stat points';
+          }
+          
+          // Validate individual stats
+          for (const [stat, points] of Object.entries(allocation)) {
+            if (points < 0 || points > 5) {
+              validationError = 'Invalid stat allocation';
+              break;
+            }
+          }
+        }
+        break;
+    }
+    
+    if (validationError) {
+      return res.json({ success: false, error: validationError });
+    }
+    
+    // Update session with step data
+    const nextStep = step < 5 ? step + 1 : step;
+    await characterCreationService.updateSession(req.session.userId, data, nextStep);
+    
+    res.json({ success: true, nextStep });
+    
+  } catch (error) {
+    console.error('Character creation step error:', error);
+    res.json({ success: false, error: 'An error occurred processing your request' });
+  }
+});
+
+// API: Validate character name
+router.post('/api/character-creation/validate-name', async (req, res) => {
+  try {
+    const { name } = req.body;
+    const validation = await characterCreationService.validateName(name);
+    res.json(validation);
+  } catch (error) {
+    console.error('Name validation error:', error);
+    res.json({ valid: false, errors: ['Unable to validate name'] });
+  }
+});
+
+// API: Create character from wizard
+router.post('/api/character-creation/create', async (req, res) => {
+  try {
+    // Get session data
+    const session = await characterCreationService.getSession(req.session.userId);
+    if (!session || session.step < 5) {
+      return res.json({ success: false, error: 'Character creation not complete' });
+    }
+    
+    const sessionData = JSON.parse(session.session_data);
+    
+    // Validate all required data
+    if (!sessionData.name || !sessionData.raceId || !sessionData.backgroundId || !sessionData.statAllocation) {
+      return res.json({ success: false, error: 'Missing required character data' });
+    }
+    
+    // Create character
+    const characterId = await characterCreationService.createCharacter(req.session.userId, sessionData);
+    
+    // Set as active character
+    req.session.characterId = characterId;
+    
+    res.json({ success: true, characterId });
+    
+  } catch (error) {
+    console.error('Character creation final error:', error);
+    res.json({ success: false, error: 'Failed to create character' });
   }
 });
 

@@ -1,0 +1,142 @@
+<div class="creation-step" id="step-name">
+  <div class="step-header">
+    <h2>Choose Your Character Name</h2>
+    <p class="step-description">Select a unique name that will represent you in the world of Aeturnis.</p>
+  </div>
+  
+  <div class="step-content">
+    <div class="form-section">
+      <label for="character-name">Character Name:</label>
+      <input 
+        type="text" 
+        id="character-name" 
+        name="name" 
+        value="<%= sessionData.name || '' %>" 
+        required 
+        minlength="3" 
+        maxlength="20"
+        placeholder="Enter your character name..."
+        autocomplete="off"
+      >
+      <div class="name-feedback" id="name-feedback"></div>
+      <small class="form-help">
+        • 3-20 characters long<br>
+        • Letters, numbers, underscores, and hyphens only<br>
+        • Must be unique across all players
+      </small>
+    </div>
+
+    <div class="name-preview" id="name-preview" style="display: none;">
+      <div class="preview-card">
+        <h3>Name Preview</h3>
+        <div class="character-nameplate">
+          <span class="name-display" id="name-display"></span>
+          <span class="level-display">Level 1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-navigation">
+    <button type="button" class="btn btn-secondary" disabled>Previous</button>
+    <button type="button" class="btn btn-primary" id="next-step-btn" disabled onclick="validateNameAndProceed()">
+      Next Step
+    </button>
+  </div>
+</div>
+
+<script>
+let nameValidationTimeout;
+let lastValidatedName = '';
+
+document.getElementById('character-name').addEventListener('input', function() {
+  const name = this.value;
+  const nextBtn = document.getElementById('next-step-btn');
+  const feedback = document.getElementById('name-feedback');
+  const preview = document.getElementById('name-preview');
+  const nameDisplay = document.getElementById('name-display');
+  
+  // Clear previous timeout
+  clearTimeout(nameValidationTimeout);
+  
+  // Basic client-side validation
+  if (name.length < 3) {
+    feedback.innerHTML = '<span class="error">Name must be at least 3 characters</span>';
+    nextBtn.disabled = true;
+    preview.style.display = 'none';
+    return;
+  }
+  
+  if (name.length > 20) {
+    feedback.innerHTML = '<span class="error">Name cannot exceed 20 characters</span>';
+    nextBtn.disabled = true;
+    preview.style.display = 'none';
+    return;
+  }
+  
+  if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
+    feedback.innerHTML = '<span class="error">Only letters, numbers, underscores, and hyphens allowed</span>';
+    nextBtn.disabled = true;
+    preview.style.display = 'none';
+    return;
+  }
+  
+  // Show preview
+  nameDisplay.textContent = name;
+  preview.style.display = 'block';
+  feedback.innerHTML = '<span class="checking">Checking availability...</span>';
+  
+  // Debounced server validation
+  nameValidationTimeout = setTimeout(() => {
+    validateNameAvailability(name);
+  }, 500);
+});
+
+async function validateNameAvailability(name) {
+  if (name === lastValidatedName) return;
+  
+  try {
+    const response = await fetch('/api/character-creation/validate-name', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    });
+    
+    const result = await response.json();
+    const feedback = document.getElementById('name-feedback');
+    const nextBtn = document.getElementById('next-step-btn');
+    
+    if (result.valid) {
+      feedback.innerHTML = '<span class="success">✓ Name is available!</span>';
+      nextBtn.disabled = false;
+    } else {
+      feedback.innerHTML = result.errors.map(error => 
+        `<span class="error">${error}</span>`
+      ).join('<br>');
+      nextBtn.disabled = true;
+    }
+    
+    lastValidatedName = name;
+  } catch (error) {
+    console.error('Name validation error:', error);
+    document.getElementById('name-feedback').innerHTML = 
+      '<span class="error">Unable to check name availability</span>';
+    document.getElementById('next-step-btn').disabled = true;
+  }
+}
+
+function validateNameAndProceed() {
+  const name = document.getElementById('character-name').value;
+  if (name && name.length >= 3) {
+    proceedToNextStep({ name });
+  }
+}
+
+// Initial validation if name is pre-filled
+document.addEventListener('DOMContentLoaded', function() {
+  const nameInput = document.getElementById('character-name');
+  if (nameInput.value) {
+    nameInput.dispatchEvent(new Event('input'));
+  }
+});
+</script>

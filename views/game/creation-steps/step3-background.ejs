@@ -1,0 +1,226 @@
+<div class="creation-step" id="step-background">
+  <div class="step-header">
+    <h2>Choose Your Background</h2>
+    <p class="step-description">Your past shapes your future. Select a background that grants starting items and stat bonuses.</p>
+  </div>
+  
+  <div class="step-content">
+    <div class="background-grid">
+      <% backgrounds.forEach(background => { %>
+      <div class="background-card" data-background-id="<%= background.id %>">
+        <input 
+          type="radio" 
+          id="background-<%= background.id %>" 
+          name="backgroundId" 
+          value="<%= background.id %>" 
+          <%= sessionData.backgroundId == background.id ? 'checked' : '' %>
+          onchange="selectBackground(<%= background.id %>)"
+        >
+        <label for="background-<%= background.id %>" class="background-card-content">
+          <div class="background-header">
+            <h3><%= background.name %></h3>
+            <div class="starting-gold">
+              Starting Gold: <%= background.starting_gold %>
+            </div>
+          </div>
+          
+          <p class="background-description"><%= background.description %></p>
+          
+          <div class="background-bonuses">
+            <h4>Stat Bonuses</h4>
+            <div class="bonus-stats">
+              <% const bonuses = typeof background.stat_bonuses === 'string' ? JSON.parse(background.stat_bonuses) : background.stat_bonuses; %>
+              <% Object.entries(bonuses).forEach(([stat, value]) => { %>
+                <% if (stat !== 'gold_bonus' && value > 0) { %>
+                <div class="stat-bonus positive">
+                  <%= stat.toUpperCase() %>: +<%= value %>
+                </div>
+                <% } %>
+              <% }); %>
+              <% if (bonuses.gold_bonus) { %>
+                <div class="stat-bonus gold">
+                  Extra Gold: +<%= bonuses.gold_bonus %>
+                </div>
+              <% } %>
+              <% if (bonuses.dodge_bonus) { %>
+                <div class="stat-bonus special">
+                  Dodge: +<%= bonuses.dodge_bonus %>%
+                </div>
+              <% } %>
+              <% if (bonuses.magic_affinity_bonus) { %>
+                <div class="stat-bonus special">
+                  Magic Affinity: +<%= bonuses.magic_affinity_bonus %>%
+                </div>
+              <% } %>
+              <% if (bonuses.weapon_affinity_bonus) { %>
+                <div class="stat-bonus special">
+                  Weapon Affinity: +<%= bonuses.weapon_affinity_bonus %>%
+                </div>
+              <% } %>
+            </div>
+          </div>
+          
+          <div class="starting-items">
+            <h4>Starting Items</h4>
+            <div class="item-list">
+              <% background.starting_items.forEach(item => { %>
+              <div class="item-entry">
+                <span class="item-name"><%= item.name %></span>
+                <span class="item-type">(<%= item.type %>)</span>
+                <% if (item.quantity > 1) { %>
+                  <span class="item-quantity">x<%= item.quantity %></span>
+                <% } %>
+              </div>
+              <% }); %>
+            </div>
+          </div>
+        </label>
+      </div>
+      <% }); %>
+    </div>
+  </div>
+
+  <div class="background-preview" id="background-preview" style="display: none;">
+    <div class="preview-card">
+      <h3>Character Summary</h3>
+      <div class="character-summary">
+        <div class="character-identity">
+          <div class="name-info">
+            <span class="name"><%= sessionData.name || 'Your Character' %></span>
+            <span class="details">
+              <span id="preview-race">Race</span> 
+              <span id="preview-background">Background</span>
+            </span>
+          </div>
+        </div>
+        
+        <div class="final-stats" id="final-stats">
+          <!-- Stats will be populated by JavaScript -->
+        </div>
+        
+        <div class="total-gold" id="total-gold">
+          <!-- Gold total will be populated by JavaScript -->
+        </div>
+        
+        <div class="starting-inventory" id="starting-inventory">
+          <!-- Items will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-navigation">
+    <button type="button" class="btn btn-secondary" onclick="goToPreviousStep()">Previous</button>
+    <button type="button" class="btn btn-primary" id="next-step-btn" disabled onclick="proceedWithBackground()">
+      Next Step
+    </button>
+  </div>
+</div>
+
+<script>
+let selectedBackgroundData = null;
+const raceData = <%- JSON.stringify(races.find(r => r.id == sessionData.raceId) || {}) %>;
+const backgrounds = <%- JSON.stringify(backgrounds) %>;
+
+function selectBackground(backgroundId) {
+  // Find background data
+  selectedBackgroundData = backgrounds.find(b => b.id === backgroundId);
+  
+  // Update UI
+  updateBackgroundPreview();
+  
+  // Enable next button
+  document.getElementById('next-step-btn').disabled = false;
+  
+  // Highlight selected card
+  document.querySelectorAll('.background-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+  document.querySelector(`[data-background-id="${backgroundId}"]`).classList.add('selected');
+}
+
+function updateBackgroundPreview() {
+  if (!selectedBackgroundData || !raceData.name) return;
+  
+  const preview = document.getElementById('background-preview');
+  const previewRace = document.getElementById('preview-race');
+  const previewBackground = document.getElementById('preview-background');
+  const finalStats = document.getElementById('final-stats');
+  const totalGold = document.getElementById('total-gold');
+  const inventory = document.getElementById('starting-inventory');
+  
+  previewRace.textContent = raceData.name;
+  previewBackground.textContent = selectedBackgroundData.name;
+  
+  // Calculate final stats
+  const backgroundBonuses = selectedBackgroundData.stat_bonuses;
+  const stats = {
+    str: 10 + (raceData.str_modifier || 0) + (backgroundBonuses.str || 0),
+    int: 10 + (raceData.int_modifier || 0) + (backgroundBonuses.int || 0),
+    vit: 10 + (raceData.vit_modifier || 0) + (backgroundBonuses.vit || 0),
+    dex: 10 + (raceData.dex_modifier || 0) + (backgroundBonuses.dex || 0),
+    wis: 10 + (raceData.wis_modifier || 0) + (backgroundBonuses.wis || 0)
+  };
+  
+  finalStats.innerHTML = `
+    <h4>Final Starting Stats</h4>
+    <div class="stats-display">
+      <div class="stat-row">
+        <span>STR: ${stats.str}</span>
+        <span>INT: ${stats.int}</span>
+        <span>VIT: ${stats.vit}</span>
+      </div>
+      <div class="stat-row">
+        <span>DEX: ${stats.dex}</span>
+        <span>WIS: ${stats.wis}</span>
+      </div>
+      <div class="derived-stats">
+        <span>Health: ${stats.vit * 10}</span>
+        <span>Mana: ${Math.floor(stats.int * 5)}</span>
+      </div>
+    </div>
+  `;
+  
+  // Calculate total starting gold
+  const baseGold = 100;
+  const backgroundGold = selectedBackgroundData.starting_gold || 0;
+  const goldBonus = backgroundBonuses.gold_bonus || 0;
+  const total = baseGold + backgroundGold + goldBonus;
+  
+  totalGold.innerHTML = `
+    <h4>Starting Gold: ${total}</h4>
+    <div class="gold-breakdown">
+      <small>Base: ${baseGold} + Background: ${backgroundGold}${goldBonus > 0 ? ` + Bonus: ${goldBonus}` : ''}</small>
+    </div>
+  `;
+  
+  // Show starting items
+  inventory.innerHTML = `
+    <h4>Starting Equipment</h4>
+    <div class="item-grid">
+      ${selectedBackgroundData.starting_items.map(item => `
+        <div class="item-preview">
+          <span class="item-name">${item.name}</span>
+          ${item.quantity > 1 ? `<span class="quantity">x${item.quantity}</span>` : ''}
+        </div>
+      `).join('')}
+    </div>
+  `;
+  
+  preview.style.display = 'block';
+}
+
+function proceedWithBackground() {
+  if (selectedBackgroundData) {
+    proceedToNextStep({ backgroundId: selectedBackgroundData.id });
+  }
+}
+
+// Initialize if background is pre-selected
+document.addEventListener('DOMContentLoaded', function() {
+  const selectedInput = document.querySelector('input[name="backgroundId"]:checked');
+  if (selectedInput) {
+    selectBackground(parseInt(selectedInput.value));
+  }
+});
+</script>

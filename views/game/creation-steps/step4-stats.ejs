@@ -1,0 +1,287 @@
+<div class="creation-step" id="step-stats">
+  <div class="step-header">
+    <h2>Allocate Additional Stats</h2>
+    <p class="step-description">Distribute 5 bonus points among your stats to customize your character.</p>
+  </div>
+  
+  <div class="step-content">
+    <div class="stats-allocation">
+      <div class="current-stats">
+        <h3>Base Stats (Race + Background)</h3>
+        <div class="base-stats-display" id="base-stats-display">
+          <!-- Base stats will be populated by JavaScript -->
+        </div>
+      </div>
+      
+      <div class="allocation-section">
+        <h3>Bonus Points to Allocate</h3>
+        <div class="points-remaining">
+          <span class="points-label">Points Remaining:</span>
+          <span class="points-count" id="points-remaining">5</span>
+        </div>
+        
+        <div class="stat-allocators">
+          <div class="stat-allocator">
+            <label>Strength (STR)</label>
+            <div class="allocator-controls">
+              <button type="button" class="btn-decrease" onclick="adjustStat('str', -1)">-</button>
+              <span class="allocated-points" id="str-allocated">0</span>
+              <button type="button" class="btn-increase" onclick="adjustStat('str', 1)">+</button>
+            </div>
+            <div class="stat-total">
+              Total: <span id="str-total">0</span>
+            </div>
+            <small>Affects physical damage and carrying capacity</small>
+          </div>
+          
+          <div class="stat-allocator">
+            <label>Intelligence (INT)</label>
+            <div class="allocator-controls">
+              <button type="button" class="btn-decrease" onclick="adjustStat('int', -1)">-</button>
+              <span class="allocated-points" id="int-allocated">0</span>
+              <button type="button" class="btn-increase" onclick="adjustStat('int', 1)">+</button>
+            </div>
+            <div class="stat-total">
+              Total: <span id="int-total">0</span>
+            </div>
+            <small>Affects magic damage and mana pool</small>
+          </div>
+          
+          <div class="stat-allocator">
+            <label>Vitality (VIT)</label>
+            <div class="allocator-controls">
+              <button type="button" class="btn-decrease" onclick="adjustStat('vit', -1)">-</button>
+              <span class="allocated-points" id="vit-allocated">0</span>
+              <button type="button" class="btn-increase" onclick="adjustStat('vit', 1)">+</button>
+            </div>
+            <div class="stat-total">
+              Total: <span id="vit-total">0</span>
+            </div>
+            <small>Affects health points and survivability</small>
+          </div>
+          
+          <div class="stat-allocator">
+            <label>Dexterity (DEX)</label>
+            <div class="allocator-controls">
+              <button type="button" class="btn-decrease" onclick="adjustStat('dex', -1)">-</button>
+              <span class="allocated-points" id="dex-allocated">0</span>
+              <button type="button" class="btn-increase" onclick="adjustStat('dex', 1)">+</button>
+            </div>
+            <div class="stat-total">
+              Total: <span id="dex-total">0</span>
+            </div>
+            <small>Affects accuracy and dodge chance</small>
+          </div>
+          
+          <div class="stat-allocator">
+            <label>Wisdom (WIS)</label>
+            <div class="allocator-controls">
+              <button type="button" class="btn-decrease" onclick="adjustStat('wis', -1)">-</button>
+              <span class="allocated-points" id="wis-allocated">0</span>
+              <button type="button" class="btn-increase" onclick="adjustStat('wis', 1)">+</button>
+            </div>
+            <div class="stat-total">
+              Total: <span id="wis-total">0</span>
+            </div>
+            <small>Affects mana regeneration and experience gain</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="allocation-presets">
+        <h3>Quick Presets</h3>
+        <div class="preset-buttons">
+          <button type="button" class="btn btn-secondary" onclick="applyPreset('warrior')">
+            Warrior (+3 STR, +2 VIT)
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="applyPreset('mage')">
+            Mage (+3 INT, +2 WIS)
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="applyPreset('rogue')">
+            Rogue (+3 DEX, +2 STR)
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="applyPreset('balanced')">
+            Balanced (+1 to all)
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="resetAllocation()">
+            Reset All
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="allocation-preview" id="allocation-preview">
+    <div class="preview-card">
+      <h3>Final Character Stats</h3>
+      <div class="final-character-display">
+        <div class="character-header">
+          <span class="name"><%= sessionData.name || 'Your Character' %></span>
+          <span class="details">
+            <span id="final-race">Race</span> 
+            <span id="final-background">Background</span>
+          </span>
+        </div>
+        
+        <div class="final-stats-grid" id="final-stats-grid">
+          <!-- Final stats will be populated by JavaScript -->
+        </div>
+        
+        <div class="combat-stats" id="combat-stats">
+          <!-- Health/Mana will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-navigation">
+    <button type="button" class="btn btn-secondary" onclick="goToPreviousStep()">Previous</button>
+    <button type="button" class="btn btn-primary" id="next-step-btn" onclick="proceedWithStats()">
+      Next Step
+    </button>
+  </div>
+</div>
+
+<script>
+const raceData = <%- JSON.stringify(races.find(r => r.id == sessionData.raceId) || {}) %>;
+const backgroundData = <%- JSON.stringify(backgrounds.find(b => b.id == sessionData.backgroundId) || {}) %>;
+
+let baseStats = {};
+let allocatedStats = { str: 0, int: 0, vit: 0, dex: 0, wis: 0 };
+let totalPoints = 5;
+let usedPoints = 0;
+
+function initializeStats() {
+  // Calculate base stats from race and background
+  const backgroundBonuses = backgroundData.stat_bonuses || {};
+  
+  baseStats = {
+    str: 10 + (raceData.str_modifier || 0) + (backgroundBonuses.str || 0),
+    int: 10 + (raceData.int_modifier || 0) + (backgroundBonuses.int || 0),
+    vit: 10 + (raceData.vit_modifier || 0) + (backgroundBonuses.vit || 0),
+    dex: 10 + (raceData.dex_modifier || 0) + (backgroundBonuses.dex || 0),
+    wis: 10 + (raceData.wis_modifier || 0) + (backgroundBonuses.wis || 0)
+  };
+  
+  // Load existing allocation if any
+  const sessionStats = <%= JSON.stringify(sessionData.statAllocation || {}) %>;
+  if (Object.keys(sessionStats).length > 0) {
+    allocatedStats = sessionStats;
+    usedPoints = Object.values(allocatedStats).reduce((sum, val) => sum + val, 0);
+  }
+  
+  updateDisplay();
+}
+
+function adjustStat(stat, amount) {
+  const newValue = allocatedStats[stat] + amount;
+  const newUsedPoints = usedPoints + amount;
+  
+  // Validate constraints
+  if (newValue < 0) return; // Can't go below 0
+  if (newUsedPoints > totalPoints) return; // Can't exceed total points
+  if (newUsedPoints < 0) return; // Can't have negative used points
+  
+  allocatedStats[stat] = newValue;
+  usedPoints = newUsedPoints;
+  
+  updateDisplay();
+}
+
+function applyPreset(presetType) {
+  resetAllocation();
+  
+  switch (presetType) {
+    case 'warrior':
+      allocatedStats = { str: 3, int: 0, vit: 2, dex: 0, wis: 0 };
+      break;
+    case 'mage':
+      allocatedStats = { str: 0, int: 3, vit: 0, dex: 0, wis: 2 };
+      break;
+    case 'rogue':
+      allocatedStats = { str: 2, int: 0, vit: 0, dex: 3, wis: 0 };
+      break;
+    case 'balanced':
+      allocatedStats = { str: 1, int: 1, vit: 1, dex: 1, wis: 1 };
+      break;
+  }
+  
+  usedPoints = Object.values(allocatedStats).reduce((sum, val) => sum + val, 0);
+  updateDisplay();
+}
+
+function resetAllocation() {
+  allocatedStats = { str: 0, int: 0, vit: 0, dex: 0, wis: 0 };
+  usedPoints = 0;
+  updateDisplay();
+}
+
+function updateDisplay() {
+  // Update points remaining
+  document.getElementById('points-remaining').textContent = totalPoints - usedPoints;
+  
+  // Update each stat display
+  ['str', 'int', 'vit', 'dex', 'wis'].forEach(stat => {
+    document.getElementById(`${stat}-allocated`).textContent = allocatedStats[stat];
+    document.getElementById(`${stat}-total`).textContent = baseStats[stat] + allocatedStats[stat];
+    
+    // Update button states
+    const decreaseBtn = document.querySelector(`.stat-allocator:nth-child(${['str', 'int', 'vit', 'dex', 'wis'].indexOf(stat) + 1}) .btn-decrease`);
+    const increaseBtn = document.querySelector(`.stat-allocator:nth-child(${['str', 'int', 'vit', 'dex', 'wis'].indexOf(stat) + 1}) .btn-increase`);
+    
+    decreaseBtn.disabled = allocatedStats[stat] <= 0;
+    increaseBtn.disabled = usedPoints >= totalPoints;
+  });
+  
+  updatePreview();
+}
+
+function updatePreview() {
+  // Update character info
+  document.getElementById('final-race').textContent = raceData.name || 'Race';
+  document.getElementById('final-background').textContent = backgroundData.name || 'Background';
+  
+  // Calculate final stats
+  const finalStats = {
+    str: baseStats.str + allocatedStats.str,
+    int: baseStats.int + allocatedStats.int,
+    vit: baseStats.vit + allocatedStats.vit,
+    dex: baseStats.dex + allocatedStats.dex,
+    wis: baseStats.wis + allocatedStats.wis
+  };
+  
+  // Update final stats display
+  document.getElementById('final-stats-grid').innerHTML = `
+    <div class="stat-final">STR: ${finalStats.str}</div>
+    <div class="stat-final">INT: ${finalStats.int}</div>
+    <div class="stat-final">VIT: ${finalStats.vit}</div>
+    <div class="stat-final">DEX: ${finalStats.dex}</div>
+    <div class="stat-final">WIS: ${finalStats.wis}</div>
+  `;
+  
+  // Update combat stats
+  const health = finalStats.vit * 10;
+  const mana = Math.floor(finalStats.int * 5);
+  
+  document.getElementById('combat-stats').innerHTML = `
+    <div class="combat-stat">Health: ${health}</div>
+    <div class="combat-stat">Mana: ${mana}</div>
+  `;
+  
+  // Update base stats display
+  document.getElementById('base-stats-display').innerHTML = `
+    <div class="base-stat">STR: ${baseStats.str}</div>
+    <div class="base-stat">INT: ${baseStats.int}</div>
+    <div class="base-stat">VIT: ${baseStats.vit}</div>
+    <div class="base-stat">DEX: ${baseStats.dex}</div>
+    <div class="base-stat">WIS: ${baseStats.wis}</div>
+  `;
+}
+
+function proceedWithStats() {
+  proceedToNextStep({ statAllocation: allocatedStats });
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', initializeStats);
+</script>

@@ -1,0 +1,190 @@
+<div class="creation-step" id="step-race">
+  <div class="step-header">
+    <h2>Choose Your Race</h2>
+    <p class="step-description">Your race determines your starting stats, abilities, and homeland.</p>
+  </div>
+  
+  <div class="step-content">
+    <div class="race-grid">
+      <% races.forEach(race => { %>
+      <div class="race-card" data-race-id="<%= race.id %>">
+        <input 
+          type="radio" 
+          id="race-<%= race.id %>" 
+          name="raceId" 
+          value="<%= race.id %>" 
+          <%= sessionData.raceId == race.id ? 'checked' : '' %>
+          onchange="selectRace(<%= race.id %>)"
+        >
+        <label for="race-<%= race.id %>" class="race-card-content">
+          <div class="race-header">
+            <h3><%= race.name %></h3>
+            <div class="race-zone">
+              Start in: <%= race.starting_zone.replace(/_/g, ' ').toUpperCase() %>
+            </div>
+          </div>
+          
+          <p class="race-description"><%= race.description %></p>
+          
+          <div class="race-stats">
+            <h4>Stat Modifiers</h4>
+            <div class="stats-grid">
+              <div class="stat-item <%= race.str_modifier > 0 ? 'positive' : race.str_modifier < 0 ? 'negative' : '' %>">
+                <span class="stat-label">STR</span>
+                <span class="stat-value"><%= race.str_modifier >= 0 ? '+' : '' %><%= race.str_modifier %></span>
+              </div>
+              <div class="stat-item <%= race.int_modifier > 0 ? 'positive' : race.int_modifier < 0 ? 'negative' : '' %>">
+                <span class="stat-label">INT</span>
+                <span class="stat-value"><%= race.int_modifier >= 0 ? '+' : '' %><%= race.int_modifier %></span>
+              </div>
+              <div class="stat-item <%= race.vit_modifier > 0 ? 'positive' : race.vit_modifier < 0 ? 'negative' : '' %>">
+                <span class="stat-label">VIT</span>
+                <span class="stat-value"><%= race.vit_modifier >= 0 ? '+' : '' %><%= race.vit_modifier %></span>
+              </div>
+              <div class="stat-item <%= race.dex_modifier > 0 ? 'positive' : race.dex_modifier < 0 ? 'negative' : '' %>">
+                <span class="stat-label">DEX</span>
+                <span class="stat-value"><%= race.dex_modifier >= 0 ? '+' : '' %><%= race.dex_modifier %></span>
+              </div>
+              <div class="stat-item <%= race.wis_modifier > 0 ? 'positive' : race.wis_modifier < 0 ? 'negative' : '' %>">
+                <span class="stat-label">WIS</span>
+                <span class="stat-value"><%= race.wis_modifier >= 0 ? '+' : '' %><%= race.wis_modifier %></span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="race-bonuses">
+            <h4>Racial Bonuses</h4>
+            <div class="bonus-list">
+              <% if (race.experience_bonus && Math.abs(race.experience_bonus) > 0) { %>
+                <div class="bonus-item <%= race.experience_bonus > 0 ? 'positive' : 'negative' %>">
+                  Experience: <%= race.experience_bonus >= 0 ? '+' : '' %><%= Math.round(race.experience_bonus * 100) %>%
+                </div>
+              <% } %>
+              <% if (race.magic_affinity_bonus && Math.abs(race.magic_affinity_bonus) > 0) { %>
+                <div class="bonus-item positive">
+                  Magic Affinity: +<%= Math.round(race.magic_affinity_bonus * 100) %>%
+                </div>
+              <% } %>
+              <% if (race.weapon_affinity_bonus && Math.abs(race.weapon_affinity_bonus) > 0) { %>
+                <div class="bonus-item positive">
+                  Weapon Affinity: +<%= Math.round(race.weapon_affinity_bonus * 100) %>%
+                </div>
+              <% } %>
+              <% if (race.special_ability) { %>
+                <div class="bonus-item special">
+                  Special: <%= race.special_ability.replace(/_/g, ' ') %>
+                </div>
+              <% } %>
+            </div>
+          </div>
+          
+          <% if (race.abilities && race.abilities.length > 0) { %>
+          <div class="race-abilities">
+            <h4>Race Abilities</h4>
+            <div class="ability-tags">
+              <% race.abilities.forEach(ability => { %>
+                <span class="ability-tag"><%= ability.replace(/_/g, ' ') %></span>
+              <% }); %>
+            </div>
+          </div>
+          <% } %>
+        </label>
+      </div>
+      <% }); %>
+    </div>
+  </div>
+
+  <div class="race-preview" id="race-preview" style="display: none;">
+    <div class="preview-card">
+      <h3>Race Preview</h3>
+      <div class="character-preview">
+        <div class="name-race-display">
+          <span class="name"><%= sessionData.name || 'Your Character' %></span>
+          <span class="race" id="preview-race-name">Race</span>
+          <span class="level">Level 1</span>
+        </div>
+        <div class="preview-stats" id="preview-stats">
+          <!-- Stats will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-navigation">
+    <button type="button" class="btn btn-secondary" onclick="goToPreviousStep()">Previous</button>
+    <button type="button" class="btn btn-primary" id="next-step-btn" disabled onclick="proceedWithRace()">
+      Next Step
+    </button>
+  </div>
+</div>
+
+<script>
+let selectedRaceData = null;
+
+function selectRace(raceId) {
+  // Find race data
+  const races = <%- JSON.stringify(races) %>;
+  selectedRaceData = races.find(r => r.id === raceId);
+  
+  // Update UI
+  updateRacePreview();
+  
+  // Enable next button
+  document.getElementById('next-step-btn').disabled = false;
+  
+  // Highlight selected card
+  document.querySelectorAll('.race-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+  document.querySelector(`[data-race-id="${raceId}"]`).classList.add('selected');
+}
+
+function updateRacePreview() {
+  if (!selectedRaceData) return;
+  
+  const preview = document.getElementById('race-preview');
+  const raceName = document.getElementById('preview-race-name');
+  const statsDiv = document.getElementById('preview-stats');
+  
+  raceName.textContent = selectedRaceData.name;
+  
+  // Calculate final stats (base 10 + racial modifiers)
+  const finalStats = {
+    str: 10 + (selectedRaceData.str_modifier || 0),
+    int: 10 + (selectedRaceData.int_modifier || 0),
+    vit: 10 + (selectedRaceData.vit_modifier || 0),
+    dex: 10 + (selectedRaceData.dex_modifier || 0),
+    wis: 10 + (selectedRaceData.wis_modifier || 0)
+  };
+  
+  statsDiv.innerHTML = `
+    <div class="stat-preview">
+      <span>STR: ${finalStats.str}</span>
+      <span>INT: ${finalStats.int}</span>
+      <span>VIT: ${finalStats.vit}</span>
+      <span>DEX: ${finalStats.dex}</span>
+      <span>WIS: ${finalStats.wis}</span>
+    </div>
+    <div class="derived-stats">
+      <span>Health: ${finalStats.vit * 10}</span>
+      <span>Mana: ${Math.floor(finalStats.int * 5)}</span>
+    </div>
+  `;
+  
+  preview.style.display = 'block';
+}
+
+function proceedWithRace() {
+  if (selectedRaceData) {
+    proceedToNextStep({ raceId: selectedRaceData.id });
+  }
+}
+
+// Initialize if race is pre-selected
+document.addEventListener('DOMContentLoaded', function() {
+  const selectedInput = document.querySelector('input[name="raceId"]:checked');
+  if (selectedInput) {
+    selectRace(parseInt(selectedInput.value));
+  }
+});
+</script>

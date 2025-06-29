@@ -178,6 +178,51 @@ class Database {
         last_used TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(character_id, affinity_type, category)
+      )`,
+
+      // Phase 2.4: Character backgrounds for creation wizard
+      `CREATE TABLE IF NOT EXISTS character_backgrounds (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(50) NOT NULL,
+        description TEXT,
+        starting_items JSONB DEFAULT '[]',
+        stat_bonuses JSONB DEFAULT '{}',
+        starting_gold INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+
+      // Phase 2.4: Tutorial quests system
+      `CREATE TABLE IF NOT EXISTS tutorial_quests (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        description TEXT,
+        objectives JSONB DEFAULT '[]',
+        rewards JSONB DEFAULT '{}',
+        order_sequence INTEGER DEFAULT 0,
+        race_specific BOOLEAN DEFAULT false,
+        race_id INTEGER REFERENCES races(id),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+
+      // Phase 2.4: Character tutorial progress tracking
+      `CREATE TABLE IF NOT EXISTS character_tutorial_progress (
+        id SERIAL PRIMARY KEY,
+        character_id INTEGER REFERENCES characters(id) ON DELETE CASCADE,
+        quest_id INTEGER REFERENCES tutorial_quests(id),
+        status VARCHAR(20) DEFAULT 'assigned',
+        progress JSONB DEFAULT '{}',
+        completed_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+
+      // Phase 2.4: Character creation session data
+      `CREATE TABLE IF NOT EXISTS character_creation_sessions (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        session_data JSONB DEFAULT '{}',
+        step INTEGER DEFAULT 1,
+        expires_at TIMESTAMP DEFAULT (CURRENT_TIMESTAMP + INTERVAL '1 hour'),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`
     ];
 
@@ -226,6 +271,10 @@ class Database {
     
     // Insert default race abilities
     await this.insertDefaultRaceAbilities();
+    
+    // Phase 2.4: Initialize character creation system
+    await this.insertDefaultBackgrounds();
+    await this.insertDefaultTutorialQuests();
   }
 
   async insertDefaultRaces() {
@@ -397,6 +446,164 @@ class Database {
         console.error(`Error inserting ability ${ability.ability_name}:`, error);
       }
     }
+  }
+
+  async insertDefaultBackgrounds() {
+    // Check if backgrounds already exist
+    const existingBackgrounds = await this.pool.query('SELECT COUNT(*) FROM character_backgrounds');
+    if (parseInt(existingBackgrounds.rows[0].count) > 0) {
+      console.log('Character backgrounds already exist');
+      return;
+    }
+
+    const backgrounds = [
+      {
+        name: 'Noble Born',
+        description: 'Raised in luxury with access to the finest education and resources. You begin with extra gold and refined equipment.',
+        starting_items: JSON.stringify([
+          { name: 'Fine Silk Clothing', type: 'clothing', quantity: 1 },
+          { name: 'Silver Ring', type: 'accessory', quantity: 1 },
+          { name: 'Letter of Introduction', type: 'document', quantity: 1 }
+        ]),
+        stat_bonuses: JSON.stringify({ wis: 2, gold_bonus: 200 }),
+        starting_gold: 500
+      },
+      {
+        name: 'Street Orphan',
+        description: 'Survived on the streets through wit and agility. You possess keen survival instincts and street knowledge.',
+        starting_items: JSON.stringify([
+          { name: 'Worn Leather Gloves', type: 'gloves', quantity: 1 },
+          { name: 'Street Map', type: 'document', quantity: 1 },
+          { name: 'Lockpick Set', type: 'tool', quantity: 1 }
+        ]),
+        stat_bonuses: JSON.stringify({ dex: 3, dodge_bonus: 5 }),
+        starting_gold: 50
+      },
+      {
+        name: 'Scholar',
+        description: 'Dedicated your life to learning and research. You begin with magical knowledge and research materials.',
+        starting_items: JSON.stringify([
+          { name: 'Basic Spellbook', type: 'book', quantity: 1 },
+          { name: 'Research Notes', type: 'document', quantity: 3 },
+          { name: 'Magic Components', type: 'material', quantity: 5 }
+        ]),
+        stat_bonuses: JSON.stringify({ int: 3, magic_affinity_bonus: 10 }),
+        starting_gold: 150
+      },
+      {
+        name: 'Merchant',
+        description: 'Traveled trade routes and understand commerce. You start with trading goods and negotiation skills.',
+        starting_items: JSON.stringify([
+          { name: 'Trade Goods', type: 'commodity', quantity: 3 },
+          { name: 'Merchant Ledger', type: 'document', quantity: 1 },
+          { name: 'Weight Scales', type: 'tool', quantity: 1 }
+        ]),
+        stat_bonuses: JSON.stringify({ wis: 2, gold_bonus: 100 }),
+        starting_gold: 300
+      },
+      {
+        name: 'Warrior',
+        description: 'Trained in combat from a young age. You begin with basic weapons and combat knowledge.',
+        starting_items: JSON.stringify([
+          { name: 'Training Sword', type: 'weapon', quantity: 1 },
+          { name: 'Leather Armor', type: 'armor', quantity: 1 },
+          { name: 'Combat Manual', type: 'book', quantity: 1 }
+        ]),
+        stat_bonuses: JSON.stringify({ str: 3, weapon_affinity_bonus: 10 }),
+        starting_gold: 100
+      },
+      {
+        name: 'Hermit',
+        description: 'Lived in solitude, mastering nature and inner wisdom. You possess survival skills and natural knowledge.',
+        starting_items: JSON.stringify([
+          { name: 'Herbal Remedies', type: 'consumable', quantity: 5 },
+          { name: 'Nature Guide', type: 'book', quantity: 1 },
+          { name: 'Wooden Staff', type: 'weapon', quantity: 1 }
+        ]),
+        stat_bonuses: JSON.stringify({ wis: 3, vit: 1 }),
+        starting_gold: 75
+      }
+    ];
+
+    for (const background of backgrounds) {
+      await this.pool.query(`
+        INSERT INTO character_backgrounds (name, description, starting_items, stat_bonuses, starting_gold)
+        VALUES ($1, $2, $3, $4, $5)
+      `, [background.name, background.description, background.starting_items, 
+          background.stat_bonuses, background.starting_gold]);
+    }
+
+    console.log('Default character backgrounds inserted');
+  }
+
+  async insertDefaultTutorialQuests() {
+    // Check if tutorial quests already exist
+    const existingTutorials = await this.pool.query('SELECT COUNT(*) FROM tutorial_quests');
+    if (parseInt(existingTutorials.rows[0].count) > 0) {
+      console.log('Tutorial quests already exist');
+      return;
+    }
+
+    const tutorials = [
+      {
+        name: 'Welcome to Aeturnis',
+        description: 'Learn the basics of your new adventure in the world of Aeturnis.',
+        objectives: JSON.stringify([
+          'Read the game interface guide',
+          'Check your character stats',
+          'Explore the starting area'
+        ]),
+        rewards: JSON.stringify({ experience: 100, gold: 50 }),
+        order_sequence: 1,
+        race_specific: false
+      },
+      {
+        name: 'First Steps in Combat',
+        description: 'Learn the fundamentals of combat and weapon usage.',
+        objectives: JSON.stringify([
+          'Engage in practice combat',
+          'Use a weapon attack',
+          'Understand combat cooldowns'
+        ]),
+        rewards: JSON.stringify({ experience: 150, gold: 25 }),
+        order_sequence: 2,
+        race_specific: false
+      },
+      {
+        name: 'Understanding Affinities',
+        description: 'Discover how weapon and magic affinities work in Aeturnis.',
+        objectives: JSON.stringify([
+          'Check your affinity levels',
+          'Use different weapon types',
+          'Cast a basic spell'
+        ]),
+        rewards: JSON.stringify({ experience: 200, affinity_boost: 5 }),
+        order_sequence: 3,
+        race_specific: false
+      },
+      {
+        name: 'Social Features',
+        description: 'Learn about chat, groups, and player interaction.',
+        objectives: JSON.stringify([
+          'Send a message in global chat',
+          'View the leaderboard',
+          'Check progression system'
+        ]),
+        rewards: JSON.stringify({ experience: 100, gold: 75 }),
+        order_sequence: 4,
+        race_specific: false
+      }
+    ];
+
+    for (const tutorial of tutorials) {
+      await this.pool.query(`
+        INSERT INTO tutorial_quests (name, description, objectives, rewards, order_sequence, race_specific)
+        VALUES ($1, $2, $3, $4, $5, $6)
+      `, [tutorial.name, tutorial.description, tutorial.objectives, 
+          tutorial.rewards, tutorial.order_sequence, tutorial.race_specific]);
+    }
+
+    console.log('Default tutorial quests inserted');
   }
 
   async query(text, params = []) {

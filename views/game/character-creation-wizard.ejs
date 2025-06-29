@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/character-wizard.css">
+</head>
+<body class="character-creation-wizard">
+    <div class="wizard-container">
+        <div class="wizard-header">
+            <h1>Create Your Character</h1>
+            <div class="step-indicator">
+                <% for (let i = 1; i <= 5; i++) { %>
+                <div class="step-indicator-item <%= currentStep >= i ? 'active' : '' %> <%= currentStep > i ? 'completed' : '' %>" data-step="<%= i %>">
+                    <div class="step-number"><%= i %></div>
+                    <div class="step-name"><%= stepNames[i-1] %></div>
+                </div>
+                <% if (i < 5) { %>
+                <div class="step-connector"></div>
+                <% } %>
+                <% } %>
+            </div>
+        </div>
+        
+        <% if (error) { %>
+        <div class="error-message">
+            <%= error %>
+        </div>
+        <% } %>
+        
+        <div class="wizard-content">
+            <div class="step-container">
+                <%- include(`creation-steps/${currentStepTemplate}`, { 
+                    sessionData, 
+                    races, 
+                    backgrounds, 
+                    tutorialQuests,
+                    isFirstCharacter 
+                }) %>
+            </div>
+        </div>
+        
+        <div class="wizard-footer">
+            <div class="progress-info">
+                Step <%= currentStep %> of 5
+            </div>
+            <div class="wizard-help">
+                <button type="button" class="btn-help" onclick="toggleHelp()">Help</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="help-overlay" id="help-overlay" style="display: none;">
+        <div class="help-content">
+            <div class="help-header">
+                <h3>Character Creation Help</h3>
+                <button type="button" class="btn-close" onclick="toggleHelp()">×</button>
+            </div>
+            <div class="help-body">
+                <div class="help-section">
+                    <h4>Step 1: Character Name</h4>
+                    <p>Choose a unique name for your character. Names must be 3-20 characters and can only contain letters, numbers, underscores, and hyphens.</p>
+                </div>
+                <div class="help-section">
+                    <h4>Step 2: Race Selection</h4>
+                    <p>Your race affects starting stats, special abilities, and where you begin your adventure. Each race has unique bonuses and characteristics.</p>
+                </div>
+                <div class="help-section">
+                    <h4>Step 3: Background Story</h4>
+                    <p>Your background represents your life before becoming an adventurer. It grants starting items, bonus stats, and additional gold.</p>
+                </div>
+                <div class="help-section">
+                    <h4>Step 4: Stat Allocation</h4>
+                    <p>Distribute 5 bonus points among your stats to customize your character. You can use presets or allocate manually.</p>
+                </div>
+                <div class="help-section">
+                    <h4>Step 5: Final Review</h4>
+                    <p>Review all your choices before creating your character. Character names and races cannot be changed later.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/character-creation-wizard.js"></script>
+    <script>
+        // Global wizard functions
+        window.sessionData = <%- JSON.stringify(sessionData) %>;
+        window.currentStep = <%= currentStep %>;
+        
+        function proceedToNextStep(stepData) {
+            showLoading();
+            
+            fetch('/api/character-creation/step', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    step: currentStep,
+                    data: stepData
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    window.location.href = `/game/character-creation-wizard?step=${currentStep + 1}`;
+                } else {
+                    hideLoading();
+                    showError(result.error || 'An error occurred');
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Step error:', error);
+                showError('Network error. Please try again.');
+            });
+        }
+        
+        function goToPreviousStep() {
+            if (currentStep > 1) {
+                window.location.href = `/game/character-creation-wizard?step=${currentStep - 1}`;
+            }
+        }
+        
+        function showLoading() {
+            document.body.classList.add('loading');
+        }
+        
+        function hideLoading() {
+            document.body.classList.remove('loading');
+        }
+        
+        function showError(message) {
+            // Create or update error message
+            let errorDiv = document.querySelector('.error-message');
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                document.querySelector('.wizard-content').insertBefore(errorDiv, document.querySelector('.step-container'));
+            }
+            errorDiv.textContent = message;
+            errorDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function toggleHelp() {
+            const helpOverlay = document.getElementById('help-overlay');
+            helpOverlay.style.display = helpOverlay.style.display === 'none' ? 'flex' : 'none';
+        }
+        
+        // Handle escape key for help overlay
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const helpOverlay = document.getElementById('help-overlay');
+                if (helpOverlay.style.display !== 'none') {
+                    toggleHelp();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
