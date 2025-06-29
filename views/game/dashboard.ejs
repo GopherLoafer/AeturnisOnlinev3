@@ -1944,6 +1944,139 @@
             font-style: italic;
             padding: 20px;
         }
+
+        /* Fix iOS zoom on input focus */
+        @media (max-width: 768px) {
+            input[type="text"],
+            input[type="password"],
+            input[type="email"],
+            input[type="number"],
+            textarea,
+            select {
+                font-size: 16px !important;
+            }
+        }
+
+        /* PWA Installation Button */
+        .pwa-install-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+            margin-left: 10px;
+        }
+
+        .pwa-install-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Update Banner */
+        .update-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            z-index: 10000;
+            animation: slideDown 0.3s ease;
+        }
+
+        .update-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            gap: 16px;
+        }
+
+        .update-btn, .dismiss-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .update-btn:hover, .dismiss-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .dismiss-btn {
+            padding: 6px 10px;
+            font-weight: bold;
+        }
+
+        /* Network Status Indicator */
+        .network-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .network-status.online {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .network-status.offline {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* PWA Standalone Mode Adjustments */
+        @media (display-mode: standalone) {
+            .header {
+                padding-top: env(safe-area-inset-top, 0);
+            }
+
+            .game-container {
+                padding-top: env(safe-area-inset-top, 0);
+                padding-bottom: env(safe-area-inset-bottom, 0);
+                padding-left: env(safe-area-inset-left, 0);
+                padding-right: env(safe-area-inset-right, 0);
+            }
+
+            .pwa-install-btn {
+                display: none;
+            }
+        }
+
+        /* Enhanced iOS PWA Support */
+        @media (max-width: 768px) and (display-mode: standalone) {
+            .chat-panel {
+                bottom: env(safe-area-inset-bottom, 0);
+            }
+
+            .mobile-overlay {
+                bottom: env(safe-area-inset-bottom, 0);
+            }
+        }
     </style>
 
     <!-- Service Worker Registration -->
@@ -2314,6 +2447,7 @@
                                 <div class="affinity-icon weapon-<%= affinity.weapon_type %>">⚔️</div>
                                 <span class="affinity-name"><%= affinity.weapon_type.charAt(0).toUpperCase() + affinity.weapon_type.slice(1) %></span>
                                 <span class="affinity-value"><%= parseFloat(affinity.affinity_percentage).toFixed(1) %>%</span>
+                            ```text
                             </div>
                             <% }); %>
                         </div>

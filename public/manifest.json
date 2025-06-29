@@ -1,21 +1,59 @@
+
 {
-  "name": "Aeturnis Online",
+  "name": "Aeturnis Online - Epic Text-Based MMORPG",
   "short_name": "Aeturnis",
-  "description": "A modern text-based MMORPG experience",
+  "description": "Immerse yourself in an infinite progression MMORPG with 8 unique races, weapon mastery, magic schools, and turn-based combat in a fantasy world.",
   "start_url": "/game/dashboard",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#0f1419",
   "theme_color": "#10b981",
-  "categories": ["games", "entertainment"],
+  "categories": ["games", "entertainment", "role-playing"],
   "dir": "ltr",
   "lang": "en-US",
+  "scope": "/",
   "icons": [
+    {
+      "src": "/images/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/images/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable any"
+    },
+    {
+      "src": "/images/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/images/icon-512.png",
@@ -36,14 +74,21 @@
       "sizes": "390x844",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Mobile gameplay"
+      "label": "Mobile gameplay with chat and inventory"
+    },
+    {
+      "src": "/images/screenshot-tablet.png", 
+      "sizes": "768x1024",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tablet view with side panels"
     },
     {
       "src": "/images/screenshot-desktop.png",
       "sizes": "1920x1080",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Desktop gameplay"
+      "label": "Full desktop experience with all panels"
     }
   ],
   "shortcuts": [
@@ -58,8 +103,33 @@
       "name": "Inventory",
       "short_name": "Items",
       "description": "Manage your inventory",
-      "url": "/game/dashboard?panel=inventory",
+      "url": "/game/dashboard?panel=inventory", 
       "icons": [{"src": "/images/inventory-icon.png", "sizes": "96x96"}]
+    },
+    {
+      "name": "Character Stats",
+      "short_name": "Stats",
+      "description": "View character progression",
+      "url": "/game/dashboard?panel=stats",
+      "icons": [{"src": "/images/stats-icon.png", "sizes": "96x96"}]
+    },
+    {
+      "name": "Guild Chat",
+      "short_name": "Chat",
+      "description": "Chat with guild members",
+      "url": "/game/dashboard?chat=guild",
+      "icons": [{"src": "/images/chat-icon.png", "sizes": "96x96"}]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+aeturnis",
+      "url": "/game/dashboard?action=%s"
     }
   ]
 }

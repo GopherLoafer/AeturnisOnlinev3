@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f1419">
+    <title>Offline - Aeturnis Online</title>
+    <link rel="stylesheet" href="/css/responsive-base.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #0f1419 100%);
+            color: var(--text-primary);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .offline-container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: var(--glass-blur);
+            box-shadow: var(--glass-shadow);
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .offline-icon {
+            font-size: 4rem;
+            margin-bottom: 24px;
+            opacity: 0.8;
+        }
+        
+        .offline-title {
+            font-size: var(--font-2xl);
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .offline-message {
+            font-size: var(--font-base);
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+        
+        .retry-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: var(--font-base);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .retry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+        }
+        
+        .features-list {
+            margin-top: 32px;
+            text-align: left;
+        }
+        
+        .features-list h3 {
+            color: var(--accent-gold);
+            font-size: var(--font-lg);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .features-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .features-list li {
+            padding: 8px 0;
+            color: var(--text-secondary);
+            font-size: var(--font-sm);
+        }
+        
+        .features-list li::before {
+            content: '⚡';
+            margin-right: 8px;
+            color: var(--primary-green);
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">🌐</div>
+        <h1 class="offline-title">You're Offline</h1>
+        <p class="offline-message">
+            It looks like you've lost your connection to Aeturnis Online. 
+            Don't worry - your adventure continues when you reconnect!
+        </p>
+        
+        <button class="retry-btn" onclick="window.location.reload()">
+            🔄 Try Again
+        </button>
+        
+        <div class="features-list">
+            <h3>While You Wait</h3>
+            <ul>
+                <li>Check your internet connection</li>
+                <li>Your game progress is safely saved</li>
+                <li>Install the app for better offline support</li>
+                <li>Follow @AeturnisOnline for server updates</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-retry connection every 30 seconds
+        setInterval(() => {
+            if (navigator.onLine) {
+                window.location.reload();
+            }
+        }, 30000);
+        
+        // Listen for online event
+        window.addEventListener('online', () => {
+            window.location.reload();
+        });
+    </script>
+</body>
+</html>
