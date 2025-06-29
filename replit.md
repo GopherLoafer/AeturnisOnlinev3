@@ -176,6 +176,10 @@ A classic text-based MMORPG with infinite progression, racial diversity, and aff
 - Reference UIMOCKUP.png for UI design decisions
 
 ## Recent Changes
+- June 29, 2025: **Critical BigInt Overflow Issue Discovered**
+  - **Overflow at Level 248**: Current compound growth formula causes PostgreSQL BIGINT overflow far too early
+  - **Simple Formula Alternative**: `100 * level^2.5 + level * 50` would allow 6+ million levels
+  - **Immediate Action Required**: Must implement overflow prevention before players reach level 248
 - June 29, 2025: **Phase 2.3 Experience System Optimization Completed**
   - **Fixed Experience Bar Display**: Added proper IDs to experience elements for dynamic updates
   - **Fixed Overflow Experience**: Experience properly carries over when leveling up
