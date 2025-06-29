@@ -241,12 +241,12 @@ function updateCharacterLevel(level) {
 // ===== Affinity System =====
 
 function updateAffinityDisplay(affinityData) {
-    if (affinityData.weapon) {
+    if (affinityData && affinityData.weapon) {
         updateWeaponAffinity(affinityData.weapon.type, affinityData.weapon.level);
         updateGameText(`<span class="affinity-gain">${affinityData.weapon.type} affinity increased!</span>`);
     }
     
-    if (affinityData.magic) {
+    if (affinityData && affinityData.magic) {
         updateMagicAffinity(affinityData.magic.school, affinityData.magic.level);
         updateGameText(`<span class="affinity-gain">${affinityData.magic.school} magic affinity increased!</span>`);
     }
@@ -257,7 +257,9 @@ function updateWeaponAffinity(weaponType, level) {
     if (affinityElement) {
         affinityElement.textContent = `${level.toFixed(2)}%`;
     }
-    gameState.affinities.weapons[weaponType] = level;
+    if (gameState && gameState.affinities && gameState.affinities.weapons) {
+        gameState.affinities.weapons[weaponType] = level;
+    }
 }
 
 function updateMagicAffinity(school, level) {
@@ -265,7 +267,9 @@ function updateMagicAffinity(school, level) {
     if (affinityElement) {
         affinityElement.textContent = `${level.toFixed(2)}%`;
     }
-    gameState.affinities.magic[school] = level;
+    if (gameState && gameState.affinities && gameState.affinities.magic) {
+        gameState.affinities.magic[school] = level;
+    }
 }
 
 // ===== Chat System =====
