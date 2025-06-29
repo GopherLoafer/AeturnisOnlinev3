@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Race Balance Management - Admin Panel</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .race-balance-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .balance-header {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 1px solid #00ff00;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .balance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .balance-section {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .race-selector {
+            margin-bottom: 20px;
+        }
+        
+        .race-selector select {
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .stat-adjustments {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-group label {
+            color: #00ff00;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .stat-group input {
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            border-radius: 3px;
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .recommendations-panel {
+            grid-column: 1 / -1;
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid #ffa500;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .recommendation-item {
+            background: rgba(0, 0, 0, 0.5);
+            border-left: 4px solid #ffa500;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        
+        .severity-high { border-left-color: #ff4444; }
+        .severity-medium { border-left-color: #ffaa00; }
+        .severity-low { border-left-color: #44ff44; }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .btn-balance {
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-balance:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
+        }
+        
+        .btn-preview {
+            background: linear-gradient(45deg, #0099ff, #0066cc);
+            color: white;
+        }
+        
+        .btn-reset {
+            background: linear-gradient(45deg, #ff4444, #cc0000);
+            color: white;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #00ff00;
+        }
+        
+        .success-message, .error-message {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .success-message {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+        }
+        
+        .error-message {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <nav class="admin-nav">
+            <h2>Admin Panel</h2>
+            <ul>
+                <li><a href="/admin">Dashboard</a></li>
+                <li><a href="/admin/users">Users</a></li>
+                <li><a href="/admin/characters">Characters</a></li>
+                <li><a href="/admin/chat">Chat</a></li>
+                <li><a href="/admin/actions">Actions</a></li>
+                <li><a href="/admin/race-management">Race Management</a></li>
+            </ul>
+        </nav>
+        
+        <div class="admin-content">
+            <div class="race-balance-container">
+                <div class="balance-header">
+                    <h1>🎯 Race Balance Management</h1>
+                    <p>Adjust racial stats, bonuses, and balance parameters</p>
+                </div>
+                
+                <div class="recommendations-panel">
+                    <h3>🤖 Balance Recommendations</h3>
+                    <div id="recommendations-list">
+                        <div class="loading-spinner">Loading recommendations...</div>
+                    </div>
+                </div>
+                
+                <div class="balance-grid">
+                    <div class="balance-section">
+                        <h3>Race Selection & Current Stats</h3>
+                        <div class="race-selector">
+                            <label for="raceSelect">Select Race:</label>
+                            <select id="raceSelect">
+                                <option value="">Loading races...</option>
+                            </select>
+                        </div>
+                        
+                        <div id="currentStats" style="display: none;">
+                            <h4>Current Race Stats</h4>
+                            <div class="stat-display" id="currentStatsDisplay">
+                                <!-- Current stats will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="balance-section">
+                        <h3>Balance Adjustments</h3>
+                        <form id="balanceForm">
+                            <div class="stat-adjustments">
+                                <div class="stat-group">
+                                    <label for="strModifier">STR Modifier:</label>
+                                    <input type="number" id="strModifier" min="-10" max="10" step="1" value="0">
+                                </div>
+                                <div class="stat-group">
+                                    <label for="intModifier">INT Modifier:</label>
+                                    <input type="number" id="intModifier" min="-10" max="10" step="1" value="0">
+                                </div>
+                                <div class="stat-group">
+                                    <label for="vitModifier">VIT Modifier:</label>
+                                    <input type="number" id="vitModifier" min="-10" max="10" step="1" value="0">
+                                </div>
+                                <div class="stat-group">
+                                    <label for="dexModifier">DEX Modifier:</label>
+                                    <input type="number" id="dexModifier" min="-10" max="10" step="1" value="0">
+                                </div>
+                                <div class="stat-group">
+                                    <label for="wisModifier">WIS Modifier:</label>
+                                    <input type="number" id="wisModifier" min="-10" max="10" step="1" value="0">
+                                </div>
+                                <div class="stat-group">
+                                    <label for="expBonus">EXP Bonus (%):</label>
+                                    <input type="number" id="expBonus" min="-30" max="50" step="5" value="0">
+                                </div>
+                                <div class="stat-group">
+                                    <label for="weaponAffinityBonus">Weapon Affinity (%):</label>
+                                    <input type="number" id="weaponAffinityBonus" min="0" max="50" step="5" value="0">
+                                </div>
+                                <div class="stat-group">
+                                    <label for="magicAffinityBonus">Magic Affinity (%):</label>
+                                    <input type="number" id="magicAffinityBonus" min="0" max="50" step="5" value="0">
+                                </div>
+                            </div>
+                            
+                            <div class="stat-group">
+                                <label for="adjustmentReason">Reason for Adjustment:</label>
+                                <textarea id="adjustmentReason" rows="3" style="background: #000; color: #00ff00; border: 1px solid #00ff00; border-radius: 3px; padding: 8px; width: 100%; font-family: 'Courier New', monospace;" placeholder="Required: Explain the reason for this balance adjustment..."></textarea>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="success-message" id="successMessage"></div>
+                <div class="error-message" id="errorMessage"></div>
+                <div class="loading-spinner" id="loadingSpinner">Processing...</div>
+                
+                <div class="action-buttons">
+                    <button class="btn-balance btn-preview" onclick="previewChanges()">🔍 Preview Changes</button>
+                    <button class="btn-balance" onclick="applyBalanceAdjustment()">⚖️ Apply Balance</button>
+                    <button class="btn-balance btn-reset" onclick="resetForm()">🔄 Reset Form</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let racesData = {};
+        let currentRaceData = null;
+        
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRaces();
+            loadRecommendations();
+        });
+        
+        async function loadRaces() {
+            try {
+                const response = await fetch('/admin/race-management/api/race-statistics');
+                const data = await response.json();
+                
+                racesData = data.races || [];
+                const raceSelect = document.getElementById('raceSelect');
+                raceSelect.innerHTML = '<option value="">Select a race...</option>';
+                
+                racesData.forEach(race => {
+                    const option = document.createElement('option');
+                    option.value = race.id;
+                    option.textContent = race.name;
+                    raceSelect.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Error loading races:', error);
+                showError('Failed to load race data');
+            }
+        }
+        
+        async function loadRecommendations() {
+            try {
+                const response = await fetch('/admin/race-management/api/balance-recommendations');
+                const recommendations = await response.json();
+                
+                const recommendationsList = document.getElementById('recommendations-list');
+                if (recommendations.length === 0) {
+                    recommendationsList.innerHTML = '<p>✅ No balance issues detected. All races appear balanced.</p>';
+                    return;
+                }
+                
+                recommendationsList.innerHTML = recommendations.map(rec => `
+                    <div class="recommendation-item severity-${rec.severity}">
+                        <strong>${rec.race_name}</strong>: ${rec.recommendation}
+                        <br><small>Issue: ${rec.issue} | Severity: ${rec.severity.toUpperCase()}</small>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading recommendations:', error);
+                document.getElementById('recommendations-list').innerHTML = '<p>❌ Failed to load recommendations</p>';
+            }
+        }
+        
+        document.getElementById('raceSelect').addEventListener('change', function() {
+            const raceId = this.value;
+            if (raceId) {
+                loadRaceData(raceId);
+            } else {
+                document.getElementById('currentStats').style.display = 'none';
+                resetForm();
+            }
+        });
+        
+        async function loadRaceData(raceId) {
+            try {
+                const race = racesData.find(r => r.id == raceId);
+                if (!race) return;
+                
+                currentRaceData = race;
+                
+                // Display current stats
+                const statsDisplay = document.getElementById('currentStatsDisplay');
+                statsDisplay.innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>STR: ${race.str_modifier || 0}</div>
+                        <div>INT: ${race.int_modifier || 0}</div>
+                        <div>VIT: ${race.vit_modifier || 0}</div>
+                        <div>DEX: ${race.dex_modifier || 0}</div>
+                        <div>WIS: ${race.wis_modifier || 0}</div>
+                        <div>EXP: ${race.experience_bonus || 0}%</div>
+                        <div>Weapon: ${race.weapon_affinity_bonus || 0}%</div>
+                        <div>Magic: ${race.magic_affinity_bonus || 0}%</div>
+                    </div>
+                `;
+                
+                document.getElementById('currentStats').style.display = 'block';
+                
+                // Reset form values
+                resetForm();
+                
+            } catch (error) {
+                console.error('Error loading race data:', error);
+                showError('Failed to load race details');
+            }
+        }
+        
+        function previewChanges() {
+            const raceId = document.getElementById('raceSelect').value;
+            if (!raceId) {
+                showError('Please select a race first');
+                return;
+            }
+            
+            const adjustments = getAdjustments();
+            if (!adjustments.reason.trim()) {
+                showError('Please provide a reason for the adjustment');
+                return;
+            }
+            
+            // Show preview modal or update display
+            alert(`Preview for ${currentRaceData.name}:\n\n` +
+                  `STR: ${currentRaceData.str_modifier || 0} → ${(currentRaceData.str_modifier || 0) + adjustments.str_modifier}\n` +
+                  `INT: ${currentRaceData.int_modifier || 0} → ${(currentRaceData.int_modifier || 0) + adjustments.int_modifier}\n` +
+                  `VIT: ${currentRaceData.vit_modifier || 0} → ${(currentRaceData.vit_modifier || 0) + adjustments.vit_modifier}\n` +
+                  `DEX: ${currentRaceData.dex_modifier || 0} → ${(currentRaceData.dex_modifier || 0) + adjustments.dex_modifier}\n` +
+                  `WIS: ${currentRaceData.wis_modifier || 0} → ${(currentRaceData.wis_modifier || 0) + adjustments.wis_modifier}\n` +
+                  `EXP: ${currentRaceData.experience_bonus || 0}% → ${(currentRaceData.experience_bonus || 0) + adjustments.experience_bonus}%\n` +
+                  `Weapon: ${currentRaceData.weapon_affinity_bonus || 0}% → ${(currentRaceData.weapon_affinity_bonus || 0) + adjustments.weapon_affinity_bonus}%\n` +
+                  `Magic: ${currentRaceData.magic_affinity_bonus || 0}% → ${(currentRaceData.magic_affinity_bonus || 0) + adjustments.magic_affinity_bonus}%\n\n` +
+                  `Reason: ${adjustments.reason}`);
+        }
+        
+        async function applyBalanceAdjustment() {
+            const raceId = document.getElementById('raceSelect').value;
+            if (!raceId) {
+                showError('Please select a race first');
+                return;
+            }
+            
+            const adjustments = getAdjustments();
+            if (!adjustments.reason.trim()) {
+                showError('Please provide a reason for the adjustment');
+                return;
+            }
+            
+            if (!confirm('Are you sure you want to apply these balance adjustments?')) {
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const response = await fetch('/admin/race-management/api/balance-adjustment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        race_id: raceId,
+                        adjustments: adjustments,
+                        reason: adjustments.reason
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess('Balance adjustments applied successfully!');
+                    resetForm();
+                    loadRaces(); // Refresh race data
+                    loadRecommendations(); // Refresh recommendations
+                } else {
+                    showError(result.message || 'Failed to apply balance adjustments');
+                }
+                
+            } catch (error) {
+                console.error('Error applying balance:', error);
+                showError('Network error occurred while applying adjustments');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function getAdjustments() {
+            return {
+                str_modifier: parseInt(document.getElementById('strModifier').value) || 0,
+                int_modifier: parseInt(document.getElementById('intModifier').value) || 0,
+                vit_modifier: parseInt(document.getElementById('vitModifier').value) || 0,
+                dex_modifier: parseInt(document.getElementById('dexModifier').value) || 0,
+                wis_modifier: parseInt(document.getElementById('wisModifier').value) || 0,
+                experience_bonus: parseInt(document.getElementById('expBonus').value) || 0,
+                weapon_affinity_bonus: parseInt(document.getElementById('weaponAffinityBonus').value) || 0,
+                magic_affinity_bonus: parseInt(document.getElementById('magicAffinityBonus').value) || 0,
+                reason: document.getElementById('adjustmentReason').value
+            };
+        }
+        
+        function resetForm() {
+            document.getElementById('balanceForm').reset();
+            document.getElementById('adjustmentReason').value = '';
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+        }
+        
+        function showSuccess(message) {
+            const element = document.getElementById('successMessage');
+            element.textContent = message;
+            element.style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showError(message) {
+            const element = document.getElementById('errorMessage');
+            element.textContent = message;
+            element.style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

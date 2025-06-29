@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Race Change - Admin Panel</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .race-change-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .change-header {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 1px solid #00ff00;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .warning-banner {
+            background: rgba(255, 69, 0, 0.2);
+            border: 2px solid #ff4500;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #ff6666;
+            text-align: center;
+        }
+        
+        .change-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .change-section {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .character-search {
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 10px;
+        }
+        
+        .character-results {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .character-item {
+            padding: 10px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .character-item:hover {
+            background: rgba(0, 255, 0, 0.1);
+        }
+        
+        .character-item.selected {
+            background: rgba(0, 255, 0, 0.2);
+            border-left: 4px solid #00ff00;
+        }
+        
+        .character-details {
+            display: none;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .stat-column {
+            text-align: center;
+        }
+        
+        .stat-column h4 {
+            color: #00ff00;
+            margin-bottom: 10px;
+        }
+        
+        .stat-item {
+            padding: 5px;
+            margin: 2px 0;
+            border-radius: 3px;
+        }
+        
+        .current-stats { background: rgba(0, 255, 0, 0.1); }
+        .arrow-column { color: #ffa500; font-size: 18px; }
+        .new-stats { background: rgba(0, 150, 255, 0.1); }
+        
+        .race-selector select {
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .reason-textarea {
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .btn-change {
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-change:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
+        }
+        
+        .btn-preview {
+            background: linear-gradient(45deg, #0099ff, #0066cc);
+            color: white;
+        }
+        
+        .btn-cancel {
+            background: linear-gradient(45deg, #ff4444, #cc0000);
+            color: white;
+        }
+        
+        .success-message, .error-message {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .success-message {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+        }
+        
+        .error-message {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #00ff00;
+        }
+        
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 500px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <nav class="admin-nav">
+            <h2>Admin Panel</h2>
+            <ul>
+                <li><a href="/admin">Dashboard</a></li>
+                <li><a href="/admin/users">Users</a></li>
+                <li><a href="/admin/characters">Characters</a></li>
+                <li><a href="/admin/chat">Chat</a></li>
+                <li><a href="/admin/actions">Actions</a></li>
+                <li><a href="/admin/race-management">Race Management</a></li>
+            </ul>
+        </nav>
+        
+        <div class="admin-content">
+            <div class="race-change-container">
+                <div class="change-header">
+                    <h1>🔄 Character Race Change</h1>
+                    <p>Change a character's race with complete data migration</p>
+                </div>
+                
+                <div class="warning-banner">
+                    <strong>⚠️ WARNING:</strong> Race changes are permanent and will reset racial quests, relocate the character to their new racial starting zone, and recalculate all racial bonuses. This action cannot be undone.
+                </div>
+                
+                <div class="change-grid">
+                    <div class="change-section">
+                        <h3>Character Selection</h3>
+                        <div class="character-search">
+                            <input type="text" class="search-input" id="characterSearch" placeholder="Search by character name or username...">
+                            <div class="character-results" id="characterResults">
+                                <div class="character-item" style="text-align: center; color: #666;">
+                                    Start typing to search for characters...
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="character-details" id="characterDetails">
+                            <h4>Selected Character</h4>
+                            <div id="characterInfo">
+                                <!-- Character info will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="change-section">
+                        <h3>New Race Selection</h3>
+                        <div style="margin-bottom: 20px;">
+                            <label for="newRaceSelect">New Race:</label>
+                            <select id="newRaceSelect">
+                                <option value="">Select new race...</option>
+                            </select>
+                        </div>
+                        
+                        <div id="raceInfo" style="display: none;">
+                            <h4>New Race Information</h4>
+                            <div id="raceDetails">
+                                <!-- Race details will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="statComparison" style="display: none;">
+                    <h3>Stat Comparison</h3>
+                    <div class="stat-comparison">
+                        <div class="stat-column">
+                            <h4>Current Stats</h4>
+                            <div id="currentStatsList"></div>
+                        </div>
+                        <div class="stat-column arrow-column">
+                            <h4>→</h4>
+                            <div style="padding: 20px;">CHANGE</div>
+                        </div>
+                        <div class="stat-column">
+                            <h4>New Stats</h4>
+                            <div id="newStatsList"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <label for="changeReason">Reason for Race Change (Required):</label>
+                    <textarea id="changeReason" class="reason-textarea" placeholder="Please provide a detailed reason for this race change. This will be logged for audit purposes."></textarea>
+                </div>
+                
+                <div class="success-message" id="successMessage"></div>
+                <div class="error-message" id="errorMessage"></div>
+                <div class="loading-spinner" id="loadingSpinner">Processing race change...</div>
+                
+                <div class="action-buttons">
+                    <button class="btn-change btn-preview" onclick="previewChange()">🔍 Preview Change</button>
+                    <button class="btn-change" onclick="confirmRaceChange()" id="changeButton" disabled>🔄 Change Race</button>
+                    <button class="btn-change btn-cancel" onclick="resetForm()">❌ Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div class="confirmation-modal" id="confirmationModal">
+        <div class="modal-content">
+            <h2>⚠️ Confirm Race Change</h2>
+            <div id="confirmationDetails"></div>
+            <div style="margin-top: 20px;">
+                <button class="btn-change" onclick="executeRaceChange()">✅ Confirm Change</button>
+                <button class="btn-change btn-cancel" onclick="closeConfirmation()">❌ Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let selectedCharacter = null;
+        let selectedNewRace = null;
+        let allRaces = [];
+        let searchTimeout = null;
+        
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRaces();
+            setupSearchHandler();
+        });
+        
+        async function loadRaces() {
+            try {
+                const response = await fetch('/admin/race-management/api/race-statistics');
+                const data = await response.json();
+                
+                allRaces = data.races || [];
+                const raceSelect = document.getElementById('newRaceSelect');
+                raceSelect.innerHTML = '<option value="">Select new race...</option>';
+                
+                allRaces.forEach(race => {
+                    const option = document.createElement('option');
+                    option.value = race.id;
+                    option.textContent = race.name;
+                    raceSelect.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Error loading races:', error);
+                showError('Failed to load race data');
+            }
+        }
+        
+        function setupSearchHandler() {
+            const searchInput = document.getElementById('characterSearch');
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    searchCharacters(this.value);
+                }, 300);
+            });
+            
+            document.getElementById('newRaceSelect').addEventListener('change', function() {
+                const raceId = this.value;
+                if (raceId) {
+                    selectedNewRace = allRaces.find(r => r.id == raceId);
+                    displayRaceInfo();
+                    updateStatComparison();
+                } else {
+                    selectedNewRace = null;
+                    document.getElementById('raceInfo').style.display = 'none';
+                    document.getElementById('statComparison').style.display = 'none';
+                }
+                updateChangeButton();
+            });
+        }
+        
+        async function searchCharacters(query) {
+            if (query.length < 2) {
+                const resultsDiv = document.getElementById('characterResults');
+                resultsDiv.innerHTML = '<div class="character-item" style="text-align: center; color: #666;">Start typing to search for characters...</div>';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/admin/api/characters?search=${encodeURIComponent(query)}&limit=10`);
+                const characters = await response.json();
+                
+                const resultsDiv = document.getElementById('characterResults');
+                if (characters.length === 0) {
+                    resultsDiv.innerHTML = '<div class="character-item" style="text-align: center; color: #666;">No characters found</div>';
+                    return;
+                }
+                
+                resultsDiv.innerHTML = characters.map(char => `
+                    <div class="character-item" data-character-id="${char.id}" onclick="selectCharacter(${char.id})">
+                        <div><strong>${char.name}</strong> (Level ${char.level})</div>
+                        <div style="font-size: 12px; color: #888;">
+                            Race: ${char.race_name} | User: ${char.username}
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error searching characters:', error);
+                document.getElementById('characterResults').innerHTML = '<div class="character-item" style="color: #ff4444;">Search failed</div>';
+            }
+        }
+        
+        async function selectCharacter(characterId) {
+            // Clear previous selection
+            document.querySelectorAll('.character-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Mark as selected
+            document.querySelector(`[data-character-id="${characterId}"]`).classList.add('selected');
+            
+            try {
+                const response = await fetch(`/admin/api/characters/${characterId}`);
+                const character = await response.json();
+                
+                selectedCharacter = character;
+                displayCharacterDetails();
+                updateStatComparison();
+                updateChangeButton();
+                
+            } catch (error) {
+                console.error('Error loading character details:', error);
+                showError('Failed to load character details');
+            }
+        }
+        
+        function displayCharacterDetails() {
+            if (!selectedCharacter) return;
+            
+            const detailsDiv = document.getElementById('characterDetails');
+            const infoDiv = document.getElementById('characterInfo');
+            
+            infoDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div><strong>Name:</strong> ${selectedCharacter.name}</div>
+                    <div><strong>Level:</strong> ${selectedCharacter.level}</div>
+                    <div><strong>Current Race:</strong> ${selectedCharacter.race_name}</div>
+                    <div><strong>Experience:</strong> ${formatNumber(selectedCharacter.experience)}</div>
+                    <div><strong>Gold:</strong> ${formatNumber(selectedCharacter.gold)}</div>
+                    <div><strong>Created:</strong> ${new Date(selectedCharacter.created_at).toLocaleDateString()}</div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <strong>Current Stats:</strong>
+                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 5px;">
+                        <div>STR: ${selectedCharacter.str}</div>
+                        <div>INT: ${selectedCharacter.int}</div>
+                        <div>VIT: ${selectedCharacter.vit}</div>
+                        <div>DEX: ${selectedCharacter.dex}</div>
+                        <div>WIS: ${selectedCharacter.wis}</div>
+                    </div>
+                </div>
+            `;
+            
+            detailsDiv.style.display = 'block';
+        }
+        
+        function displayRaceInfo() {
+            if (!selectedNewRace) return;
+            
+            const raceInfoDiv = document.getElementById('raceInfo');
+            const detailsDiv = document.getElementById('raceDetails');
+            
+            detailsDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div><strong>Race:</strong> ${selectedNewRace.name}</div>
+                    <div><strong>EXP Bonus:</strong> ${selectedNewRace.experience_bonus || 0}%</div>
+                    <div><strong>STR Modifier:</strong> ${selectedNewRace.str_modifier || 0}</div>
+                    <div><strong>INT Modifier:</strong> ${selectedNewRace.int_modifier || 0}</div>
+                    <div><strong>VIT Modifier:</strong> ${selectedNewRace.vit_modifier || 0}</div>
+                    <div><strong>DEX Modifier:</strong> ${selectedNewRace.dex_modifier || 0}</div>
+                    <div><strong>WIS Modifier:</strong> ${selectedNewRace.wis_modifier || 0}</div>
+                    <div><strong>Weapon Affinity:</strong> ${selectedNewRace.weapon_affinity_bonus || 0}%</div>
+                    <div><strong>Magic Affinity:</strong> ${selectedNewRace.magic_affinity_bonus || 0}%</div>
+                </div>
+            `;
+            
+            raceInfoDiv.style.display = 'block';
+        }
+        
+        function updateStatComparison() {
+            if (!selectedCharacter || !selectedNewRace) {
+                document.getElementById('statComparison').style.display = 'none';
+                return;
+            }
+            
+            // Calculate new stats (this is a simplified calculation)
+            const currentRace = allRaces.find(r => r.name === selectedCharacter.race_name);
+            const currentModifiers = currentRace ? {
+                str: currentRace.str_modifier || 0,
+                int: currentRace.int_modifier || 0,
+                vit: currentRace.vit_modifier || 0,
+                dex: currentRace.dex_modifier || 0,
+                wis: currentRace.wis_modifier || 0
+            } : { str: 0, int: 0, vit: 0, dex: 0, wis: 0 };
+            
+            const newModifiers = {
+                str: selectedNewRace.str_modifier || 0,
+                int: selectedNewRace.int_modifier || 0,
+                vit: selectedNewRace.vit_modifier || 0,
+                dex: selectedNewRace.dex_modifier || 0,
+                wis: selectedNewRace.wis_modifier || 0
+            };
+            
+            // Base stats (removing current racial modifiers)
+            const baseStats = {
+                str: selectedCharacter.str - currentModifiers.str,
+                int: selectedCharacter.int - currentModifiers.int,
+                vit: selectedCharacter.vit - currentModifiers.vit,
+                dex: selectedCharacter.dex - currentModifiers.dex,
+                wis: selectedCharacter.wis - currentModifiers.wis
+            };
+            
+            // New stats (adding new racial modifiers)
+            const newStats = {
+                str: baseStats.str + newModifiers.str,
+                int: baseStats.int + newModifiers.int,
+                vit: baseStats.vit + newModifiers.vit,
+                dex: baseStats.dex + newModifiers.dex,
+                wis: baseStats.wis + newModifiers.wis
+            };
+            
+            document.getElementById('currentStatsList').innerHTML = `
+                <div class="stat-item current-stats">STR: ${selectedCharacter.str}</div>
+                <div class="stat-item current-stats">INT: ${selectedCharacter.int}</div>
+                <div class="stat-item current-stats">VIT: ${selectedCharacter.vit}</div>
+                <div class="stat-item current-stats">DEX: ${selectedCharacter.dex}</div>
+                <div class="stat-item current-stats">WIS: ${selectedCharacter.wis}</div>
+            `;
+            
+            document.getElementById('newStatsList').innerHTML = `
+                <div class="stat-item new-stats">STR: ${newStats.str}</div>
+                <div class="stat-item new-stats">INT: ${newStats.int}</div>
+                <div class="stat-item new-stats">VIT: ${newStats.vit}</div>
+                <div class="stat-item new-stats">DEX: ${newStats.dex}</div>
+                <div class="stat-item new-stats">WIS: ${newStats.wis}</div>
+            `;
+            
+            document.getElementById('statComparison').style.display = 'block';
+        }
+        
+        function updateChangeButton() {
+            const button = document.getElementById('changeButton');
+            const reason = document.getElementById('changeReason').value.trim();
+            
+            if (selectedCharacter && selectedNewRace && reason.length > 10) {
+                button.disabled = false;
+            } else {
+                button.disabled = true;
+            }
+        }
+        
+        // Update button state when reason changes
+        document.getElementById('changeReason').addEventListener('input', updateChangeButton);
+        
+        function previewChange() {
+            if (!selectedCharacter || !selectedNewRace) {
+                showError('Please select both a character and a new race');
+                return;
+            }
+            
+            const reason = document.getElementById('changeReason').value.trim();
+            if (!reason || reason.length < 10) {
+                showError('Please provide a detailed reason (at least 10 characters)');
+                return;
+            }
+            
+            alert(`Preview Race Change:\n\n` +
+                  `Character: ${selectedCharacter.name} (Level ${selectedCharacter.level})\n` +
+                  `Current Race: ${selectedCharacter.race_name}\n` +
+                  `New Race: ${selectedNewRace.name}\n\n` +
+                  `Changes that will occur:\n` +
+                  `• Character will be moved to ${selectedNewRace.name} starting zone\n` +
+                  `• Racial stats will be recalculated\n` +
+                  `• Racial quests will be reset\n` +
+                  `• Character level and experience will be preserved\n\n` +
+                  `Reason: ${reason}`);
+        }
+        
+        function confirmRaceChange() {
+            if (!selectedCharacter || !selectedNewRace) {
+                showError('Please select both a character and a new race');
+                return;
+            }
+            
+            const reason = document.getElementById('changeReason').value.trim();
+            if (!reason || reason.length < 10) {
+                showError('Please provide a detailed reason (at least 10 characters)');
+                return;
+            }
+            
+            // Show confirmation modal
+            document.getElementById('confirmationDetails').innerHTML = `
+                <p><strong>Character:</strong> ${selectedCharacter.name}</p>
+                <p><strong>Current Race:</strong> ${selectedCharacter.race_name}</p>
+                <p><strong>New Race:</strong> ${selectedNewRace.name}</p>
+                <p><strong>Reason:</strong> ${reason}</p>
+                <br>
+                <p style="color: #ff6666;">This action cannot be undone!</p>
+            `;
+            
+            document.getElementById('confirmationModal').style.display = 'flex';
+        }
+        
+        function closeConfirmation() {
+            document.getElementById('confirmationModal').style.display = 'none';
+        }
+        
+        async function executeRaceChange() {
+            closeConfirmation();
+            showLoading(true);
+            
+            try {
+                const response = await fetch('/admin/race-management/api/race-change', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        character_id: selectedCharacter.id,
+                        new_race_id: selectedNewRace.id,
+                        reason: document.getElementById('changeReason').value.trim()
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess(`Race change completed successfully! ${selectedCharacter.name} is now a ${selectedNewRace.name}.`);
+                    resetForm();
+                } else {
+                    showError(result.message || 'Failed to change race');
+                }
+                
+            } catch (error) {
+                console.error('Error changing race:', error);
+                showError('Network error occurred during race change');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function resetForm() {
+            selectedCharacter = null;
+            selectedNewRace = null;
+            
+            document.getElementById('characterSearch').value = '';
+            document.getElementById('newRaceSelect').value = '';
+            document.getElementById('changeReason').value = '';
+            
+            document.getElementById('characterResults').innerHTML = '<div class="character-item" style="text-align: center; color: #666;">Start typing to search for characters...</div>';
+            document.getElementById('characterDetails').style.display = 'none';
+            document.getElementById('raceInfo').style.display = 'none';
+            document.getElementById('statComparison').style.display = 'none';
+            
+            updateChangeButton();
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+        }
+        
+        function showSuccess(message) {
+            const element = document.getElementById('successMessage');
+            element.textContent = message;
+            element.style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showError(message) {
+            const element = document.getElementById('errorMessage');
+            element.textContent = message;
+            element.style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+        
+        function formatNumber(num) {
+            return new Intl.NumberFormat().format(num);
+        }
+    </script>
+</body>
+</html>

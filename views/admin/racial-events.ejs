@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Racial Events Management - Admin Panel</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .events-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .events-header {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 1px solid #00ff00;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .events-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .events-section {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .event-form {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            color: #00ff00;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            border-radius: 3px;
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .event-type-options {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            border: 1px solid #555;
+        }
+        
+        .active-events-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .event-item {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .event-item.active {
+            border-color: #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+        
+        .event-item.upcoming {
+            border-color: #ffa500;
+        }
+        
+        .event-item.expired {
+            border-color: #666;
+            opacity: 0.7;
+        }
+        
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .event-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #00ff00;
+        }
+        
+        .event-status {
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-active {
+            background: #00ff00;
+            color: #000;
+        }
+        
+        .status-upcoming {
+            background: #ffa500;
+            color: #000;
+        }
+        
+        .status-expired {
+            background: #666;
+            color: #fff;
+        }
+        
+        .event-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 14px;
+        }
+        
+        .event-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 12px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-edit {
+            background: #0099ff;
+            color: white;
+        }
+        
+        .btn-end {
+            background: #ff4444;
+            color: white;
+        }
+        
+        .btn-extend {
+            background: #ffa500;
+            color: white;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .btn-event {
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-event:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
+        }
+        
+        .btn-clear {
+            background: linear-gradient(45deg, #ff4444, #cc0000);
+            color: white;
+        }
+        
+        .success-message, .error-message {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .success-message {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+        }
+        
+        .error-message {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #00ff00;
+        }
+        
+        .event-preview {
+            background: rgba(0, 150, 255, 0.1);
+            border: 1px solid #0099ff;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .datetime-input {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <nav class="admin-nav">
+            <h2>Admin Panel</h2>
+            <ul>
+                <li><a href="/admin">Dashboard</a></li>
+                <li><a href="/admin/users">Users</a></li>
+                <li><a href="/admin/characters">Characters</a></li>
+                <li><a href="/admin/chat">Chat</a></li>
+                <li><a href="/admin/actions">Actions</a></li>
+                <li><a href="/admin/race-management">Race Management</a></li>
+            </ul>
+        </nav>
+        
+        <div class="admin-content">
+            <div class="events-container">
+                <div class="events-header">
+                    <h1>🎉 Racial Events Management</h1>
+                    <p>Create and manage race-specific events with bonuses and rewards</p>
+                </div>
+                
+                <div class="events-grid">
+                    <div class="events-section">
+                        <h3>Create New Event</h3>
+                        <form class="event-form" id="eventForm">
+                            <div class="form-group">
+                                <label for="eventName">Event Name:</label>
+                                <input type="text" id="eventName" placeholder="e.g., Elven Moon Festival" required>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="targetRace">Target Race:</label>
+                                    <select id="targetRace" required>
+                                        <option value="">Select race...</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="eventType">Event Type:</label>
+                                    <select id="eventType" required>
+                                        <option value="">Select type...</option>
+                                        <option value="experience_boost">Experience Boost</option>
+                                        <option value="stat_bonus">Temporary Stat Bonus</option>
+                                        <option value="special_reward">Special Reward</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div id="bonusOptions" class="event-type-options">
+                                <!-- Dynamic content based on event type -->
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="eventDescription">Event Description:</label>
+                                <textarea id="eventDescription" rows="3" placeholder="Describe the event and its lore..."></textarea>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="startTime">Start Time:</label>
+                                    <div class="datetime-input">
+                                        <input type="date" id="startDate" required>
+                                        <input type="time" id="startTime" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="endTime">End Time:</label>
+                                    <div class="datetime-input">
+                                        <input type="date" id="endDate" required>
+                                        <input type="time" id="endTime" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        
+                        <div class="event-preview" id="eventPreview">
+                            <h4>Event Preview</h4>
+                            <div id="previewContent"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="events-section">
+                        <h3>Active & Upcoming Events</h3>
+                        <div class="active-events-list" id="activeEventsList">
+                            <div class="loading-spinner">Loading events...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="success-message" id="successMessage"></div>
+                <div class="error-message" id="errorMessage"></div>
+                <div class="loading-spinner" id="loadingSpinner">Creating event...</div>
+                
+                <div class="action-buttons">
+                    <button class="btn-event" onclick="previewEvent()">🔍 Preview Event</button>
+                    <button class="btn-event" onclick="createEvent()">🎉 Create Event</button>
+                    <button class="btn-event btn-clear" onclick="clearForm()">🗑️ Clear Form</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let allRaces = [];
+        let activeEvents = [];
+        
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRaces();
+            loadActiveEvents();
+            setupEventHandlers();
+            setDefaultDateTime();
+        });
+        
+        async function loadRaces() {
+            try {
+                const response = await fetch('/admin/race-management/api/race-statistics');
+                const data = await response.json();
+                
+                allRaces = data.races || [];
+                const raceSelect = document.getElementById('targetRace');
+                raceSelect.innerHTML = '<option value="">Select race...</option>';
+                
+                allRaces.forEach(race => {
+                    const option = document.createElement('option');
+                    option.value = race.id;
+                    option.textContent = race.name;
+                    raceSelect.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Error loading races:', error);
+                showError('Failed to load race data');
+            }
+        }
+        
+        async function loadActiveEvents() {
+            try {
+                const response = await fetch('/admin/race-management/api/racial-events');
+                const events = await response.json();
+                
+                activeEvents = events;
+                displayActiveEvents();
+                
+            } catch (error) {
+                console.error('Error loading events:', error);
+                document.getElementById('activeEventsList').innerHTML = '<p style="color: #ff4444;">Failed to load events</p>';
+            }
+        }
+        
+        function setupEventHandlers() {
+            document.getElementById('eventType').addEventListener('change', function() {
+                updateBonusOptions(this.value);
+            });
+            
+            // Auto-preview when form changes
+            const formInputs = document.querySelectorAll('#eventForm input, #eventForm select, #eventForm textarea');
+            formInputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    if (isFormValid()) {
+                        previewEvent();
+                    }
+                });
+            });
+        }
+        
+        function setDefaultDateTime() {
+            const now = new Date();
+            const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            const weekLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+            
+            document.getElementById('startDate').value = tomorrow.toISOString().split('T')[0];
+            document.getElementById('startTime').value = '12:00';
+            document.getElementById('endDate').value = weekLater.toISOString().split('T')[0];
+            document.getElementById('endTime').value = '12:00';
+        }
+        
+        function updateBonusOptions(eventType) {
+            const bonusDiv = document.getElementById('bonusOptions');
+            
+            if (!eventType) {
+                bonusDiv.style.display = 'none';
+                return;
+            }
+            
+            let optionsHTML = '';
+            
+            switch (eventType) {
+                case 'experience_boost':
+                    optionsHTML = `
+                        <div class="form-group">
+                            <label for="expBoostAmount">Experience Boost Percentage:</label>
+                            <input type="number" id="expBoostAmount" min="10" max="300" value="50" placeholder="50">
+                            <small style="color: #888;">Players of this race will gain this much extra experience</small>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'stat_bonus':
+                    optionsHTML = `
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="statBonusType">Stat to Boost:</label>
+                                <select id="statBonusType">
+                                    <option value="all">All Stats</option>
+                                    <option value="str">Strength</option>
+                                    <option value="int">Intelligence</option>
+                                    <option value="vit">Vitality</option>
+                                    <option value="dex">Dexterity</option>
+                                    <option value="wis">Wisdom</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="statBonusAmount">Bonus Amount:</label>
+                                <input type="number" id="statBonusAmount" min="1" max="20" value="5" placeholder="5">
+                            </div>
+                        </div>
+                        <small style="color: #888;">Temporary stat boost for the duration of the event</small>
+                    `;
+                    break;
+                    
+                case 'special_reward':
+                    optionsHTML = `
+                        <div class="form-group">
+                            <label for="rewardType">Reward Type:</label>
+                            <select id="rewardType">
+                                <option value="gold">Gold Bonus</option>
+                                <option value="item">Special Item</option>
+                                <option value="title">Exclusive Title</option>
+                                <option value="ability">Temporary Ability</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="rewardDetails">Reward Details:</label>
+                            <textarea id="rewardDetails" rows="2" placeholder="Describe the special reward..."></textarea>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            bonusDiv.innerHTML = optionsHTML;
+            bonusDiv.style.display = 'block';
+        }
+        
+        function displayActiveEvents() {
+            const eventsContainer = document.getElementById('activeEventsList');
+            
+            if (activeEvents.length === 0) {
+                eventsContainer.innerHTML = '<p style="text-align: center; color: #666;">No active events</p>';
+                return;
+            }
+            
+            const now = new Date();
+            
+            eventsContainer.innerHTML = activeEvents.map(event => {
+                const startTime = new Date(event.start_time);
+                const endTime = new Date(event.end_time);
+                
+                let status = 'expired';
+                let statusText = 'Expired';
+                
+                if (now < startTime) {
+                    status = 'upcoming';
+                    statusText = 'Upcoming';
+                } else if (now >= startTime && now <= endTime) {
+                    status = 'active';
+                    statusText = 'Active';
+                }
+                
+                const raceName = allRaces.find(r => r.id == event.race_id)?.name || 'Unknown';
+                
+                return `
+                    <div class="event-item ${status}">
+                        <div class="event-actions">
+                            <button class="btn-small btn-edit" onclick="editEvent(${event.id})">✏️</button>
+                            ${status === 'active' ? `<button class="btn-small btn-end" onclick="endEvent(${event.id})">🛑</button>` : ''}
+                            ${status === 'upcoming' ? `<button class="btn-small btn-extend" onclick="extendEvent(${event.id})">⏰</button>` : ''}
+                        </div>
+                        
+                        <div class="event-header">
+                            <div class="event-title">${event.event_name}</div>
+                            <div class="event-status status-${status}">${statusText}</div>
+                        </div>
+                        
+                        <div class="event-details">
+                            <div><strong>Race:</strong> ${raceName}</div>
+                            <div><strong>Type:</strong> ${formatEventType(event.event_type)}</div>
+                            <div><strong>Start:</strong> ${formatDateTime(startTime)}</div>
+                            <div><strong>End:</strong> ${formatDateTime(endTime)}</div>
+                        </div>
+                        
+                        ${event.description ? `<div style="margin-top: 10px; font-style: italic; color: #ccc;">${event.description}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function formatEventType(type) {
+            const types = {
+                'experience_boost': 'Experience Boost',
+                'stat_bonus': 'Stat Bonus',
+                'special_reward': 'Special Reward'
+            };
+            return types[type] || type;
+        }
+        
+        function formatDateTime(date) {
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+        
+        function isFormValid() {
+            const required = ['eventName', 'targetRace', 'eventType', 'startDate', 'startTime', 'endDate', 'endTime'];
+            return required.every(id => document.getElementById(id).value.trim());
+        }
+        
+        function previewEvent() {
+            if (!isFormValid()) {
+                document.getElementById('eventPreview').style.display = 'none';
+                return;
+            }
+            
+            const eventData = collectEventData();
+            const raceName = allRaces.find(r => r.id == eventData.race_id)?.name || 'Unknown';
+            
+            const previewContent = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div><strong>Event:</strong> ${eventData.event_name}</div>
+                    <div><strong>Race:</strong> ${raceName}</div>
+                    <div><strong>Type:</strong> ${formatEventType(eventData.event_type)}</div>
+                    <div><strong>Duration:</strong> ${calculateDuration(eventData.start_time, eventData.end_time)}</div>
+                </div>
+                ${eventData.description ? `<div style="margin-top: 10px;"><strong>Description:</strong> ${eventData.description}</div>` : ''}
+                <div style="margin-top: 10px;"><strong>Bonus Details:</strong> ${formatBonusDetails(eventData)}</div>
+            `;
+            
+            document.getElementById('previewContent').innerHTML = previewContent;
+            document.getElementById('eventPreview').style.display = 'block';
+        }
+        
+        function collectEventData() {
+            const startDate = document.getElementById('startDate').value;
+            const startTime = document.getElementById('startTime').value;
+            const endDate = document.getElementById('endDate').value;
+            const endTime = document.getElementById('endTime').value;
+            
+            const eventData = {
+                event_name: document.getElementById('eventName').value,
+                race_id: document.getElementById('targetRace').value,
+                event_type: document.getElementById('eventType').value,
+                description: document.getElementById('eventDescription').value,
+                start_time: new Date(`${startDate}T${startTime}`).toISOString(),
+                end_time: new Date(`${endDate}T${endTime}`).toISOString(),
+                bonus_data: {}
+            };
+            
+            // Collect type-specific bonus data
+            switch (eventData.event_type) {
+                case 'experience_boost':
+                    const expAmount = document.getElementById('expBoostAmount');
+                    if (expAmount) {
+                        eventData.bonus_data.experience_multiplier = parseFloat(expAmount.value) / 100;
+                    }
+                    break;
+                    
+                case 'stat_bonus':
+                    const statType = document.getElementById('statBonusType');
+                    const statAmount = document.getElementById('statBonusAmount');
+                    if (statType && statAmount) {
+                        eventData.bonus_data.stat_type = statType.value;
+                        eventData.bonus_data.bonus_amount = parseInt(statAmount.value);
+                    }
+                    break;
+                    
+                case 'special_reward':
+                    const rewardType = document.getElementById('rewardType');
+                    const rewardDetails = document.getElementById('rewardDetails');
+                    if (rewardType && rewardDetails) {
+                        eventData.bonus_data.reward_type = rewardType.value;
+                        eventData.bonus_data.reward_description = rewardDetails.value;
+                    }
+                    break;
+            }
+            
+            return eventData;
+        }
+        
+        function formatBonusDetails(eventData) {
+            switch (eventData.event_type) {
+                case 'experience_boost':
+                    return `+${(eventData.bonus_data.experience_multiplier * 100)}% experience gain`;
+                    
+                case 'stat_bonus':
+                    const statName = eventData.bonus_data.stat_type === 'all' ? 'All Stats' : eventData.bonus_data.stat_type.toUpperCase();
+                    return `+${eventData.bonus_data.bonus_amount} ${statName}`;
+                    
+                case 'special_reward':
+                    return `${eventData.bonus_data.reward_type}: ${eventData.bonus_data.reward_description}`;
+                    
+                default:
+                    return 'No bonus configured';
+            }
+        }
+        
+        function calculateDuration(startTime, endTime) {
+            const duration = new Date(endTime) - new Date(startTime);
+            const days = Math.floor(duration / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((duration % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            
+            if (days > 0) {
+                return `${days} day${days !== 1 ? 's' : ''}, ${hours} hour${hours !== 1 ? 's' : ''}`;
+            } else {
+                return `${hours} hour${hours !== 1 ? 's' : ''}`;
+            }
+        }
+        
+        async function createEvent() {
+            if (!isFormValid()) {
+                showError('Please fill in all required fields');
+                return;
+            }
+            
+            const eventData = collectEventData();
+            
+            // Validate dates
+            const now = new Date();
+            const startTime = new Date(eventData.start_time);
+            const endTime = new Date(eventData.end_time);
+            
+            if (startTime <= now) {
+                showError('Start time must be in the future');
+                return;
+            }
+            
+            if (endTime <= startTime) {
+                showError('End time must be after start time');
+                return;
+            }
+            
+            if (!confirm('Create this racial event?')) {
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const response = await fetch('/admin/race-management/api/racial-events', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(eventData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess('Racial event created successfully!');
+                    clearForm();
+                    loadActiveEvents(); // Refresh events list
+                } else {
+                    showError(result.message || 'Failed to create event');
+                }
+                
+            } catch (error) {
+                console.error('Error creating event:', error);
+                showError('Network error occurred while creating event');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function clearForm() {
+            document.getElementById('eventForm').reset();
+            document.getElementById('bonusOptions').style.display = 'none';
+            document.getElementById('eventPreview').style.display = 'none';
+            setDefaultDateTime();
+        }
+        
+        async function editEvent(eventId) {
+            // Placeholder for edit functionality
+            alert(`Edit event ${eventId} - This feature will be implemented in a future update`);
+        }
+        
+        async function endEvent(eventId) {
+            if (!confirm('Are you sure you want to end this event immediately?')) {
+                return;
+            }
+            
+            // Placeholder for end event functionality
+            alert(`End event ${eventId} - This feature will be implemented in a future update`);
+        }
+        
+        async function extendEvent(eventId) {
+            const newEndTime = prompt('Enter new end time (YYYY-MM-DD HH:MM):');
+            if (!newEndTime) return;
+            
+            // Placeholder for extend event functionality
+            alert(`Extend event ${eventId} to ${newEndTime} - This feature will be implemented in a future update`);
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+        }
+        
+        function showSuccess(message) {
+            const element = document.getElementById('successMessage');
+            element.textContent = message;
+            element.style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showError(message) {
+            const element = document.getElementById('errorMessage');
+            element.textContent = message;
+            element.style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
