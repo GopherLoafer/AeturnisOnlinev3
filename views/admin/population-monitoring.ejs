@@ -420,7 +420,12 @@
             try {
                 // Load population monitoring data
                 const response = await fetch('/admin/race-management/api/population-monitoring');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
+                console.log('Population monitoring data loaded:', data);
                 
                 populationData = data;
                 updateDashboard(data);
@@ -430,7 +435,18 @@
                 
             } catch (error) {
                 console.error('Error loading monitoring data:', error);
-                showError('Failed to load monitoring data');
+                showError(`Failed to load monitoring data: ${error.message}`);
+                
+                // Show fallback data for debugging
+                const fallbackData = {
+                    totalCharacters: 0,
+                    activePlayers24h: 0,
+                    newRegistrations: 0,
+                    averageLevel: 0,
+                    raceDistribution: [],
+                    levelDistribution: []
+                };
+                updateDashboard(fallbackData);
             } finally {
                 showLoading(false);
             }

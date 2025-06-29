@@ -275,11 +275,21 @@
         async function loadRaces() {
             try {
                 const response = await fetch('/admin/race-management/api/race-statistics');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
                 const data = await response.json();
+                console.log('Loaded race data:', data);
                 
                 racesData = data.races || [];
                 const raceSelect = document.getElementById('raceSelect');
                 raceSelect.innerHTML = '<option value="">Select a race...</option>';
+                
+                if (racesData.length === 0) {
+                    raceSelect.innerHTML = '<option value="">No races available</option>';
+                    return;
+                }
                 
                 racesData.forEach(race => {
                     const option = document.createElement('option');
@@ -290,31 +300,36 @@
                 
             } catch (error) {
                 console.error('Error loading races:', error);
-                showError('Failed to load race data');
+                showError('Failed to load race data. Please check console for details.');
             }
         }
         
         async function loadRecommendations() {
             try {
                 const response = await fetch('/admin/race-management/api/balance-recommendations');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
                 const recommendations = await response.json();
+                console.log('Loaded recommendations:', recommendations);
                 
                 const recommendationsList = document.getElementById('recommendations-list');
-                if (recommendations.length === 0) {
+                if (!recommendations || recommendations.length === 0) {
                     recommendationsList.innerHTML = '<p>✅ No balance issues detected. All races appear balanced.</p>';
                     return;
                 }
                 
                 recommendationsList.innerHTML = recommendations.map(rec => `
                     <div class="recommendation-item severity-${rec.severity}">
-                        <strong>${rec.race_name}</strong>: ${rec.recommendation}
+                        <strong>${rec.race_name}</strong>: ${rec.suggestion}
                         <br><small>Issue: ${rec.issue} | Severity: ${rec.severity.toUpperCase()}</small>
                     </div>
                 `).join('');
                 
             } catch (error) {
                 console.error('Error loading recommendations:', error);
-                document.getElementById('recommendations-list').innerHTML = '<p>❌ Failed to load recommendations</p>';
+                document.getElementById('recommendations-list').innerHTML = '<p>⚠️ Unable to load recommendations. Please check server logs.</p>';
             }
         }
         

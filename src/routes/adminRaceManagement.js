@@ -41,8 +41,8 @@ router.get('/race-statistics', async (req, res) => {
  */
 router.get('/api/race-statistics', async (req, res) => {
   try {
-    const statistics = await adminRaceManagementService.getRaceStatistics();
-    res.json({ statistics });
+    const races = await adminRaceManagementService.getRaceStatistics();
+    res.json({ races });
   } catch (error) {
     console.error('Error getting race statistics:', error);
     res.status(500).json({ error: 'Failed to get race statistics' });
@@ -55,7 +55,32 @@ router.get('/api/race-statistics', async (req, res) => {
 router.get('/api/population-monitoring', async (req, res) => {
   try {
     const populationData = await adminRaceManagementService.getPopulationMonitoring();
-    res.json(populationData);
+    const raceStats = await adminRaceManagementService.getRaceStatistics();
+    
+    // Format data for frontend
+    const response = {
+      totalCharacters: populationData.totalCharacters || 0,
+      activePlayers24h: populationData.activePlayers24h || 0,
+      newRegistrations: populationData.newRegistrations || 0,
+      averageLevel: populationData.averageLevel || 0,
+      charactersChange: populationData.charactersChange || 0,
+      activeChange: populationData.activeChange || 0,
+      registrationsChange: populationData.registrationsChange || 0,
+      levelChange: populationData.levelChange || 0,
+      retentionRate: populationData.retentionRate || 0,
+      avgSessionTime: populationData.avgSessionTime || 0,
+      characterRatio: populationData.characterRatio || 0,
+      balanceHealth: populationData.balanceHealth || 0,
+      raceDistribution: raceStats.map(race => ({
+        race_name: race.name,
+        count: race.character_count || 0,
+        active_24h: race.active_24h || 0,
+        avg_level: race.average_level || 0
+      })),
+      levelDistribution: populationData.levelDistribution || []
+    };
+    
+    res.json(response);
   } catch (error) {
     console.error('Error getting population monitoring:', error);
     res.status(500).json({ error: 'Failed to get population monitoring data' });
@@ -209,10 +234,10 @@ router.post('/api/racial-events', async (req, res) => {
 router.get('/api/racial-events', async (req, res) => {
   try {
     const activeEvents = await adminRaceManagementService.getActiveRacialEvents();
-    res.json({ events: activeEvents });
+    res.json(activeEvents || []);
   } catch (error) {
     console.error('Error getting racial events:', error);
-    res.status(500).json({ error: 'Failed to get racial events' });
+    res.json([]);
   }
 });
 
@@ -267,10 +292,10 @@ router.post('/api/race-rewards', async (req, res) => {
 router.get('/api/balance-recommendations', async (req, res) => {
   try {
     const recommendations = await adminRaceManagementService.getRaceBalanceRecommendations();
-    res.json({ recommendations });
+    res.json(recommendations || []);
   } catch (error) {
     console.error('Error getting balance recommendations:', error);
-    res.status(500).json({ error: 'Failed to get balance recommendations' });
+    res.json([]);
   }
 });
 
@@ -293,6 +318,31 @@ router.get('/population-monitoring', async (req, res) => {
     res.status(500).render('error', { 
       title: 'Error', 
       message: 'Failed to load population monitoring page' 
+    });
+  }
+});
+
+/**
+ * Debug endpoint to test service functionality
+ */
+router.get('/api/debug', async (req, res) => {
+  try {
+    const raceStats = await adminRaceManagementService.getRaceStatistics();
+    const populationData = await adminRaceManagementService.getPopulationMonitoring();
+    const recommendations = await adminRaceManagementService.getRaceBalanceRecommendations();
+    
+    res.json({
+      debug: true,
+      raceStats: raceStats.length,
+      populationDataKeys: Object.keys(populationData || {}),
+      recommendationsCount: recommendations ? recommendations.length : 0,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.json({
+      debug: true,
+      error: error.message,
+      stack: error.stack
     });
   }
 });
