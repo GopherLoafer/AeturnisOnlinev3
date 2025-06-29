@@ -317,3 +317,48 @@ img[data-src].loaded {
         max-width: 100vw !important;
     }
 }
+
+/* Ensure minimum touch target sizes */
+@media (max-width: 1024px) {
+    .action-btn,
+    .move-btn,
+    .chat-send,
+    .tab-button,
+    .nav-btn,
+    .inventory-slot,
+    .equipment-slot,
+    button,
+    a[role="button"] {
+        min-width: 44px !important;
+        min-height: 44px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        touch-action: manipulation; /* Prevents zoom on double-tap */
+    }
+    
+    /* Add touch feedback */
+    @media (hover: none) {
+        button:active,
+        .btn:active,
+        .action-btn:active,
+        .inventory-slot:active,
+        .equipment-slot:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+            transition: transform 0.1s ease;
+        }
+    }
+}
+
+/* Ensure text inputs don't zoom on iOS */
+@media (max-width: 768px) {
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="number"],
+    textarea,
+    select {
+        font-size: 16px !important; /* Prevents zoom on iOS */
+    }
+}
