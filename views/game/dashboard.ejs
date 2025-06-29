@@ -127,8 +127,8 @@
                 <div class="tabs">
                     <button class="tab-btn active" data-tab="inventory">Inventory</button>
                     <button class="tab-btn" data-tab="skills">Skills</button>
-                    <button class="tab-btn" data-tab="progression">Progression</button>
-                    <button class="tab-btn" data-tab="quests">Quests</button>
+                    <button class="tab-btn" data-tab="progression">Progress</button>
+                    <button class="tab-btn" data-tab="rewards">Rewards</button>
                 </div>
                 
                 <div id="inventory" class="tab-content active">
@@ -172,44 +172,50 @@
 
                 <div id="progression" class="tab-content">
                     <div class="progression-section">
-                        <h4>Level Progression</h4>
                         <div class="progression-info">
                             <div class="stat-row">
-                                <span class="stat-label">Current Level</span>
-                                <span class="stat-value"><%= character.level %></span>
+                                <span class="stat-label">Level</span>
+                                <span class="stat-value level"><%= character.level %></span>
                             </div>
                             <div class="stat-row">
-                                <span class="stat-label">Total Experience</span>
+                                <span class="stat-label">Experience</span>
                                 <span class="stat-value"><%= character.experience.toLocaleString() %></span>
                             </div>
-                            <div class="stat-row">
-                                <span class="stat-label">Progress to Next</span>
-                                <span class="stat-value"><%= progression.progressPercentage %>%</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: <%= progression.progressPercentage %>%"></div>
+                                <span class="progress-text"><%= progression.progressPercentage %>%</span>
                             </div>
                             <% if (progression.nextMilestone && progression.nextMilestone.levelsRemaining) { %>
-                            <div class="stat-row">
-                                <span class="stat-label">Next Milestone</span>
-                                <span class="stat-value">Level <%= progression.nextMilestone.level %></span>
+                            <div class="milestone-info">
+                                <span class="milestone-label">Next Milestone:</span>
+                                <span class="milestone-value">Level <%= progression.nextMilestone.level %></span>
                             </div>
                             <% } %>
                         </div>
 
                         <div class="progression-actions">
-                            <button id="test-btn" class="progression-btn">Test Button</button>
-                            <button id="gain-100-exp" class="progression-btn">Gain 100 EXP</button>
-                            <button id="gain-1000-exp" class="progression-btn">Gain 1000 EXP</button>
-                            <button id="simulate-levelup" class="progression-btn">Simulate Level Up</button>
-                            <button id="view-leaderboard" class="progression-btn">View Leaderboard</button>
+                            <button id="gain-100-exp" class="progression-btn small">+100 EXP</button>
+                            <button id="gain-1000-exp" class="progression-btn small">+1K EXP</button>
+                            <button id="simulate-levelup" class="progression-btn">Level Test</button>
+                            <button id="view-leaderboard" class="progression-btn">Leaderboard</button>
                         </div>
+                    </div>
+                </div>
 
+                <div id="rewards" class="tab-content">
+                    <div class="rewards-section">
                         <h4>Recent Rewards</h4>
                         <div id="rewards-display" class="rewards-display">
-                            <!-- Recent rewards and progression messages will appear here -->
                             <div class="reward-message info">Start gaining experience to see rewards!</div>
                         </div>
-
-                        <div id="progression-output" class="progression-output" style="display: none;">
-                            <!-- Hidden progression messages container for compatibility -->
+                        
+                        <div class="milestone-preview">
+                            <h5>Upcoming Milestones</h5>
+                            <div class="milestone-list">
+                                <div class="milestone-item">Level 1,000 - "Ascendant"</div>
+                                <div class="milestone-item">Level 5,000 - "Transcendent"</div>
+                                <div class="milestone-item">Level 15,000 - "Apex Warrior"</div>
+                            </div>
                         </div>
                     </div>
                 </div>

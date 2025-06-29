@@ -501,14 +501,6 @@ function addProgressionMessage(message, className = '') {
 function initializeProgressionButtons() {
     console.log('Initializing progression buttons');
     
-    const testBtn = document.getElementById('test-btn');
-    if (testBtn) {
-        testBtn.addEventListener('click', function() {
-            console.log('Test button clicked');
-            addProgressionMessage('Test message - buttons are working!', 'success');
-        });
-    }
-    
     const gain100Btn = document.getElementById('gain-100-exp');
     if (gain100Btn) {
         gain100Btn.addEventListener('click', function() {
