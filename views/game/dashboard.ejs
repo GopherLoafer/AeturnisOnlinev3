@@ -1367,11 +1367,11 @@
                         </div>
                         <div class="progression-item">
                             <span>Total Experience:</span>
-                            <span><%= progression.totalExperience.toLocaleString() %></span>
+                            <span><%= parseFloat(character.experience || 0).toLocaleString() %></span>
                         </div>
                         <div class="progression-item">
                             <span>Next Level Req:</span>
-                            <span><%= progression.experienceToNext.toLocaleString() %></span>
+                            <span><%= (progression.expNeededForNext || 0).toLocaleString() %></span>
                         </div>
                     </div>
                 </div>
