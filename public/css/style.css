@@ -467,6 +467,262 @@ body {
     padding: 1rem;
 }
 
+/* Infinite Progression System Styles */
+.prestige-marker {
+    margin-left: 0.5rem;
+    font-size: 1.2em;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+.prestige-marker.bronze {
+    color: #cd7f32;
+    text-shadow: 0 0 5px rgba(205, 127, 50, 0.5);
+}
+
+.prestige-marker.silver {
+    color: #c0c0c0;
+    text-shadow: 0 0 5px rgba(192, 192, 192, 0.5);
+}
+
+.prestige-marker.gold {
+    color: #ffd700;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.prestige-marker.platinum {
+    color: #e5e4e2;
+    text-shadow: 0 0 5px rgba(229, 228, 226, 0.5);
+}
+
+.prestige-marker.diamond {
+    color: #b9f2ff;
+    text-shadow: 0 0 5px rgba(185, 242, 255, 0.5);
+}
+
+.prestige-marker.legendary {
+    color: #ff6b6b;
+    text-shadow: 0 0 8px rgba(255, 107, 107, 0.7);
+    animation: legendaryGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes legendaryGlow {
+    from { 
+        text-shadow: 0 0 8px rgba(255, 107, 107, 0.7);
+    }
+    to { 
+        text-shadow: 0 0 15px rgba(255, 107, 107, 1);
+    }
+}
+
+.experience-section {
+    margin-top: 1rem;
+}
+
+.exp-progress {
+    margin-top: 0.5rem;
+}
+
+.exp-bar {
+    width: 100%;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #333;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.25rem;
+}
+
+.exp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00ff41, #00cc33);
+    transition: width 0.3s ease;
+    box-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
+}
+
+.exp-text {
+    font-size: 0.8rem;
+    color: #00ff41;
+    text-align: center;
+}
+
+.next-milestone {
+    margin-top: 0.5rem;
+    color: #888;
+    font-style: italic;
+}
+
+.next-milestone small {
+    color: #66ccff;
+}
+
+/* Progression buttons and interface */
+.progression-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.progression-btn {
+    background: #333;
+    border: 1px solid #00ff41;
+    color: #00ff41;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.progression-btn:hover {
+    background: rgba(0, 255, 65, 0.1);
+    box-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
+}
+
+.progression-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Leaderboard styles */
+.leaderboard-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    border-bottom: 1px solid #333;
+    transition: background 0.2s;
+}
+
+.leaderboard-entry:hover {
+    background: rgba(0, 255, 65, 0.05);
+}
+
+.leaderboard-rank {
+    font-weight: bold;
+    color: #00ff41;
+    min-width: 2rem;
+}
+
+.leaderboard-name {
+    flex: 1;
+    margin-left: 0.5rem;
+}
+
+.leaderboard-level {
+    color: #66ccff;
+    margin-right: 0.5rem;
+}
+
+.leaderboard-prestige {
+    margin-left: 0.5rem;
+}
+
+/* Progression output styles */
+.progression-output {
+    margin-top: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #333;
+    border-radius: 4px;
+}
+
+.progression-message {
+    margin-bottom: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.9rem;
+}
+
+.progression-message.success {
+    background: rgba(0, 255, 65, 0.1);
+    color: #00ff41;
+    border-left: 3px solid #00ff41;
+}
+
+.progression-message.level-up {
+    background: rgba(255, 215, 0, 0.1);
+    color: #ffd700;
+    border-left: 3px solid #ffd700;
+    font-weight: bold;
+    animation: levelUpGlow 0.5s ease-in-out;
+}
+
+.progression-message.stat-gain {
+    background: rgba(102, 204, 255, 0.1);
+    color: #66ccff;
+    border-left: 3px solid #66ccff;
+}
+
+.progression-message.milestone {
+    background: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+    border-left: 3px solid #ff6b6b;
+    font-weight: bold;
+}
+
+.progression-message.special-reward {
+    background: rgba(255, 99, 255, 0.1);
+    color: #ff63ff;
+    border-left: 3px solid #ff63ff;
+    font-style: italic;
+}
+
+.progression-message.prestige {
+    background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 107, 107, 0.1));
+    color: #ffd700;
+    border-left: 3px solid #ffd700;
+    font-weight: bold;
+    text-transform: uppercase;
+    animation: prestigeGlow 1s ease-in-out;
+}
+
+.progression-message.error {
+    background: rgba(255, 102, 102, 0.1);
+    color: #ff6666;
+    border-left: 3px solid #ff6666;
+}
+
+@keyframes levelUpGlow {
+    0% { transform: scale(1); box-shadow: none; }
+    50% { transform: scale(1.02); box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+    100% { transform: scale(1); box-shadow: none; }
+}
+
+@keyframes prestigeGlow {
+    0% { transform: scale(1); box-shadow: none; }
+    50% { transform: scale(1.05); box-shadow: 0 0 15px rgba(255, 215, 0, 0.7); }
+    100% { transform: scale(1); box-shadow: none; }
+}
+
+.leaderboard-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.leaderboard-container h4 {
+    color: #00ff41;
+    margin-bottom: 1rem;
+    text-align: center;
+    border-bottom: 1px solid #333;
+    padding-bottom: 0.5rem;
+}
+
+.progression-section {
+    padding: 1rem;
+}
+
+.progression-info {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #333;
+    border-radius: 4px;
+}
+
 .starting-zone {
     color: #999;
 }

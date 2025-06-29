@@ -1,8 +1,10 @@
 const express = require('express');
 const db = require('../database');
 const { requireCharacter } = require('../middleware/auth');
+const LevelService = require('../levelService');
 
 const router = express.Router();
+const levelService = new LevelService();
 
 // Dashboard - character selection or main game
 router.get('/dashboard', async (req, res) => {
@@ -19,10 +21,11 @@ router.get('/dashboard', async (req, res) => {
       return res.redirect('/game/character-select');
     }
 
-    // Get current character with race info
+    // Get current character with race info and progression data
     const result = await db.query(`
       SELECT c.*, r.name as race_name, r.str_modifier, r.int_modifier, 
-             r.vit_modifier, r.dex_modifier, r.wis_modifier
+             r.vit_modifier, r.dex_modifier, r.wis_modifier,
+             r.experience_bonus, r.special_ability
       FROM characters c
       JOIN races r ON c.race_id = r.id
       WHERE c.id = $1 AND c.user_id = $2
@@ -47,11 +50,15 @@ router.get('/dashboard', async (req, res) => {
       [character.id]
     );
 
+    // Get progression information
+    const progressionInfo = await levelService.getProgressionInfo(character.id);
+
     res.render('game/dashboard', {
       title: 'Game - Aeturnis Online',
       character,
       weaponAffinities: weaponAffinities.rows,
       magicAffinities: magicAffinities.rows,
+      progression: progressionInfo,
       user: req.user
     });
   } catch (error) {

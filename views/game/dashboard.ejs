@@ -28,9 +28,35 @@
         <div class="panel character-panel">
             <h3><%= character.name %></h3>
             <div class="character-info">
-                <p><strong>Race:</strong> <%= character.race_name %></p>
+                <p><strong>Race:</strong> <%= character.race_name %>
+                    <% if (character.prestige_marker) { %>
+                        <span class="prestige-marker <%= character.prestige_marker %>">
+                            <% if (character.prestige_marker === 'bronze') { %>🥉<% } %>
+                            <% if (character.prestige_marker === 'silver') { %>🥈<% } %>
+                            <% if (character.prestige_marker === 'gold') { %>🥇<% } %>
+                            <% if (character.prestige_marker === 'platinum') { %>💎<% } %>
+                            <% if (character.prestige_marker === 'diamond') { %>💠<% } %>
+                            <% if (character.prestige_marker === 'legendary') { %>⭐<% } %>
+                        </span>
+                    <% } %>
+                </p>
                 <p><strong>Level:</strong> <%= character.level %></p>
-                <p><strong>Experience:</strong> <%= character.experience.toLocaleString() %></p>
+                <div class="experience-section">
+                    <p><strong>Experience:</strong> <%= character.experience.toLocaleString() %></p>
+                    <div class="exp-progress">
+                        <div class="exp-bar">
+                            <div class="exp-fill" style="width: <%= progression.progressPercentage %>%"></div>
+                        </div>
+                        <div class="exp-text">
+                            <%= progression.currentLevelProgress.toLocaleString() %> / <%= progression.expNeededForNext.toLocaleString() %> (<%= progression.progressPercentage %>%)
+                        </div>
+                    </div>
+                    <% if (progression.nextMilestone && progression.nextMilestone.levelsRemaining) { %>
+                        <div class="next-milestone">
+                            <small>Next Milestone: Level <%= progression.nextMilestone.level %> (<%= progression.nextMilestone.levelsRemaining %> levels)</small>
+                        </div>
+                    <% } %>
+                </div>
             </div>
             
             <div class="stats">
@@ -98,6 +124,7 @@
                 <div class="tabs">
                     <button class="tab-btn active" onclick="showTab('inventory')">Inventory</button>
                     <button class="tab-btn" onclick="showTab('skills')">Skills</button>
+                    <button class="tab-btn" onclick="showTab('progression')">Progression</button>
                     <button class="tab-btn" onclick="showTab('quests')">Quests</button>
                 </div>
                 
@@ -137,6 +164,43 @@
                             <span class="skill-value"><%= parseFloat(affinity.affinity_percentage).toFixed(2) %>%</span>
                         </div>
                         <% }); %>
+                    </div>
+                </div>
+
+                <div id="progression" class="tab-content">
+                    <div class="progression-section">
+                        <h4>Level Progression</h4>
+                        <div class="progression-info">
+                            <div class="stat-row">
+                                <span class="stat-label">Current Level</span>
+                                <span class="stat-value"><%= character.level %></span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Total Experience</span>
+                                <span class="stat-value"><%= character.experience.toLocaleString() %></span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Progress to Next</span>
+                                <span class="stat-value"><%= progression.progressPercentage %>%</span>
+                            </div>
+                            <% if (progression.nextMilestone && progression.nextMilestone.levelsRemaining) { %>
+                            <div class="stat-row">
+                                <span class="stat-label">Next Milestone</span>
+                                <span class="stat-value">Level <%= progression.nextMilestone.level %></span>
+                            </div>
+                            <% } %>
+                        </div>
+
+                        <div class="progression-actions">
+                            <button onclick="gainExperience(100)" class="progression-btn">Gain 100 EXP</button>
+                            <button onclick="gainExperience(1000)" class="progression-btn">Gain 1000 EXP</button>
+                            <button onclick="simulateLevelUp()" class="progression-btn">Simulate Level Up</button>
+                            <button onclick="showLeaderboard()" class="progression-btn">View Leaderboard</button>
+                        </div>
+
+                        <div id="progression-output" class="progression-output">
+                            <!-- Progression messages will appear here -->
+                        </div>
                     </div>
                 </div>
                 

@@ -12,6 +12,7 @@ const authRoutes = require('./src/routes/auth');
 const gameRoutes = require('./src/routes/game');
 const adminRoutes = require('./src/routes/admin');
 const abilitiesRoutes = require('./src/routes/abilities');
+const progressionRoutes = require('./src/routes/progression');
 const { requireAuth, requireAdmin } = require('./src/middleware/auth');
 
 const app = express();
@@ -73,6 +74,7 @@ app.use('/auth', authRoutes);
 app.use('/game', requireAuth, gameRoutes);
 app.use('/admin', requireAdmin, adminRoutes);
 app.use('/api/abilities', requireAuth, abilitiesRoutes);
+app.use('/api/progression', requireAuth, progressionRoutes);
 
 // Home route
 app.get('/', (req, res) => {

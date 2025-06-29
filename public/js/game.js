@@ -300,6 +300,142 @@ function addToGameOutput(message, className = '') {
     }
 }
 
+// Progression System Functions
+async function gainExperience(amount) {
+    try {
+        const response = await fetch('/api/progression/award-experience', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ amount })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            addProgressionMessage(`Gained ${data.experienceGained} experience!`, 'success');
+            
+            if (data.leveledUp) {
+                addProgressionMessage(`LEVEL UP! You are now level ${data.newLevel}!`, 'level-up');
+                
+                if (data.statGains) {
+                    const statText = Object.entries(data.statGains)
+                        .filter(([stat, gain]) => gain > 0)
+                        .map(([stat, gain]) => `${stat.toUpperCase()}: +${gain}`)
+                        .join(', ');
+                    addProgressionMessage(`Stat gains: ${statText}`, 'stat-gain');
+                }
+                
+                if (data.milestoneRewards && data.milestoneRewards.length > 0) {
+                    data.milestoneRewards.forEach(milestone => {
+                        addProgressionMessage(`MILESTONE! Level ${milestone.level} reached! Gained ${milestone.goldReward} gold!`, 'milestone');
+                        if (milestone.specialReward) {
+                            addProgressionMessage(`Special reward: ${milestone.specialReward}`, 'special-reward');
+                        }
+                    });
+                }
+                
+                if (data.newPrestigeMarker) {
+                    addProgressionMessage(`NEW PRESTIGE MARKER: ${data.newPrestigeMarker.toUpperCase()}!`, 'prestige');
+                }
+                
+                // Refresh the page to show updated stats
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+        } else {
+            addProgressionMessage(data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error gaining experience:', error);
+        addProgressionMessage('Failed to gain experience', 'error');
+    }
+}
+
+async function simulateLevelUp() {
+    try {
+        const response = await fetch('/api/progression/simulate-level-up', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            addProgressionMessage(data.message, 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            addProgressionMessage(data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error simulating level up:', error);
+        addProgressionMessage('Failed to simulate level up', 'error');
+    }
+}
+
+async function showLeaderboard() {
+    try {
+        const response = await fetch('/api/progression/leaderboard');
+        const data = await response.json();
+        
+        if (data.success) {
+            displayLeaderboard(data.leaderboard);
+        } else {
+            addProgressionMessage('Failed to load leaderboard', 'error');
+        }
+    } catch (error) {
+        console.error('Error loading leaderboard:', error);
+        addProgressionMessage('Failed to load leaderboard', 'error');
+    }
+}
+
+function displayLeaderboard(leaderboard) {
+    const output = document.getElementById('progression-output');
+    if (!output) return;
+
+    let html = '<div class="leaderboard-container"><h4>Level Leaderboard</h4>';
+    
+    if (leaderboard.length === 0) {
+        html += '<p>No leaderboard data available</p>';
+    } else {
+        leaderboard.forEach(entry => {
+            html += `
+                <div class="leaderboard-entry">
+                    <span class="leaderboard-rank">#${entry.rank}</span>
+                    <span class="leaderboard-name">${entry.name}</span>
+                    <span class="leaderboard-race">${entry.race}</span>
+                    <span class="leaderboard-level">Lv ${entry.level}</span>
+                    <span class="leaderboard-prestige">${entry.prestigeDisplay}</span>
+                </div>
+            `;
+        });
+    }
+    
+    html += '</div>';
+    output.innerHTML = html;
+}
+
+function addProgressionMessage(message, className = '') {
+    const output = document.getElementById('progression-output');
+    if (!output) return;
+
+    const messageElement = document.createElement('div');
+    messageElement.textContent = message;
+    messageElement.className = `progression-message ${className}`;
+    
+    output.appendChild(messageElement);
+    output.scrollTop = output.scrollHeight;
+    
+    // Also add to main game output
+    addToGameOutput(message, className);
+}
+
 // Keyboard shortcuts
 document.addEventListener('keydown', function(event) {
     // Prevent shortcuts when typing in input fields
