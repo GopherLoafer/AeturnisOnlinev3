@@ -2568,5 +2568,60 @@
     <script src="/js/performance-utils.js"></script>
     <script src="/js/responsive-images.js"></script>
     <script src="/js/mobile-navigation.js"></script>
+    
+    <!-- Mobile Navigation Initialization -->
+    <script>
+    // Initialize mobile features when DOM is ready
+    (function() {
+        let mobileNav = null;
+        let chatHandler = null;
+        
+        function initializeMobileFeatures() {
+            const isMobile = window.innerWidth < 1024;
+            
+            if (isMobile) {
+                // Initialize mobile navigation if not already done
+                if (!mobileNav && typeof MobileNavigation !== 'undefined') {
+                    mobileNav = new MobileNavigation();
+                    window.mobileNav = mobileNav;
+                }
+            }
+            
+            // Initialize chat handler for ALL screen sizes
+            if (!chatHandler && typeof ChatHandler !== 'undefined') {
+                chatHandler = new ChatHandler();
+                window.chatHandler = chatHandler;
+            }
+        }
+        
+        // Run on DOM ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeMobileFeatures);
+        } else {
+            initializeMobileFeatures();
+        }
+        
+        // Handle resize events with debouncing
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(initializeMobileFeatures, 250);
+        });
+        
+        // Prevent zoom on input focus (iOS fix)
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        });
+        
+        // Fix iOS viewport issues
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+            viewport.setAttribute('content', 
+                viewport.getAttribute('content') + ', viewport-fit=cover');
+        }
+    })();
+    </script>
 </body>
 </html>
