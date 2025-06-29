@@ -237,10 +237,40 @@ class ChatHandler {
 // Export for global access
 window.ChatHandler = ChatHandler;
 
-// Initialize on DOM load
-document.addEventListener('DOMContentLoaded', () => {
-    if (document.querySelector('.game-container')) {
-        new MobileNavigation();
-        new ChatHandler();
+// Initialize mobile features when DOM is ready
+(function() {
+    let mobileNav = null;
+    let chatHandler = null;
+    
+    function initializeMobileFeatures() {
+        const isMobile = window.innerWidth < 1024;
+        
+        if (isMobile && document.querySelector('.game-container')) {
+            // Initialize mobile navigation if not already done
+            if (!mobileNav && typeof MobileNavigation !== 'undefined') {
+                mobileNav = new MobileNavigation();
+                window.mobileNav = mobileNav;
+            }
+        }
+        
+        // Initialize chat handler for ALL screen sizes
+        if (!chatHandler && typeof ChatHandler !== 'undefined') {
+            chatHandler = new ChatHandler();
+            window.chatHandler = chatHandler;
+        }
     }
-});
+    
+    // Run on DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeMobileFeatures);
+    } else {
+        initializeMobileFeatures();
+    }
+    
+    // Handle resize events with debouncing
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(initializeMobileFeatures, 250);
+    });
+})();
