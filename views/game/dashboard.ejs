@@ -1510,8 +1510,8 @@
                         <span class="stat-value" id="stat-wis"><%= character.wis_total %></span>
                     </div>
                     <div class="stat-item">
-                        <span>LUK</span>
-                        <span class="stat-value" id="stat-luk"><%= character.luk_total %></span>
+                        <span>TOTAL</span>
+                        <span class="stat-value" id="stat-total"><%= character.str_total + character.int_total + character.vit_total + character.dex_total + character.wis_total + (character.luk_total || 0) %></span>
                     </div>
                 </div>
             </div>
