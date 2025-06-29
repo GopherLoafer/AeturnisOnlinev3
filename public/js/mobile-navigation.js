@@ -119,111 +119,91 @@ class ChatHandler {
     constructor() {
         this.chatPanel = document.querySelector('.chat-panel');
         this.mainPanel = document.querySelector('.main-panel');
+        this.gameOutput = document.querySelector('.game-output');
+        this.isExpanded = false;
+        this.originalHeight = null;
         this.init();
     }
     
     init() {
-        if (window.innerWidth <= 767) {
-            this.bindEvents();
-            this.restoreState();
+        // Store original height
+        if (this.chatPanel) {
+            this.originalHeight = window.getComputedStyle(this.chatPanel).height;
         }
-    }
-    
-    bindEvents() {
-        const header = this.chatPanel?.querySelector('.chat-header');
         
-        // Toggle chat on header click
-        header?.addEventListener('click', () => {
-            this.toggleChat();
-        });
+        // Create expand button
+        const expandBtn = document.createElement('button');
+        expandBtn.className = 'chat-expand-btn';
+        expandBtn.innerHTML = '💬 <span class="expand-text">Expand Chat</span>';
+        expandBtn.setAttribute('aria-label', 'Toggle chat expansion');
+        expandBtn.setAttribute('title', 'Toggle chat size');
         
-        // Prevent closing when interacting with chat content
-        this.chatPanel?.addEventListener('click', (e) => {
-            if (e.target.closest('.chat-messages') || 
-                e.target.closest('.chat-input-container') ||
-                e.target.closest('.chat-tabs')) {
-                e.stopPropagation();
+        // Add to chat panel header
+        const chatHeader = this.chatPanel?.querySelector('.chat-header');
+        if (chatHeader) {
+            chatHeader.appendChild(expandBtn);
+        } else if (this.chatPanel) {
+            // Create header if it doesn't exist
+            const header = document.createElement('div');
+            header.className = 'chat-header';
+            header.appendChild(expandBtn);
+            this.chatPanel.insertBefore(header, this.chatPanel.firstChild);
+        }
+        
+        // Bind events
+        expandBtn.addEventListener('click', () => this.toggle());
+        
+        // Handle escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isExpanded) {
+                this.toggle();
             }
         });
         
-        // Close chat when clicking outside
-        document.addEventListener('click', (e) => {
-            if (this.chatPanel?.classList.contains('expanded') && 
-                !e.target.closest('.chat-panel') &&
-                window.innerWidth <= 767) {
-                this.closeChat();
-            }
-        });
-        
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 767) {
-                this.resetChat();
-            }
-        });
-    }
-    
-    toggleChat() {
-        const isExpanded = this.chatPanel?.classList.toggle('expanded');
-        
-        // Save state
-        localStorage.setItem('chatExpanded', isExpanded.toString());
-        
-        // Adjust main content area for mobile
-        this.adjustMainContent(isExpanded);
-        
-        // Auto-scroll to bottom when expanded
-        if (isExpanded) {
-            setTimeout(() => {
-                const chatMessages = document.getElementById('chat-messages');
-                if (chatMessages) {
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }
-            }, 300); // Wait for expansion animation
+        // Save preference
+        const savedState = localStorage.getItem('chatExpanded');
+        if (savedState === 'true') {
+            this.toggle();
         }
     }
     
-    closeChat() {
-        this.chatPanel?.classList.remove('expanded');
-        localStorage.setItem('chatExpanded', 'false');
-        this.adjustMainContent(false);
-    }
-    
-    expandChat() {
-        this.chatPanel?.classList.add('expanded');
-        localStorage.setItem('chatExpanded', 'true');
-        this.adjustMainContent(true);
-    }
-    
-    adjustMainContent(isExpanded) {
-        if (window.innerWidth <= 767 && this.mainPanel) {
-            if (isExpanded) {
-                // Account for expanded chat height (60vh max 500px)
-                const chatHeight = Math.min(window.innerHeight * 0.6, 500);
-                this.mainPanel.style.marginBottom = `${chatHeight}px`;
-            } else {
-                // Account for collapsed chat height (60px)
-                this.mainPanel.style.marginBottom = '60px';
-            }
+    toggle() {
+        this.isExpanded = !this.isExpanded;
+        
+        if (this.isExpanded) {
+            this.chatPanel?.classList.add('expanded');
+            this.mainPanel?.classList.add('chat-expanded');
+            document.body.classList.add('chat-modal-open');
+            
+            // Focus chat input
+            const chatInput = this.chatPanel?.querySelector('.chat-input');
+            chatInput?.focus();
+        } else {
+            this.chatPanel?.classList.remove('expanded');
+            this.mainPanel?.classList.remove('chat-expanded');
+            document.body.classList.remove('chat-modal-open');
         }
-    }
-    
-    restoreState() {
-        const wasExpanded = localStorage.getItem('chatExpanded') === 'true';
-        if (wasExpanded && this.chatPanel) {
-            this.chatPanel.classList.add('expanded');
-            this.adjustMainContent(true);
+        
+        // Update button text
+        const btn = this.chatPanel?.querySelector('.chat-expand-btn');
+        if (btn) {
+            btn.innerHTML = this.isExpanded ? 
+                '✕ <span class="expand-text">Minimize</span>' : 
+                '💬 <span class="expand-text">Expand Chat</span>';
         }
-    }
-    
-    resetChat() {
-        // Reset mobile-specific styles when switching to desktop
-        if (this.mainPanel) {
-            this.mainPanel.style.marginBottom = '';
-        }
-        this.chatPanel?.classList.remove('expanded');
+        
+        // Save preference
+        localStorage.setItem('chatExpanded', this.isExpanded);
+        
+        // Emit event for other components
+        window.dispatchEvent(new CustomEvent('chatToggled', { 
+            detail: { expanded: this.isExpanded } 
+        }));
     }
 }
+
+// Export for global access
+window.ChatHandler = ChatHandler;
 
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', () => {
