@@ -227,7 +227,7 @@ class CharacterCreationService {
       
       // Calculate starting gold
       const backgroundGold = background ? background.starting_gold : 0;
-      const backgroundBonuses = background ? JSON.parse(background.stat_bonuses || '{}') : {};
+      const backgroundBonuses = background ? background.stat_bonuses || {} : {};
       const goldBonus = backgroundBonuses.gold_bonus || 0;
       const startingGold = 100 + backgroundGold + goldBonus;
       
