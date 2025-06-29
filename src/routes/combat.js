@@ -6,17 +6,18 @@
 const express = require('express');
 const router = express.Router();
 const combatService = require('../services/combatService');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, requireCharacter } = require('../middleware/auth');
 
-// All combat routes require authentication
+// All combat routes require authentication and character selection
 router.use(requireAuth);
+router.use(requireCharacter);
 
 /**
  * Get current combat status
  */
 router.get('/status', async (req, res) => {
   try {
-    const characterId = req.session.character.id;
+    const characterId = req.character.id;
     const activeCombat = await combatService.getActiveCombat(characterId);
     
     if (!activeCombat) {
@@ -134,7 +135,7 @@ router.post('/action', async (req, res) => {
  */
 router.get('/monsters', async (req, res) => {
   try {
-    const characterZone = req.session.character.location_zone;
+    const characterZone = req.character.location_zone;
     
     // Get spawned monsters in the zone
     const result = await req.app.locals.db.query(
