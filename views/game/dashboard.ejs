@@ -729,59 +729,105 @@
             color: #00ff41;
         }
 
-        /* Minimap */
-        .minimap-section {
-            margin-top: 20px;
+        /* Mini-map (Reference Design) */
+        .mini-map {
+            height: 200px;
+            background: #0a0a0a;
+            border-bottom: 1px solid #333;
+            position: relative;
+            overflow: hidden;
         }
 
-        .minimap-section h4 {
-            color: #FFD700;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .minimap {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid #333;
-            border-radius: 4px;
-            padding: 10px;
-        }
-
-        .minimap-grid {
+        .map-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(9, 1fr);
+            grid-template-rows: repeat(9, 1fr);
+            height: 100%;
+            padding: 10px;
             gap: 2px;
-            max-width: 120px;
-            margin: 0 auto;
         }
 
-        .minimap-cell {
-            aspect-ratio: 1;
+        .map-cell {
             background: #1a1a1a;
             border: 1px solid #333;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 10px;
-            color: #666;
-        }
-
-        .minimap-cell.direction-btn {
-            background: #2a2a2a;
-            color: #00ff41;
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .minimap-cell.direction-btn:hover {
-            background: rgba(0, 255, 65, 0.2);
-            border-color: #00ff41;
+        .map-cell:hover {
+            background: #2a2a2a;
+            border-color: #555;
         }
 
-        .minimap-cell.player-position {
-            background: #FFD700;
-            color: #000;
-            font-weight: bold;
+        .map-cell.current {
+            background: #003300;
+            border-color: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+            color: #00ff00;
+        }
+
+        .map-cell.player {
+            background: #000033;
+            border-color: #0066ff;
+            color: #0066ff;
+        }
+
+        .map-cell.enemy {
+            background: #330000;
+            border-color: #ff0000;
+            color: #ff0000;
+        }
+
+        .map-cell.npc {
+            background: #333300;
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+
+        .map-cell.treasure {
+            background: #1a1a0a;
+            border-color: #ffd700;
+            color: #ffd700;
+        }
+
+        .map-cell.danger {
+            background: #330011;
+            border-color: #ff6600;
+            color: #ff6600;
+        }
+
+        .map-cell.exit {
+            background: #0a1a0a;
+            border-color: #00cc00;
+            color: #00cc00;
+        }
+
+        .map-cell.obstacle {
+            background: #2a2a1a;
+            border-color: #888;
+            color: #888;
+        }
+
+        .map-cell.water {
+            background: #001122;
+            border-color: #0088cc;
+            color: #0088cc;
+        }
+
+        .map-cell.resource {
+            background: #112200;
+            border-color: #44aa44;
+            color: #44aa44;
+        }
+
+        .map-cell.hidden {
+            background: #1a0a1a;
+            border-color: #aa44aa;
+            color: #aa44aa;
         }
 
         /* Combat Actions */
@@ -1022,6 +1068,100 @@
 
             <!-- Equipment Tab -->
             <div id="equipment" class="tab-content active">
+                <div class="mini-map">
+                    <div class="map-grid">
+                        <div class="map-cell"></div>
+                        <div class="map-cell npc">🏪</div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell enemy">!</div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell player">P</div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell enemy">!</div>
+                        <div class="map-cell"></div>
+                        
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell current" onclick="move('north')">@</div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell" onclick="move('west')"></div>
+                        <div class="map-cell treasure">💎</div>
+                        <div class="map-cell" onclick="move('east')"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell" onclick="move('south')"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell danger">⚠️</div>
+                        <div class="map-cell"></div>
+                        
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell exit">🚪</div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        
+                        <div class="map-cell"></div>
+                        <div class="map-cell obstacle">🗿</div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell water">🌊</div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell resource">🌳</div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell hidden">?</div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                        <div class="map-cell"></div>
+                    </div>
+                </div>
+                
                 <div class="equipment-section">
                     <h3>Equipment</h3>
                     <div class="equipment-grid">
@@ -1034,23 +1174,6 @@
                         <div class="equipment-slot equipped">💍</div>
                         <div class="equipment-slot equipped">💍</div>
                         <div class="equipment-slot">📿</div>
-                    </div>
-                </div>
-                
-                <div class="minimap-section">
-                    <h4>Minimap</h4>
-                    <div class="minimap">
-                        <div class="minimap-grid">
-                            <div class="minimap-cell"></div>
-                            <div class="minimap-cell direction-btn" onclick="move('north')">N</div>
-                            <div class="minimap-cell"></div>
-                            <div class="minimap-cell direction-btn" onclick="move('west')">W</div>
-                            <div class="minimap-cell player-position">●</div>
-                            <div class="minimap-cell direction-btn" onclick="move('east')">E</div>
-                            <div class="minimap-cell"></div>
-                            <div class="minimap-cell direction-btn" onclick="move('south')">S</div>
-                            <div class="minimap-cell"></div>
-                        </div>
                     </div>
                 </div>
             </div>
