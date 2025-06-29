@@ -164,6 +164,8 @@ function updateGameText(message) {
 // ===== Character State Updates =====
 
 function updateCharacterStats(character) {
+    console.log('updateCharacterStats called with:', character);
+    
     // Update individual stat displays
     const statMappings = {
         'stat-str': character.str_total || character.str_base || 10,
@@ -465,6 +467,8 @@ function refreshGameState() {
             
             // Update character display
             if (data.character) {
+                console.log('Character data received:', data.character);
+                console.log('Stats - STR:', data.character.str_total, 'INT:', data.character.int_total, 'VIT:', data.character.vit_total);
                 updateCharacterStats(data.character);
                 
                 updateHealthMana(
