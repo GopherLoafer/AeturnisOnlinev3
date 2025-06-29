@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text MMORPG - UI Mockup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        /* Main Layout */
+        .game-container {
+            display: grid;
+            grid-template-areas:
+                "header header header"
+                "left-panel main right-panel"
+                "bottom-panel bottom-panel bottom-panel";
+            grid-template-columns: 250px 1fr 250px;
+            grid-template-rows: 60px 1fr 200px;
+            height: 100vh;
+            gap: 2px;
+            background: #1a1a1a;
+            padding: 2px;
+        }
+
+        /* Header */
+        .header {
+            grid-area: header;
+            background: linear-gradient(to bottom, #2a2a2a, #1a1a1a);
+            border-bottom: 2px solid #444;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 20px;
+        }
+
+        .resource-bar {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .resource {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid #333;
+        }
+
+        .resource-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .gold-icon { background: linear-gradient(135deg, #FFD700, #FFA500); }
+        .exp-icon { background: linear-gradient(135deg, #00ff00, #00aa00); }
+        .turns-icon { background: linear-gradient(135deg, #00ffff, #0088ff); }
+
+        /* Left Panel - Character Info */
+        .left-panel {
+            grid-area: left-panel;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .character-info {
+            margin-bottom: 20px;
+        }
+
+        .character-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 5px;
+        }
+
+        .character-title {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .stat-bars {
+            margin-bottom: 15px;
+        }
+
+        .stat-bar {
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            margin-bottom: 2px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .bar-container {
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .hp-bar { background: linear-gradient(90deg, #ff0000, #ff6666); }
+        .mp-bar { background: linear-gradient(90deg, #0066ff, #66b3ff); }
+        .sp-bar { background: linear-gradient(90deg, #ffaa00, #ffdd66); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            font-size: 12px;
+        }
+
+        .stat-item {
+            background: rgba(0,0,0,0.3);
+            padding: 5px 8px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stat-value {
+            color: #00ff00;
+            font-weight: bold;
+        }
+
+        /* Equipment Section */
+        .equipment-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 15px;
+        }
+
+        .equipment-slot {
+            aspect-ratio: 1;
+            background: #2a2a2a;
+            border: 2px solid #444;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .equipment-slot:hover {
+            border-color: #666;
+            transform: scale(1.05);
+        }
+
+        .equipment-slot.equipped {
+            border-color: #00ff00;
+            background: radial-gradient(ellipse at center, #003300, #2a2a2a);
+        }
+
+        .equipment-slot.legendary {
+            border-color: #FFA500;
+            box-shadow: 0 0 10px #FFA500;
+        }
+
+        .slot-label {
+            font-size: 10px;
+            color: #666;
+            text-align: center;
+        }
+
+        /* Main Game Area */
+        .main-panel {
+            grid-area: main;
+            background: #0f0f0f;
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .game-output {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            line-height: 1.6;
+        }
+
+        .game-text {
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .location-text {
+            color: #00ffff;
+            font-weight: bold;
+        }
+
+        .combat-text {
+            color: #ff6666;
+        }
+
+        .loot-text {
+            color: #FFD700;
+        }
+
+        .system-text {
+            color: #888;
+            font-style: italic;
+        }
+
+        .damage-text {
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        .heal-text {
+            color: #00ff00;
+            font-weight: bold;
+        }
+
+        /* Action Buttons */
+        .action-panel {
+            background: #1a1a1a;
+            border-top: 1px solid #333;
+            padding: 15px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .action-btn {
+            background: linear-gradient(to bottom, #3a3a3a, #2a2a2a);
+            border: 1px solid #555;
+            color: #fff;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(to bottom, #4a4a4a, #3a3a3a);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        .action-btn.combat {
+            border-color: #ff6666;
+            color: #ff6666;
+        }
+
+        .action-btn.movement {
+            border-color: #66ff66;
+            color: #66ff66;
+        }
+
+        .action-btn.special {
+            border-color: #FFD700;
+            color: #FFD700;
+        }
+
+        .command-input {
+            width: 100%;
+            background: #0a0a0a;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Consolas', monospace;
+        }
+
+        /* Right Panel - Map & Inventory */
+        .right-panel {
+            grid-area: right-panel;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .mini-map {
+            height: 200px;
+            background: #0a0a0a;
+            border-bottom: 1px solid #333;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            grid-template-rows: repeat(9, 1fr);
+            height: 100%;
+            padding: 10px;
+            gap: 2px;
+        }
+
+        .map-cell {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-cell:hover {
+            background: #2a2a2a;
+            border-color: #555;
+        }
+
+        .map-cell.current {
+            background: #003300;
+            border-color: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        .map-cell.player {
+            background: #000033;
+            border-color: #0066ff;
+        }
+
+        .map-cell.enemy {
+            background: #330000;
+            border-color: #ff0000;
+        }
+
+        .map-cell.npc {
+            background: #333300;
+            border-color: #ffff00;
+        }
+
+        .inventory-tabs {
+            display: flex;
+            background: #0a0a0a;
+            border-bottom: 1px solid #333;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+        }
+
+        .tab:hover {
+            background: #1a1a1a;
+        }
+
+        .tab.active {
+            background: #2a2a2a;
+            border-bottom: 2px solid #00ff00;
+        }
+
+        .inventory-grid {
+            flex: 1;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            overflow-y: auto;
+            align-content: start;
+        }
+
+        .inventory-slot {
+            aspect-ratio: 1;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 10px;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .inventory-slot:hover {
+            transform: scale(1.1);
+            z-index: 10;
+            border-color: #666;
+        }
+
+        .item-count {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            font-size: 9px;
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        /* Bottom Panel - Chat */
+        .bottom-panel {
+            grid-area: bottom-panel;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-tabs {
+            display: flex;
+            background: #0a0a0a;
+            border-bottom: 1px solid #333;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            font-size: 13px;
+        }
+
+        .chat-message {
+            margin-bottom: 5px;
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        .chat-time {
+            color: #666;
+            font-size: 11px;
+        }
+
+        .chat-name {
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .chat-name:hover {
+            text-decoration: underline;
+        }
+
+        .chat-name.global { color: #ffffff; }
+        .chat-name.guild { color: #00ff00; }
+        .chat-name.party { color: #66b3ff; }
+        .chat-name.whisper { color: #ff66ff; }
+        .chat-name.system { color: #FFD700; }
+
+        .chat-input-container {
+            display: flex;
+            padding: 10px;
+            gap: 10px;
+            background: #0a0a0a;
+            border-top: 1px solid #333;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        .chat-send {
+            background: linear-gradient(to bottom, #0066ff, #0044cc);
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .chat-send:hover {
+            background: linear-gradient(to bottom, #0077ff, #0055dd);
+            transform: scale(1.05);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .game-container {
+                grid-template-areas:
+                    "header"
+                    "main"
+                    "bottom-panel";
+                grid-template-columns: 1fr;
+                grid-template-rows: 50px 1fr 150px;
+            }
+
+            .left-panel, .right-panel {
+                display: none;
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .header {
+                padding: 0 10px;
+            }
+
+            .resource {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+        }
+
+        /* Floating Action Button (Mobile) */
+        .fab-container {
+            position: fixed;
+            bottom: 170px;
+            right: 20px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .fab-container {
+                display: block;
+            }
+        }
+
+        .fab {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border: none;
+            color: #000;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+        }
+
+        .fab-menu {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .fab-menu.active {
+            display: flex;
+        }
+
+        .fab-item {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #2a2a2a;
+            border: 1px solid #555;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .fab-item:hover {
+            transform: scale(1.1);
+            background: #3a3a3a;
+        }
+
+        /* Tooltips */
+        .tooltip {
+            position: absolute;
+            background: #000;
+            border: 1px solid #FFD700;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            max-width: 300px;
+        }
+
+        .tooltip.active {
+            opacity: 0.95;
+        }
+
+        .tooltip-title {
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 5px;
+        }
+
+        .tooltip-stat {
+            color: #00ff00;
+            font-size: 11px;
+        }
+
+        .tooltip-description {
+            color: #ccc;
+            font-style: italic;
+            margin-top: 5px;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header Bar -->
+        <header class="header">
+            <div class="resource-bar">
+                <div class="resource">
+                    <div class="resource-icon gold-icon"></div>
+                    <span>12,450</span>
+                </div>
+                <div class="resource">
+                    <div class="resource-icon exp-icon"></div>
+                    <span>Lv 42 (65%)</span>
+                </div>
+                <div class="resource">
+                    <div class="resource-icon turns-icon"></div>
+                    <span>5,237 / 5,400</span>
+                </div>
+            </div>
+            <button class="action-btn special" style="width: 100px;">Menu</button>
+        </header>
+
+        <!-- Left Panel - Character Info -->
+        <aside class="left-panel">
+            <div class="character-info">
+                <div class="character-name">Shadowblade</div>
+                <div class="character-title">Destroyer of Worlds</div>
+                
+                <div class="stat-bars">
+                    <div class="stat-bar">
+                        <div class="stat-label">
+                            <span>HP</span>
+                            <span>3,250 / 4,200</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill hp-bar" style="width: 77%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-bar">
+                        <div class="stat-label">
+                            <span>MP</span>
+                            <span>890 / 1,200</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill mp-bar" style="width: 74%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-bar">
+                        <div class="stat-label">
+                            <span>SP</span>
+                            <span>150 / 150</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill sp-bar" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span>STR</span>
+                        <span class="stat-value">156</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>DEX</span>
+                        <span class="stat-value">132</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>VIT</span>
+                        <span class="stat-value">98</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>INT</span>
+                        <span class="stat-value">45</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>WIS</span>
+                        <span class="stat-value">52</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>CHA</span>
+                        <span class="stat-value">38</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="equipment-section">
+                <h3 style="font-size: 14px; margin-bottom: 10px; color: #FFD700;">Equipment</h3>
+                <div class="equipment-grid">
+                    <div class="equipment-slot equipped">
+                        <div class="slot-label">Head</div>
+                    </div>
+                    <div class="equipment-slot equipped legendary">
+                        <div class="slot-label">Chest</div>
+                    </div>
+                    <div class="equipment-slot equipped">
+                        <div class="slot-label">Legs</div>
+                    </div>
+                    <div class="equipment-slot equipped">
+                        <div class="slot-label">Main</div>
+                    </div>
+                    <div class="equipment-slot">
+                        <div class="slot-label">Off</div>
+                    </div>
+                    <div class="equipment-slot equipped">
+                        <div class="slot-label">Feet</div>
+                    </div>
+                    <div class="equipment-slot equipped">
+                        <div class="slot-label">Ring1</div>
+                    </div>
+                    <div class="equipment-slot equipped">
+                        <div class="slot-label">Ring2</div>
+                    </div>
+                    <div class="equipment-slot">
+                        <div class="slot-label">Neck</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Game Area -->
+        <main class="main-panel">
+            <div class="game-output">
+                <p class="game-text location-text">[ Dark Forest - Level 40-50 Zone ] (12, 8)</p>
+                <p class="game-text system-text">The ancient trees loom overhead, blocking out most of the sunlight. You hear strange noises in the distance.</p>
+                <p class="game-text">You move north.</p>
+                <p class="game-text combat-text">A Wild Dire Wolf (Level 45) appears!</p>
+                <p class="game-text">You attack with your Legendary Shadowfang Blade!</p>
+                <p class="game-text damage-text">Critical Hit! You deal 1,247 damage!</p>
+                <p class="game-text">The Dire Wolf strikes back with its claws!</p>
+                <p class="game-text damage-text">You take 156 damage.</p>
+                <p class="game-text">You cast Fireball!</p>
+                <p class="game-text damage-text">You deal 892 fire damage!</p>
+                <p class="game-text combat-text">You have defeated the Dire Wolf!</p>
+                <p class="game-text loot-text">You gain 1,250 experience points!</p>
+                <p class="game-text loot-text">You loot: 127 gold, Wolf Pelt (x2), Health Potion</p>
+                <p class="game-text system-text">Your Sword Mastery increases! (47/100)</p>
+            </div>
+
+            <div class="action-panel">
+                <div class="quick-actions">
+                    <button class="action-btn movement">North</button>
+                    <button class="action-btn movement">South</button>
+                    <button class="action-btn movement">East</button>
+                    <button class="action-btn movement">West</button>
+                    <button class="action-btn combat">Fight</button>
+                    <button class="action-btn combat">Cast</button>
+                    <button class="action-btn special">Rest</button>
+                    <button class="action-btn special">Map</button>
+                </div>
+                <input type="text" class="command-input" placeholder="Enter command... (type /help for commands)">
+            </div>
+        </main>
+
+        <!-- Right Panel - Map & Inventory -->
+        <aside class="right-panel">
+            <div class="mini-map">
+                <div class="map-grid">
+                    <div class="map-cell"></div>
+                    <div class="map-cell npc">🏪</div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell enemy">!</div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell player">P</div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell enemy">!</div>
+                    <div class="map-cell"></div>
+                    
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell current">@</div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    
+                    <div class="map-cell"></div>
+                    <div class="map-cell npc">⛪</div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell enemy">!</div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                    <div class="map-cell"></div>
+                </div>
+            </div>
+
+            <div class="inventory-tabs">
+                <div class="tab active">Inventory</div>
+                <div class="tab">Skills</div>
+                <div class="tab">Quests</div>
+            </div>
+
+            <div class="inventory-grid">
+                <div class="inventory-slot" style="border-color: #ff9500;">⚔️</div>
+                <div class="inventory-slot" style="border-color: #0066ff;">🛡️</div>
+                <div class="inventory-slot" style="border-color: #00ff00;">🧪<span class="item-count">12</span></div>
+                <div class="inventory-slot" style="border-color: #00ff00;">🧪<span class="item-count">8</span></div>
+                <div class="inventory-slot">🥩<span class="item-count">25</span></div>
+                <div class="inventory-slot">💎</div>
+                <div class="inventory-slot">📜</div>
+                <div class="inventory-slot">🗝️<span class="item-count">3</span></div>
+                <div class="inventory-slot"></div>
+                <div class="inventory-slot"></div>
+                <div class="inventory-slot"></div>
+                <div class="inventory-slot"></div>
+                <div class="inventory-slot"></div>
+                <div class="inventory-slot"></div>
+                <div class="inventory-slot"></div>
+                <div class="inventory-slot"></div>
+                <div class="inventory-slot"></div>
+                <div class="inventory-slot"></div>
+                <div class="inventory-slot"></div>
+                <div class="inventory-slot"></div>
+            </div>
+        </aside>
+
+        <!-- Bottom Panel - Chat -->
+        <section class="bottom-panel">
+            <div class="chat-tabs">
+                <div class="tab active">All</div>
+                <div class="tab">Global</div>
+                <div class="tab">Guild</div>
+                <div class="tab">Party</div>
+                <div class="tab">Combat</div>
+            </div>
+
+            <div class="chat-messages">
+                <div class="chat-message">
+                    <span class="chat-time">[14:32]</span>
+                    <span class="chat-name global">DragonSlayer:</span>
+                    <span>Anyone want to group for Demon Tower?</span>
+                </div>
+                <div class="chat-message">
+                    <span class="chat-time">[14:33]</span>
+                    <span class="chat-name guild">[Guild] MysticMage:</span>
+                    <span>Guild raid starts in 30 minutes!</span>
+                </div>
+                <div class="chat-message">
+                    <span class="chat-time">[14:33]</span>
+                    <span class="chat-name whisper">StealthAssassin whispers:</span>
+                    <span>Hey, want to trade that legendary sword?</span>
+                </div>
+                <div class="chat-message">
+                    <span class="chat-time">[14:34]</span>
+                    <span class="chat-name system">System:</span>
+                    <span>The weekly tournament begins in 1 hour! Sign up at any arena!</span>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" placeholder="Type message...">
+                <button class="chat-send">Send</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Mobile FAB -->
+    <div class="fab-container">
+        <div class="fab-menu">
+            <button class="fab-item">📦</button>
+            <button class="fab-item">👥</button>
+            <button class="fab-item">🗺️</button>
+            <button class="fab-item">⚙️</button>
+        </div>
+        <button class="fab">≡</button>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tooltip">
+        <div class="tooltip-title">Legendary Shadowfang Blade</div>
+        <div class="tooltip-stat">Damage: 125-175</div>
+        <div class="tooltip-stat">+45 STR, +30 DEX</div>
+        <div class="tooltip-stat">15% Critical Strike Chance</div>
+        <div class="tooltip-stat">10% Life Steal</div>
+        <div class="tooltip-description">A blade forged from the essence of shadows. It whispers dark secrets to its wielder.</div>
+    </div>
+
+    <script>
+        // Simulate incoming game messages
+        function addGameMessage(text, className = '') {
+            const output = document.querySelector('.game-output');
+            const p = document.createElement('p');
+            p.className = `game-text ${className}`;
+            p.textContent = text;
+            output.appendChild(p);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Simulate chat messages
+        function addChatMessage(name, message, type = 'global') {
+            const chatMessages = document.querySelector('.chat-messages');
+            const div = document.createElement('div');
+            div.className = 'chat-message';
+            const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+            div.innerHTML = `
+                <span class="chat-time">[${time}]</span>
+                <span class="chat-name ${type}">${name}:</span>
+                <span>${message}</span>
+            `;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Handle command input
+        document.querySelector('.command-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && e.target.value.trim()) {
+                addGameMessage(`> ${e.target.value}`, 'system-text');
+                // Process command here
+                e.target.value = '';
+            }
+        });
+
+        // Handle chat input
+        document.querySelector('.chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && e.target.value.trim()) {
+                addChatMessage('You', e.target.value, 'global');
+                e.target.value = '';
+            }
+        });
+
+        // Mobile FAB toggle
+        document.querySelector('.fab').addEventListener('click', function() {
+            document.querySelector('.fab-menu').classList.toggle('active');
+        });
+
+        // Simulate combat
+        let inCombat = false;
+        document.querySelector('.action-btn.combat').addEventListener('click', () => {
+            if (!inCombat) {
+                inCombat = true;
+                addGameMessage('You search for enemies...', 'system-text');
+                setTimeout(() => {
+                    addGameMessage('A Skeleton Warrior (Level 44) appears!', 'combat-text');
+                    setTimeout(() => {
+                        addGameMessage('You attack with your Legendary Shadowfang Blade!');
+                        addGameMessage('You deal 856 damage!', 'damage-text');
+                    }, 1000);
+                }, 500);
+            }
+        });
+
+        // Add some ambient messages
+        setInterval(() => {
+            const messages = [
+                { name: 'NewPlayer123', text: 'How do I get to the bank?', type: 'global' },
+                { name: 'TraderJoe', text: 'WTS Rare Fire Gem 5k gold!', type: 'global' },
+                { name: '[Guild] LeaderName', text: 'Remember to donate to guild bank!', type: 'guild' },
+                { name: 'System', text: 'Double XP weekend starts Friday!', type: 'system' }
+            ];
+            const msg = messages[Math.floor(Math.random() * messages.length)];
+            addChatMessage(msg.name, msg.text, msg.type);
+        }, 15000);
+    </script>
+</body>
+</html>

@@ -165,12 +165,61 @@ class Database {
         item_type VARCHAR(50) NOT NULL,
         restriction_type VARCHAR(20) DEFAULT 'forbidden',
         description TEXT
+      )`,
+
+      // Phase 2.3: Character affinities table for unified affinity tracking
+      `CREATE TABLE IF NOT EXISTS character_affinities (
+        id SERIAL PRIMARY KEY,
+        character_id INTEGER REFERENCES characters(id) ON DELETE CASCADE,
+        affinity_type VARCHAR(20) NOT NULL,
+        category VARCHAR(10) NOT NULL,
+        level DECIMAL(5,2) DEFAULT 0.00,
+        total_experience DECIMAL(10,2) DEFAULT 0.00,
+        last_used TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(character_id, affinity_type, category)
       )`
     ];
 
     for (const query of queries) {
       await this.pool.query(query);
     }
+
+    // Create indices for affinity system
+    await this.pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_character_affinities_character 
+      ON character_affinities(character_id);
+    `);
+
+    await this.pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_character_affinities_type 
+      ON character_affinities(affinity_type, category);
+    `);
+
+    // Add affinity bonus columns to races table if they don't exist
+    try {
+      await this.pool.query(`
+        ALTER TABLE races 
+        ADD COLUMN IF NOT EXISTS weapon_affinity_bonus DECIMAL(3,2) DEFAULT 0.00,
+        ADD COLUMN IF NOT EXISTS magic_affinity_bonus DECIMAL(3,2) DEFAULT 0.00;
+      `);
+    } catch (error) {
+      // Columns might already exist, ignore error
+      console.log('Affinity bonus columns may already exist:', error.message);
+    }
+
+    // Add phase_name column to milestone_rewards if it doesn't exist
+    try {
+      await this.pool.query(`
+        ALTER TABLE milestone_rewards 
+        ADD COLUMN IF NOT EXISTS phase_name VARCHAR(20);
+      `);
+    } catch (error) {
+      // Column might already exist, ignore error
+      console.log('Phase name column may already exist:', error.message);
+    }
+
+    console.log('Affinity system tables initialized');
 
     // Insert default races if they don't exist
     await this.insertDefaultRaces();
@@ -197,48 +246,6 @@ class Database {
         name: 'Elf',
         description: '+15 INT/WIS, -10 STR, +20% magic affinity gain. Masters of arcane arts.',
         str_modifier: -10, int_modifier: 15, vit_modifier: 0, dex_modifier: 0, wis_modifier: 15,
-
-
-        // Phase 2.3: Affinity System Tables
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS character_affinities (
-                id SERIAL PRIMARY KEY,
-                character_id INTEGER REFERENCES characters(id) ON DELETE CASCADE,
-                affinity_type VARCHAR(20) NOT NULL, -- sword, axe, fire, ice, etc.
-                category VARCHAR(10) NOT NULL, -- 'weapons' or 'magic'
-                level DECIMAL(5,2) DEFAULT 0.00, -- 0.00 to 100.00
-                total_experience DECIMAL(10,2) DEFAULT 0.00,
-                last_used TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(character_id, affinity_type, category)
-            );
-        `);
-
-        await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_character_affinities_character 
-            ON character_affinities(character_id);
-        `);
-
-        await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_character_affinities_type 
-            ON character_affinities(affinity_type, category);
-        `);
-
-        // Add affinity bonus columns to races table
-        await client.query(`
-            ALTER TABLE races 
-            ADD COLUMN IF NOT EXISTS weapon_affinity_bonus DECIMAL(3,2) DEFAULT 0.00,
-            ADD COLUMN IF NOT EXISTS magic_affinity_bonus DECIMAL(3,2) DEFAULT 0.00;
-        `);
-
-        // Add phase_name column to milestone_rewards
-        await client.query(`
-            ALTER TABLE milestone_rewards 
-            ADD COLUMN IF NOT EXISTS phase_name VARCHAR(20);
-        `);
-
-        console.log('Affinity system tables initialized');
-
         starting_zone: 'elven_forest',
         experience_bonus: 0.0,
         magic_affinity_bonus: 0.20,
