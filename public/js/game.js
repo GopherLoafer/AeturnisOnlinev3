@@ -241,27 +241,21 @@ function updateExperience(expData) {
 }
 
 function updateExperienceBar(expData) {
-    console.log('updateExperienceBar called with:', expData);
     const expBar = document.getElementById('exp-bar');
     const expText = document.getElementById('exp-text');
     const expLabel = document.querySelector('.stat-label span:last-child');
     
     if (expBar && expData.current !== undefined && expData.required !== undefined) {
         const expPercent = Math.floor((expData.current / expData.required) * 100);
-        console.log('Experience percent calculated:', expPercent, '% (', expData.current, '/', expData.required, ')');
         expBar.style.width = `${expPercent}%`;
         
         if (expText) {
-            // Show current/required format
             expText.textContent = `${formatNumber(expData.current)}/${formatNumber(expData.required)}`;
         }
         
         if (expLabel) {
-            // Update the percentage label
             expLabel.textContent = `${expPercent}% to next`;
         }
-    } else {
-        console.log('Missing exp data or elements - expBar:', !!expBar, 'expText:', !!expText, 'current:', expData.current, 'required:', expData.required);
     }
 }
 
@@ -462,10 +456,12 @@ function initializeProgressionButtons() {
 
 // ===== Game State Refresh =====
 
+let gameStateRefreshTimeout;
 function refreshGameState() {
-    console.log('Game state refresh triggered');
-    
-    fetch('/api/game/state')
+    // Debounce rapid successive calls
+    clearTimeout(gameStateRefreshTimeout);
+    gameStateRefreshTimeout = setTimeout(() => {
+        fetch('/api/game/state')
     .then(response => {
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -478,8 +474,6 @@ function refreshGameState() {
             
             // Update character display
             if (data.character) {
-                console.log('Character data received:', data.character);
-                console.log('Stats - STR:', data.character.str_total, 'INT:', data.character.int_total, 'VIT:', data.character.vit_total);
                 updateCharacterStats(data.character);
                 
                 updateHealthMana(
@@ -490,13 +484,6 @@ function refreshGameState() {
                 updateCharacterLevel(data.character.level);
                 
                 if (data.character.experience !== undefined) {
-                    console.log('Character experience data:', {
-                        level: data.character.level,
-                        total_experience: data.character.experience,
-                        experience_progress: data.character.experience_progress,
-                        experience_to_next: data.character.experience_to_next
-                    });
-                    
                     // Use experience_progress (current level progress) instead of total experience
                     const currentProgress = data.character.experience_progress || 0;
                     const required = data.character.experience_to_next || 1000;
@@ -519,6 +506,7 @@ function refreshGameState() {
     .catch(error => {
         console.error('Game state refresh error:', error);
     });
+    }, 150); // 150ms debounce delay
 }
 
 // ===== Utility Functions =====

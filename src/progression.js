@@ -239,15 +239,7 @@ class ProgressionSystem {
         const expNeededForNext = expForNextLevel - expForCurrentLevel;
         const remainingExp = expForNextLevel - currentExperience;
         
-        // Debug logging
-        console.log('Experience Progress Debug:', {
-            currentLevel,
-            currentExperience,
-            expForCurrentLevel,
-            expForNextLevel,
-            currentLevelProgress,
-            expNeededForNext
-        });
+        // Debug logging (removed for performance)
         
         return {
             currentLevel,

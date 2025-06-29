@@ -910,13 +910,13 @@
         <!-- Right Panel - Tabs -->
         <aside class="right-panel">
             <div class="panel-tabs">
-                <button class="tab active" onclick="switchTab('inventory')">Inventory</button>
-                <button class="tab" onclick="switchTab('abilities')">Abilities</button>
-                <button class="tab" onclick="switchTab('progress')">Progress</button>
+                <button class="tab-button active" onclick="switchTab('inventory')">Inventory</button>
+                <button class="tab-button" onclick="switchTab('abilities')">Abilities</button>
+                <button class="tab-button" onclick="switchTab('progress')">Progress</button>
             </div>
 
             <!-- Inventory Tab -->
-            <div id="inventory-tab" class="tab-content active">
+            <div id="inventory" class="tab-content active">
                 <div class="inventory-grid">
                     <div class="inventory-slot filled">⚔️</div>
                     <div class="inventory-slot filled">🛡️</div>
@@ -942,7 +942,7 @@
             </div>
 
             <!-- Abilities Tab -->
-            <div id="abilities-tab" class="tab-content">
+            <div id="abilities" class="tab-content">
                 <h4 style="color: #FFD700; margin-bottom: 15px;">Race Abilities</h4>
                 <div id="race-abilities">
                     <div class="loading">Loading abilities...</div>
@@ -950,7 +950,7 @@
             </div>
 
             <!-- Progress Tab -->
-            <div id="progress-tab" class="tab-content">
+            <div id="progress" class="tab-content">
                 <div class="progress-section">
                     <h4>Character Progression</h4>
                     <div class="progress-buttons">

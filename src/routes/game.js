@@ -286,13 +286,7 @@ router.get('/state', requireCharacter, async (req, res) => {
     character.dex_total = character.dex_base || 10;
     character.wis_total = character.wis_base || 10;
 
-    // Log for debugging
-    console.log('Game state API - character data:', {
-      level: character.level,
-      experience: character.experience,
-      experienceToNext: progressionInfo.experienceToNext,
-      currentLevelProgress: progressionInfo.currentLevelProgress
-    });
+    // Character data prepared for frontend
 
     res.json({
       success: true,
