@@ -191,8 +191,14 @@ router.get('/character-creation-wizard', async (req, res) => {
       : (session.session_data || {});
     const stepConfig = characterCreationService.getStep(step);
     
-    // Get data needed for current step
-    let stepData = { sessionData };
+    // Get data needed for all steps (initialize with defaults)
+    let stepData = { 
+      sessionData,
+      races: [],
+      backgrounds: [],
+      tutorialQuests: [],
+      isFirstCharacter: false
+    };
     
     if (step >= 2) {
       // Get races for step 2+
