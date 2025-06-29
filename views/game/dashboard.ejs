@@ -1,17 +1,16 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="theme-color" content="#0f1419">
-    
+
     <!-- Performance optimizations -->
     <meta name="color-scheme" content="dark">
     <meta name="format-detection" content="telephone=no">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    
+
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="/manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
@@ -24,7 +23,7 @@
     <!-- Microsoft Tiles -->
     <meta name="msapplication-TileColor" content="#10b981">
     <meta name="msapplication-TileImage" content="/images/icon-192.png">
-    
+
     <title>Aeturnis Online - <%= character.name %></title>
     <link rel="stylesheet" href="/css/responsive-base.css">
     <link rel="stylesheet" href="/css/utilities.css">
@@ -190,7 +189,7 @@
             .game-title {
                 font-size: var(--font-lg);
             }
-            
+
             .server-metrics {
                 display: none; /* Hide on mobile to save space */
             }
@@ -208,27 +207,27 @@
                 transition: transform 0.3s cubic-bezier(0.23, 1, 0.320, 1);
                 overscroll-behavior: contain;
             }
-            
+
             .left-panel {
                 left: 0;
                 transform: translateX(-100%);
             }
-            
+
             .right-panel {
                 right: 0;
                 transform: translateX(100%);
             }
-            
+
             .left-panel.active {
                 transform: translateX(0);
                 box-shadow: 2px 0 25px rgba(0, 0, 0, 0.5);
             }
-            
+
             .right-panel.active {
                 transform: translateX(0);
                 box-shadow: -2px 0 25px rgba(0, 0, 0, 0.5);
             }
-            
+
             .mobile-overlay {
                 position: fixed;
                 top: 0;
@@ -241,18 +240,18 @@
                 transition: opacity 0.3s ease;
                 z-index: 999;
             }
-            
+
             .mobile-overlay.active {
                 opacity: 1;
                 visibility: visible;
             }
-            
+
             .mobile-nav-buttons {
                 display: flex;
                 gap: 10px;
                 margin-left: auto;
             }
-            
+
             .nav-btn {
                 background: rgba(255, 255, 255, 0.1);
                 border: 1px solid rgba(255, 255, 255, 0.2);
@@ -266,7 +265,7 @@
                 cursor: pointer;
                 transition: all 0.2s ease;
             }
-            
+
             .nav-btn:active {
                 transform: scale(0.95);
             }
@@ -278,7 +277,7 @@
                 position: static;
                 transform: none !important;
             }
-            
+
             .mobile-nav-buttons, .mobile-overlay {
                 display: none !important;
             }
@@ -944,7 +943,7 @@
                 grid-template-columns: repeat(2, 1fr);
                 gap: var(--spacing-xs);
             }
-            
+
             .action-btn {
                 font-size: var(--font-xs);
                 padding: 8px;
@@ -1210,7 +1209,7 @@
             line-height: 1.2;
             z-index: 2;
         }
-        
+
         @media (max-width: 479px) {
             .item-count {
                 font-size: 8px;
@@ -1320,12 +1319,12 @@
                 border-right: none;
                 border-bottom: none;
             }
-            
+
             .chat-panel.expanded {
                 height: 60vh;
                 max-height: 500px;
             }
-            
+
             /* Hide tabs and messages when collapsed */
             .chat-panel:not(.expanded) .chat-tabs,
             .chat-panel:not(.expanded) .chat-messages,
@@ -1351,20 +1350,20 @@
                 min-height: 44px;
                 border-bottom: 1px solid rgba(236, 72, 153, 0.2);
             }
-            
+
             .chat-title {
                 font-size: var(--font-sm);
                 font-weight: 600;
                 color: #e2e8f0;
             }
-            
+
             .chat-expand-icon {
                 font-size: var(--font-lg);
                 color: rgba(236, 72, 153, 0.8);
                 transition: transform 0.3s ease;
                 line-height: 1;
             }
-            
+
             .chat-panel.expanded .chat-expand-icon {
                 transform: rotate(180deg);
             }
@@ -1405,7 +1404,7 @@
             .chat-tabs {
                 border-radius: 0;
             }
-            
+
             .chat-tab {
                 font-size: clamp(10px, 2.5vw, 12px);
                 padding: var(--spacing-xs) var(--spacing-xs);
@@ -1485,7 +1484,7 @@
                 padding: var(--spacing-xs) var(--spacing-sm);
                 gap: var(--spacing-xs);
             }
-            
+
             .chat-input {
                 font-size: clamp(14px, 3.5vw, 16px);
                 padding: 12px var(--spacing-sm);
@@ -1780,7 +1779,7 @@
             justify-content: center;
             flex-wrap: wrap;
         }
-        
+
         /* Combat Styles */
         .combat-status {
             background: rgba(50, 0, 0, 0.5);
@@ -1789,23 +1788,23 @@
             margin-bottom: 10px;
             border-radius: 4px;
         }
-        
+
         .combat-header {
             color: #ff6666 !important;
             font-weight: bold;
             margin-bottom: 10px;
         }
-        
+
         .combat-health {
             display: flex;
             justify-content: space-between;
             margin-top: 5px;
         }
-        
+
         .enemy-text {
             color: #ff6666 !important;
         }
-        
+
         .monster-info {
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid #333;
@@ -1813,54 +1812,54 @@
             margin: 5px 0;
             border-radius: 4px;
         }
-        
+
         .monster-info .action-btn {
             float: right;
             padding: 4px 8px;
             font-size: 12px;
         }
-        
+
         .combat-action {
             margin: 5px 0;
         }
-        
+
         .victory-text {
             color: #FFD700 !important;
             font-weight: bold;
         }
-        
+
         .defeat-text {
             color: #ff0000 !important;
             font-weight: bold;
         }
-        
+
         .flee-text {
             color: #cccccc !important;
             font-style: italic;
         }
-        
+
         .defend-text {
             color: #0099ff !important;
         }
-        
+
         .spell-text {
             color: #9966ff !important;
         }
-        
+
         .miss-text {
             color: #999999 !important;
             font-style: italic;
         }
-        
+
         .action-btn.combat:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        
+
         .action-btn.defend {
             background: linear-gradient(135deg, #0066cc, #003366);
         }
-        
+
         .action-btn.flee {
             background: linear-gradient(135deg, #666666, #333333);
         }
@@ -1946,7 +1945,7 @@
             padding: 20px;
         }
     </style>
-    
+
     <!-- Service Worker Registration -->
     <script>
     if ('serviceWorker' in navigator) {
@@ -2169,7 +2168,7 @@
                 <div class="tile-content">
                     <div class="location-name">Darkwood Forest - Northern Path</div>
                     <div class="location-description">Ancient trees tower above, their branches forming a natural canopy that blocks most sunlight. The forest floor is covered in moss and fallen leaves.</div>
-                    
+
                     <!-- Special Tile (Shop/Temple) -->
                     <div class="special-tile">
                         <div class="special-tile-name">🏪 Mystic Merchant's Stall</div>
@@ -2198,7 +2197,7 @@
                     <div class="map-cell enemy">!</div>
                     <div class="map-cell"></div>
                     <div class="map-cell"></div>
-                    
+
                     <!-- Row 2 -->
                     <div class="map-cell"></div>
                     <div class="map-cell"></div>
@@ -2206,7 +2205,7 @@
                     <div class="map-cell"></div>
                     <div class="map-cell treasure">💎</div>
                     <div class="map-cell"></div>
-                    
+
                     <!-- Row 3 -->
                     <div class="map-cell"></div>
                     <div class="map-cell" onclick="move('west')">←</div>
@@ -2214,7 +2213,7 @@
                     <div class="map-cell" onclick="move('east')">→</div>
                     <div class="map-cell"></div>
                     <div class="map-cell water">🌊</div>
-                    
+
                     <!-- Row 4 -->
                     <div class="map-cell"></div>
                     <div class="map-cell"></div>
@@ -2222,7 +2221,7 @@
                     <div class="map-cell"></div>
                     <div class="map-cell obstacle">🗿</div>
                     <div class="map-cell"></div>
-                    
+
                     <!-- Row 5 -->
                     <div class="map-cell danger">⚠️</div>
                     <div class="map-cell"></div>
@@ -2230,7 +2229,7 @@
                     <div class="map-cell exit">🚪</div>
                     <div class="map-cell"></div>
                     <div class="map-cell resource">🌳</div>
-                    
+
                     <!-- Row 6 -->
                     <div class="map-cell"></div>
                     <div class="map-cell hidden">?</div>
@@ -2348,7 +2347,7 @@
                 <span class="chat-title">Chat</span>
                 <span class="chat-expand-icon">▲</span>
             </div>
-            
+
             <div class="chat-tabs">
                 <button class="chat-tab active" data-channel="all">All</button>
                 <button class="chat-tab" data-channel="global">Global</button>
@@ -2387,7 +2386,7 @@
         function sendChatMessage() {
             const chatInput = document.getElementById('chat-input');
             const message = chatInput.value.trim();
-            
+
             if (message) {
                 // Add message to chat (in real implementation, this would go through the server)
                 addChatMessage('You', message, 'global');
@@ -2414,12 +2413,12 @@
             messageElement.className = 'game-text';
             messageElement.innerHTML = message;
             gameOutput.appendChild(messageElement);
-            
+
             // Scroll only the game output container, not the page
             setTimeout(() => {
                 gameOutput.scrollTop = gameOutput.scrollHeight;
             }, 0);
-            
+
             // Keep only last 50 messages for performance
             while (gameOutput.children.length > 50) {
                 gameOutput.removeChild(gameOutput.firstChild);
@@ -2450,7 +2449,7 @@
             try {
                 const response = await fetch('/api/abilities/race-abilities/<%= character.id %>');
                 const data = await response.json();
-                
+
                 const abilitiesContainer = document.getElementById('race-abilities');
                 if (data.success && data.abilities && data.abilities.length > 0) {
                     abilitiesContainer.innerHTML = data.abilities.map(ability => `
@@ -2484,7 +2483,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ability_name: abilityName })
                 });
-                
+
                 const data = await response.json();
                 if (data.success) {
                     updateGameText(`<span class="heal-text">Used ability: ${abilityName}. ${data.message}</span>`);
@@ -2522,7 +2521,7 @@
         document.addEventListener('click', function(event) {
             const settingsDropdown = document.querySelector('.settings-dropdown');
             const dropdown = document.getElementById('settings-dropdown');
-            
+
             if (settingsDropdown && !settingsDropdown.contains(event.target)) {
                 dropdown.classList.remove('show');
             }
@@ -2566,7 +2565,7 @@
             window.scrollTo(0, 0);
             document.body.scrollTop = 0;
             document.documentElement.scrollTop = 0;
-            
+
             // Disable any automatic scrolling behavior
             document.body.style.overflow = 'hidden';
             document.documentElement.style.overflow = 'hidden';
@@ -2595,17 +2594,17 @@
     <script src="/js/responsive-images.js"></script>
     <script src="/js/mobile-navigation.js"></script>
     <script src="/js/mobile-game-features.js"></script>
-    
+
     <!-- Mobile Navigation Initialization -->
     <script>
     // Initialize mobile features when DOM is ready
     (function() {
         let mobileNav = null;
         let chatHandler = null;
-        
+
         function initializeMobileFeatures() {
             const isMobile = window.innerWidth < 1024;
-            
+
             if (isMobile) {
                 // Initialize mobile navigation if not already done
                 if (!mobileNav && typeof MobileNavigation !== 'undefined') {
@@ -2613,35 +2612,35 @@
                     window.mobileNav = mobileNav;
                 }
             }
-            
+
             // Initialize chat handler for ALL screen sizes
             if (!chatHandler && typeof ChatHandler !== 'undefined') {
                 chatHandler = new ChatHandler();
                 window.chatHandler = chatHandler;
             }
         }
-        
+
         // Run on DOM ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initializeMobileFeatures);
         } else {
             initializeMobileFeatures();
         }
-        
+
         // Handle resize events with debouncing
         let resizeTimer;
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(initializeMobileFeatures, 250);
         });
-        
+
         // Prevent zoom on input focus (iOS fix)
         document.addEventListener('touchstart', function(e) {
             if (e.touches.length > 1) {
                 e.preventDefault();
             }
         });
-        
+
         // Fix iOS viewport issues
         const viewport = document.querySelector('meta[name="viewport"]');
         if (viewport) {

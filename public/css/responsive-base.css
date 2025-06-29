@@ -37,6 +37,38 @@
     --glass-border: rgba(59, 130, 246, 0.3);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     --glass-blur: blur(20px);
+    
+    /* Fluid Typography */
+    --font-xs: clamp(0.75rem, 1.5vw, 0.875rem);
+    --font-sm: clamp(0.875rem, 2vw, 1rem);
+    --font-base: clamp(1rem, 2.5vw, 1.125rem);
+    --font-lg: clamp(1.125rem, 3vw, 1.5rem);
+    --font-xl: clamp(1.5rem, 4vw, 2rem);
+    --font-2xl: clamp(2rem, 5vw, 3rem);
+    --font-title: clamp(2.5rem, 8vw, 4rem);
+    
+    /* Breakpoints */
+    --mobile: 480px;
+    --tablet: 768px;
+    --desktop: 1024px;
+    --wide: 1440px;
+    
+    /* Modern Color Palette */
+    --primary-green: #10b981;
+    --primary-blue: #3b82f6;
+    --primary-purple: #8b5cf6;
+    --accent-gold: #fbbf24;
+    --danger: #ef4444;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --bg-dark: #0f1419;
+    --bg-darker: #1a1f2e;
+    
+    /* Glass Morphism */
+    --glass-bg: rgba(15, 20, 25, 0.95);
+    --glass-border: rgba(59, 130, 246, 0.3);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --glass-blur: blur(20px);
 }
 
 /* Responsive Reset */
@@ -310,11 +342,115 @@ img[data-src].loaded {
     }
 }
 
+/* Emergency Mobile Fixes */
+@media (max-width: 480px) {
+    /* Fix game container overflow */
+    .game-container {
+        grid-template-rows: 50px 1fr 100px !important;
+        grid-template-columns: 1fr !important;
+        padding: 5px !important;
+        gap: 5px !important;
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+    
+    /* Fix header spacing */
+    .header {
+        padding: 0 10px !important;
+        gap: 8px;
+    }
+    
+    .game-title {
+        font-size: clamp(1rem, 4vw, 1.5rem) !important;
+    }
+    
+    /* Reduce map grid for mobile */
+    .map-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        grid-template-rows: repeat(4, 1fr) !important;
+        font-size: 14px !important;
+        gap: 2px !important;
+    }
+    
+    /* Compress chat panel */
+    .chat-panel {
+        grid-row: 3;
+        height: 100px !important;
+        max-height: 100px !important;
+    }
+    
+    .chat-messages {
+        height: 40px !important;
+        font-size: 11px !important;
+    }
+    
+    /* Hide non-essential elements */
+    .server-metrics,
+    .settings-dropdown {
+        display: none !important;
+    }
+}
+
+/* Tablet adjustments */
+@media (min-width: 481px) and (max-width: 768px) {
+    .game-container {
+        grid-template-columns: 200px 1fr !important;
+        padding: 10px !important;
+    }
+    
+    .left-panel {
+        width: 200px !important;
+    }
+}
+
 /* Prevent horizontal scroll on all mobile devices */
 @media (max-width: 1024px) {
     html, body {
         overflow-x: hidden !important;
         max-width: 100vw !important;
+    }
+    
+    /* Ensure minimum touch target sizes */
+    .action-btn,
+    .move-btn,
+    .chat-send,
+    .tab-button,
+    .nav-btn,
+    .inventory-slot,
+    .equipment-slot,
+    button,
+    a[role="button"] {
+        min-width: 44px !important;
+        min-height: 44px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        touch-action: manipulation;
+    }
+    
+    /* Add touch feedback */
+    @media (hover: none) {
+        button:active,
+        .btn:active,
+        .action-btn:active,
+        .inventory-slot:active,
+        .equipment-slot:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+            transition: transform 0.1s ease;
+        }
+    }
+}
+
+/* Fix iOS zoom on input focus */
+@media (max-width: 768px) {
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="number"],
+    textarea,
+    select {
+        font-size: 16px !important;
     }
 }
 
@@ -516,6 +652,105 @@ img[data-src].loaded {
 }
 
 /* Step 8: Chat Resize Indicator Styles */
+/* Universal Chat System - Works on all screen sizes */
+.chat-panel {
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
+}
+
+/* Chat header with expand button */
+.chat-header {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 15;
+    padding: 8px;
+}
+
+.chat-expand-btn {
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    color: #3b82f6;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.chat-expand-btn:hover {
+    background: rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile-specific chat expansion */
+@media (max-width: 768px) {
+    .chat-panel.expanded {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60vh !important;
+        max-height: 400px;
+        z-index: 1100;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+        animation: slideUp 0.3s ease;
+    }
+    
+    .expand-text {
+        display: none;
+    }
+    
+    @media (min-width: 480px) {
+        .expand-text {
+            display: inline;
+            margin-left: 4px;
+        }
+    }
+    
+    .main-panel.chat-expanded {
+        margin-bottom: 60vh;
+    }
+    
+    body.chat-modal-open {
+        overflow: hidden;
+    }
+}
+
+/* Desktop chat expansion */
+@media (min-width: 1024px) {
+    .chat-panel.expanded {
+        height: 400px !important;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    .chat-expand-btn .expand-text {
+        display: inline;
+    }
+    
+    .main-panel {
+        transition: margin-bottom 0.3s ease;
+    }
+    
+    .main-panel.chat-expanded {
+        margin-bottom: 200px;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
 /* Chat resize indicator */
 .chat-collapse-indicator {
     position: absolute;

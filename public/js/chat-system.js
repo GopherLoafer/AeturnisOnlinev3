@@ -1,3 +1,4 @@
+
 /**
  * Enhanced Chat System for all screen sizes
  */
