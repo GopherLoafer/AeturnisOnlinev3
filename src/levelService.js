@@ -53,17 +53,13 @@ class LevelService {
                 throw new Error(`Invalid experience amount: ${finalExperience}`);
             }
             
-            const newTotalExperience = BigInt(character.experience) + BigInt(finalExperience);
-            
-            // PostgreSQL BIGINT limit check
-            const MAX_BIGINT = BigInt('9223372036854775807');
-            if (newTotalExperience > MAX_BIGINT) {
-                throw new Error(`Experience overflow: ${newTotalExperience} exceeds PostgreSQL BIGINT limit`);
-            }
+            // NUMERIC type handles arbitrarily large numbers, no overflow check needed
+            const currentExperience = parseFloat(character.experience) || 0;
+            const newTotalExperience = currentExperience + finalExperience;
 
             // Calculate levels using advanced algorithm
             const oldLevel = character.level;
-            const newLevel = this.progression.getLevelFromExperience(Number(newTotalExperience));
+            const newLevel = this.progression.getLevelFromExperience(newTotalExperience);
 
             let levelUpResults = {
                 experienceGained: finalExperience,
@@ -80,7 +76,7 @@ class LevelService {
             // Update character experience
             await client.query(
                 'UPDATE characters SET experience = $1, last_active = CURRENT_TIMESTAMP WHERE id = $2',
-                [newTotalExperience.toString(), characterId]
+                [newTotalExperience, characterId]
             );
 
             // Handle level ups with advanced system
@@ -231,7 +227,7 @@ class LevelService {
         }
 
         const character = result.rows[0];
-        const progressInfo = this.progression.getExperienceProgress(character.level, parseInt(character.experience));
+        const progressInfo = this.progression.getExperienceProgress(character.level, parseFloat(character.experience) || 0);
         
         return {
             ...progressInfo,

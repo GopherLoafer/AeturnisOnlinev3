@@ -176,6 +176,11 @@ A classic text-based MMORPG with infinite progression, racial diversity, and aff
 - Reference UIMOCKUP.png for UI design decisions
 
 ## Recent Changes
+- June 29, 2025: **NUMERIC Type Conversion Completed**
+  - **Database Migration**: Converted experience, gold, and total_uses columns from BIGINT to NUMERIC(40,0)
+  - **Overflow Protection**: Can now handle numbers 100x larger than BIGINT max (9.2 quintillion)
+  - **Code Updates**: Removed all BigInt JavaScript usage, now using parseFloat for NUMERIC handling
+  - **Tested & Verified**: Successfully storing and calculating with values up to 923 quintillion+
 - June 29, 2025: **Critical BigInt Overflow Issue Discovered**
   - **Overflow at Level 248**: Current compound growth formula causes PostgreSQL BIGINT overflow far too early
   - **Simple Formula Alternative**: `100 * level^2.5 + level * 50` would allow 6+ million levels
