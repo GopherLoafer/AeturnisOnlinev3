@@ -286,6 +286,57 @@ body {
     font-size: 0.9rem;
 }
 
+/* Condensed race info layout */
+.race-info {
+    margin-top: 0.75rem;
+}
+
+.stats-row, .bonuses-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+}
+
+.stat-mod {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    color: #00ff41;
+    border: 1px solid #333;
+    min-width: 3.5rem;
+    text-align: center;
+}
+
+.bonus {
+    background: rgba(0, 50, 100, 0.3);
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    color: #66ccff;
+    border: 1px solid #4a90e2;
+}
+
+.ability {
+    background: rgba(100, 0, 50, 0.3);
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    color: #ff6699;
+    border: 1px solid #e24a90;
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.starting-zone {
+    font-size: 0.7rem;
+    color: #888;
+    margin-top: 0.25rem;
+    text-transform: capitalize;
+}
+
+/* Legacy support for old class names */
 .race-stats {
     margin-bottom: 1rem;
 }

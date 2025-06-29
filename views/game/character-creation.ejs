@@ -33,40 +33,35 @@
                             <h3><%= race.name %></h3>
                             <p class="race-description"><%= race.description %></p>
                             
-                            <div class="race-stats">
-                                <h4>Stat Modifiers</h4>
-                                <div class="stat-modifier">STR: <%= race.str_modifier >= 0 ? '+' : '' %><%= race.str_modifier %></div>
-                                <div class="stat-modifier">INT: <%= race.int_modifier >= 0 ? '+' : '' %><%= race.int_modifier %></div>
-                                <div class="stat-modifier">VIT: <%= race.vit_modifier >= 0 ? '+' : '' %><%= race.vit_modifier %></div>
-                                <div class="stat-modifier">DEX: <%= race.dex_modifier >= 0 ? '+' : '' %><%= race.dex_modifier %></div>
-                                <div class="stat-modifier">WIS: <%= race.wis_modifier >= 0 ? '+' : '' %><%= race.wis_modifier %></div>
-                            </div>
-
-                            <div class="race-bonuses">
-                                <h4>Racial Bonuses</h4>
-                                <% if (race.experience_bonus && race.experience_bonus !== 0) { %>
-                                <div class="bonus-item">EXP: <%= race.experience_bonus >= 0 ? '+' : '' %><%= (race.experience_bonus * 100).toFixed(0) %>%</div>
-                                <% } %>
-                                <% if (race.magic_affinity_bonus && race.magic_affinity_bonus !== 0) { %>
-                                <div class="bonus-item">Magic Affinity: +<%= (race.magic_affinity_bonus * 100).toFixed(0) %>%</div>
-                                <% } %>
-                                <% if (race.weapon_affinity_bonus && race.weapon_affinity_bonus !== 0) { %>
-                                <div class="bonus-item">Weapon Affinity: +<%= (race.weapon_affinity_bonus * 100).toFixed(0) %>%</div>
-                                <% } %>
-                                <% if (race.regeneration_modifier && race.regeneration_modifier !== 1.0) { %>
-                                <div class="bonus-item">Regeneration: <%= (race.regeneration_modifier * 100).toFixed(0) %>%</div>
-                                <% } %>
-                            </div>
-
-                            <div class="race-abilities">
-                                <h4>Special Abilities</h4>
-                                <div class="ability-item">
-                                    <strong><%= race.special_ability ? race.special_ability.replace('_', ' ').toUpperCase() : 'NONE' %></strong>
+                            <div class="race-info">
+                                <!-- Stats Row -->
+                                <div class="stats-row">
+                                    <span class="stat-mod">STR: <%= race.str_modifier >= 0 ? '+' : '' %><%= race.str_modifier %></span>
+                                    <span class="stat-mod">INT: <%= race.int_modifier >= 0 ? '+' : '' %><%= race.int_modifier %></span>
+                                    <span class="stat-mod">VIT: <%= race.vit_modifier >= 0 ? '+' : '' %><%= race.vit_modifier %></span>
+                                    <span class="stat-mod">DEX: <%= race.dex_modifier >= 0 ? '+' : '' %><%= race.dex_modifier %></span>
+                                    <span class="stat-mod">WIS: <%= race.wis_modifier >= 0 ? '+' : '' %><%= race.wis_modifier %></span>
                                 </div>
-                            </div>
-                            
-                            <div class="starting-zone">
-                                <small>Starting Zone: <%= race.starting_zone.replace('_', ' ').toUpperCase() %></small>
+                                
+                                <!-- Bonuses Row -->
+                                <div class="bonuses-row">
+                                    <% if (race.experience_bonus && Math.abs(race.experience_bonus) > 0) { %>
+                                        <span class="bonus">EXP: <%= race.experience_bonus >= 0 ? '+' : '' %><%= Math.round(race.experience_bonus * 100) %>%</span>
+                                    <% } %>
+                                    <% if (race.magic_affinity_bonus && Math.abs(race.magic_affinity_bonus) > 0) { %>
+                                        <span class="bonus">Magic: +<%= Math.round(race.magic_affinity_bonus * 100) %>%</span>
+                                    <% } %>
+                                    <% if (race.weapon_affinity_bonus && Math.abs(race.weapon_affinity_bonus) > 0) { %>
+                                        <span class="bonus">Weapon: +<%= Math.round(race.weapon_affinity_bonus * 100) %>%</span>
+                                    <% } %>
+                                    <% if (race.special_ability) { %>
+                                        <span class="ability"><%= race.special_ability.replace(/_/g, ' ') %></span>
+                                    <% } %>
+                                </div>
+                                
+                                <div class="starting-zone">
+                                    <%= race.starting_zone.replace(/_/g, ' ').toUpperCase() %>
+                                </div>
                             </div>
                         </label>
                     </div>
