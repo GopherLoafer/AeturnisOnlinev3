@@ -179,6 +179,13 @@ A classic text-based MMORPG with infinite progression, racial diversity, and aff
 - Reference UIMOCKUP.png for UI design decisions
 
 ## Recent Changes
+- June 29, 2025: **Mobile Service Worker Redirect Error Fixed**
+  - **Service Worker v2**: Intelligent caching strategy prevents auth route conflicts
+  - **Redirect error resolved**: Added SKIP_CACHE_URLS for dynamic routes (/auth/, /game/, /admin/, /api/)
+  - **Static asset caching**: Only cache CSS/JS files to avoid authentication issues
+  - **Immediate activation**: skipWaiting() and clients.claim() for instant updates
+  - **Low FPS optimization**: Enhanced monitoring with automatic performance mode activation
+  - **Console spam reduced**: FPS warnings only after 3 consecutive seconds of poor performance
 - June 29, 2025: **Critical Performance Issues Fixed**
   - **Service Worker registration fixed**: Created service-worker.js with PWA caching for offline functionality
   - **Performance CSS integrated**: Added performance.css to dashboard template for mobile optimization

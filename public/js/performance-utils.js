@@ -59,6 +59,7 @@ class PerformanceManager {
     setupFPSMonitoring() {
         let lastTime = performance.now();
         let frameCount = 0;
+        let lowFpsCount = 0;
         
         const measureFPS = () => {
             const currentTime = performance.now();
@@ -68,7 +69,15 @@ class PerformanceManager {
                 const fps = Math.round(frameCount * 1000 / (currentTime - lastTime));
                 
                 if (fps < this.fpsThreshold) {
-                    this.throttledWarn(`Low FPS detected: ${fps}`);
+                    lowFpsCount++;
+                    // Only warn after consistent low FPS (3 consecutive seconds)
+                    if (lowFpsCount >= 3) {
+                        this.throttledWarn(`Low FPS detected: ${fps}`);
+                        this.optimizeForLowFPS();
+                        lowFpsCount = 0; // Reset counter after optimization
+                    }
+                } else {
+                    lowFpsCount = 0; // Reset if FPS improves
                 }
                 
                 frameCount = 0;
@@ -79,6 +88,23 @@ class PerformanceManager {
         };
         
         requestAnimationFrame(measureFPS);
+    }
+    
+    optimizeForLowFPS() {
+        // Reduce animation quality on low FPS
+        document.documentElement.classList.add('low-fps-mode');
+        
+        // Disable non-essential animations
+        const animations = document.querySelectorAll('.animated, .shimmer, .pulse');
+        animations.forEach(el => {
+            el.style.animationDuration = '0.1s';
+        });
+        
+        // Reduce update frequency
+        if (window.refreshGameState) {
+            clearInterval(window.gameStateRefreshInterval);
+            window.gameStateRefreshInterval = setInterval(window.refreshGameState, 300000); // 5 minutes
+        }
     }
     
     performMemoryCleanup() {

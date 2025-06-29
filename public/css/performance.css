@@ -99,3 +99,26 @@ img.loaded {
         background-position: 200% 0;
     }
 }
+
+/* Low FPS mode optimizations */
+.low-fps-mode {
+    /* Disable expensive effects */
+    .shimmer,
+    .pulse,
+    .glow,
+    .animated {
+        animation: none !important;
+        transition: none !important;
+    }
+    
+    /* Simplify backgrounds */
+    body {
+        background: var(--bg-dark) !important;
+    }
+    
+    /* Reduce rendering complexity */
+    * {
+        backdrop-filter: none !important;
+        box-shadow: none !important;
+    }
+}
