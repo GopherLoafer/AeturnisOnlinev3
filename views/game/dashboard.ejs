@@ -786,8 +786,8 @@
                             <span><%= character.health_current %>/<%= character.health_max %></span>
                         </div>
                         <div class="bar-container">
-                            <div class="bar-fill hp-bar" style="width: <%= (character.health_current / character.health_max * 100) %>%"></div>
-                            <div class="bar-text"><%= Math.round((character.health_current / character.health_max * 100)) %>%</div>
+                            <div class="bar-fill hp-bar" id="health-bar" style="width: <%= (character.health_current / character.health_max * 100) %>%"></div>
+                            <div class="bar-text" id="health-text"><%= Math.round((character.health_current / character.health_max * 100)) %>%</div>
                         </div>
                     </div>
                     <div class="stat-bar">
@@ -796,8 +796,8 @@
                             <span><%= character.mana_current %>/<%= character.mana_max %></span>
                         </div>
                         <div class="bar-container">
-                            <div class="bar-fill mp-bar" style="width: <%= (character.mana_current / character.mana_max * 100) %>%"></div>
-                            <div class="bar-text"><%= Math.round((character.mana_current / character.mana_max * 100)) %>%</div>
+                            <div class="bar-fill mp-bar" id="mana-bar" style="width: <%= (character.mana_current / character.mana_max * 100) %>%"></div>
+                            <div class="bar-text" id="mana-text"><%= Math.round((character.mana_current / character.mana_max * 100)) %>%</div>
                         </div>
                     </div>
                     <div class="stat-bar">

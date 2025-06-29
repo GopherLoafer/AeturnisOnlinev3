@@ -416,8 +416,8 @@ function gainExperience(amount) {
     .then(data => {
         console.log('Response data:', data);
         if (data.success) {
-            const expGained = data.data?.experienceGained || amount;
-            addProgressionMessage(`Gained ${expGained} experience!`, 'success');
+            const expGained = parseInt(data.data?.experienceGained || amount);
+            addProgressionMessage(`Gained ${formatNumber(expGained)} experience!`, 'success');
             
             if (data.data?.leveledUp) {
                 addProgressionMessage(`Level up! Now level ${data.data.newLevel}!`, 'level-up');
