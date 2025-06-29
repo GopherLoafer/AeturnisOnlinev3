@@ -4,9 +4,7 @@
  * Handles weapon and magic affinity progression with usage-based tracking
  */
 
-const { query } = require('./database');
-
-const { query } = require('./database');
+const database = require('./database');
 
 class AffinityService {
   constructor() {
@@ -48,7 +46,7 @@ class AffinityService {
    */
   async getWeaponAffinities(characterId) {
     try {
-      const result = await query(
+      const result = await database.query(
         'SELECT weapon_type, affinity_percentage FROM weapon_affinities WHERE character_id = $1',
         [characterId]
       );
@@ -71,7 +69,7 @@ class AffinityService {
    */
   async getMagicAffinities(characterId) {
     try {
-      const result = await query(
+      const result = await database.query(
         'SELECT magic_school, affinity_percentage FROM magic_affinities WHERE character_id = $1',
         [characterId]
       );
@@ -99,7 +97,7 @@ class AffinityService {
       }
 
       // Get character race for bonuses
-      const raceResult = await query(
+      const raceResult = await database.query(
         'SELECT race FROM characters WHERE id = $1',
         [characterId]
       );
@@ -119,7 +117,7 @@ class AffinityService {
       }
       
       // Get current affinity
-      const currentResult = await query(
+      const currentResult = await database.query(
         'SELECT affinity_percentage FROM weapon_affinities WHERE character_id = $1 AND weapon_type = $2',
         [characterId, weaponType]
       );
@@ -138,12 +136,12 @@ class AffinityService {
 
       // Update or insert affinity
       if (currentResult.rows.length > 0) {
-        await query(
+        await database.query(
           'UPDATE weapon_affinities SET affinity_percentage = $1, last_used = NOW() WHERE character_id = $2 AND weapon_type = $3',
           [newAffinity, characterId, weaponType]
         );
       } else {
-        await query(
+        await database.query(
           'INSERT INTO weapon_affinities (character_id, weapon_type, affinity_percentage, last_used) VALUES ($1, $2, $3, NOW())',
           [characterId, weaponType, newAffinity]
         );
@@ -173,7 +171,7 @@ class AffinityService {
       }
 
       // Get character race for bonuses
-      const raceResult = await query(
+      const raceResult = await database.query(
         'SELECT race FROM characters WHERE id = $1',
         [characterId]
       );
@@ -201,7 +199,7 @@ class AffinityService {
       }
       
       // Get current affinity
-      const currentResult = await query(
+      const currentResult = await database.query(
         'SELECT affinity_percentage FROM magic_affinities WHERE character_id = $1 AND magic_school = $2',
         [characterId, magicSchool]
       );
@@ -220,12 +218,12 @@ class AffinityService {
 
       // Update or insert affinity
       if (currentResult.rows.length > 0) {
-        await query(
+        await database.query(
           'UPDATE magic_affinities SET affinity_percentage = $1, last_used = NOW() WHERE character_id = $2 AND magic_school = $3',
           [newAffinity, characterId, magicSchool]
         );
       } else {
-        await query(
+        await database.query(
           'INSERT INTO magic_affinities (character_id, magic_school, affinity_percentage, last_used) VALUES ($1, $2, $3, NOW())',
           [characterId, magicSchool, newAffinity]
         );
@@ -318,14 +316,14 @@ class AffinityService {
       lastWeek.setDate(lastWeek.getDate() - 7);
       
       // Weapons not used in a week lose 0.1% affinity
-      await query(
+      await database.query(
         'UPDATE weapon_affinities SET affinity_percentage = GREATEST(0, affinity_percentage - 0.1) WHERE character_id = $1 AND last_used < $2',
         [characterId, lastWeek]
       );
 
       // Magic schools not used in a week lose 0.1% affinity
-      await query(
-        'UPDATE magic_affinities SET affinity_percentage = GREATEST(0, affinity_percentage - 0.1) WHERE character_id = $2 AND last_used < $2',
+      await database.query(
+        'UPDATE magic_affinities SET affinity_percentage = GREATEST(0, affinity_percentage - 0.1) WHERE character_id = $1 AND last_used < $2',
         [characterId, lastWeek]
       );
 
@@ -390,7 +388,5 @@ class AffinityService {
     }
   }
 }
-
-module.exports = new AffinityService();
 
 module.exports = new AffinityService();
