@@ -125,6 +125,20 @@ class PerformanceManager {
                 gameOutput.removeChild(gameOutput.firstChild);
             }
         }
+        
+        // Clean up progression messages
+        const progressionMessages = document.getElementById('progression-messages');
+        if (progressionMessages && progressionMessages.children.length > 20) {
+            const toRemove = progressionMessages.children.length - 20;
+            for (let i = 0; i < toRemove; i++) {
+                progressionMessages.removeChild(progressionMessages.firstChild);
+            }
+        }
+        
+        // Force garbage collection if available
+        if (window.gc) {
+            window.gc();
+        }
     }
     
     throttledWarn(message) {
@@ -260,7 +274,86 @@ const efficientScroll = window.throttle(() => {
 
 window.addEventListener('scroll', efficientScroll, { passive: true });
 
+// DOM Batch Update Utility
+class DOMBatchUpdater {
+    constructor() {
+        this.pendingUpdates = [];
+        this.isUpdateScheduled = false;
+    }
+    
+    batchUpdate(callback) {
+        this.pendingUpdates.push(callback);
+        if (!this.isUpdateScheduled) {
+            this.isUpdateScheduled = true;
+            window.requestAnimationFrame(() => {
+                this.executeBatch();
+            });
+        }
+    }
+    
+    executeBatch() {
+        const updates = this.pendingUpdates.splice(0);
+        updates.forEach(callback => {
+            try {
+                callback();
+            } catch (error) {
+                console.warn('DOM batch update error:', error);
+            }
+        });
+        this.isUpdateScheduled = false;
+    }
+}
+
+// Enhanced debounce with immediate execution option
+window.debounceImmediate = function(func, wait, immediate = false) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            timeout = null;
+            if (!immediate) func(...args);
+        };
+        const callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func(...args);
+    };
+};
+
+// Throttle with trailing execution
+window.throttleTrailing = function(func, limit) {
+    let inThrottle;
+    let lastFunc;
+    let lastRan;
+    return function() {
+        const context = this;
+        const args = arguments;
+        if (!inThrottle) {
+            func.apply(context, args);
+            lastRan = Date.now();
+            inThrottle = true;
+        } else {
+            clearTimeout(lastFunc);
+            lastFunc = setTimeout(function() {
+                if ((Date.now() - lastRan) >= limit) {
+                    func.apply(context, args);
+                    lastRan = Date.now();
+                }
+            }, limit - (Date.now() - lastRan));
+        }
+    };
+};
+
 // Initialize performance manager
 document.addEventListener('DOMContentLoaded', () => {
     window.performanceManager = new PerformanceManager();
+    window.domBatchUpdater = new DOMBatchUpdater();
+    
+    // Add to PerformanceUtils namespace
+    window.PerformanceUtils = {
+        debounce: window.debounce,
+        throttle: window.throttle,
+        debounceImmediate: window.debounceImmediate,
+        throttleTrailing: window.throttleTrailing,
+        DOMBatchUpdater: window.domBatchUpdater
+    };
 });

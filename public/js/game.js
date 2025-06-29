@@ -29,7 +29,7 @@ async function checkCombatStatus() {
     try {
         const response = await fetch('/api/combat/status');
         const data = await response.json();
-        
+
         gameState.combat.inCombat = data.inCombat;
         if (data.inCombat) {
             gameState.combat.session = data.session;
@@ -48,14 +48,14 @@ async function loadAvailableMonsters() {
     try {
         const response = await fetch('/api/combat/monsters');
         const data = await response.json();
-        
+
         if (data.monsters && data.monsters.length > 0) {
             const gameText = document.getElementById('game-text');
             gameText.innerHTML = `
                 <p class="game-text location-text">You are in ${data.zone}</p>
                 <p class="game-text">Available monsters to fight:</p>
             `;
-            
+
             data.monsters.forEach(monster => {
                 const monsterDiv = document.createElement('div');
                 monsterDiv.className = 'monster-info';
@@ -85,7 +85,7 @@ async function startCombat(targetId, targetType) {
             updateGameText(cooldownCheck.message || 'You must wait before taking another action.');
             return;
         }
-        
+
         const response = await fetch('/api/combat/start', {
             method: 'POST',
             headers: {
@@ -93,9 +93,9 @@ async function startCombat(targetId, targetType) {
             },
             body: JSON.stringify({ targetId, targetType })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             gameState.combat.inCombat = true;
             gameState.combat.session = data.session;
@@ -115,7 +115,7 @@ async function performCombatAction(actionType) {
         updateGameText('You are not in combat!');
         return;
     }
-    
+
     try {
         // Check cooldown first
         const cooldownCheck = await checkCooldown();
@@ -124,7 +124,7 @@ async function performCombatAction(actionType) {
             showCooldownTimer(cooldownCheck.remainingTime || cooldownCheck.remainingCooldown);
             return;
         }
-        
+
         const response = await fetch('/api/combat/action', {
             method: 'POST',
             headers: {
@@ -136,26 +136,26 @@ async function performCombatAction(actionType) {
                 actionData: {}
             })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             // Update cooldown
             if (data.cooldownUntil) {
                 gameState.combat.cooldownUntil = new Date(data.cooldownUntil);
                 showCooldownTimer();
             }
-            
+
             // Display action result
             if (data.result) {
                 displayCombatAction(data.result);
             }
-            
+
             // Update combat status
             if (data.combatStatus) {
                 gameState.combat.session = data.combatStatus;
                 updateCombatDisplay();
-                
+
                 // Check if combat ended
                 if (data.combatStatus.session_status !== 'active') {
                     gameState.combat.inCombat = false;
@@ -189,11 +189,11 @@ async function checkCooldown() {
 
 function showCooldownTimer(remainingMs) {
     const actionButtons = document.querySelectorAll('.action-btn.combat');
-    
+
     if (!remainingMs && gameState.combat.cooldownUntil) {
         remainingMs = Math.max(0, new Date(gameState.combat.cooldownUntil) - new Date());
     }
-    
+
     if (remainingMs <= 0) {
         actionButtons.forEach(btn => {
             btn.disabled = false;
@@ -201,15 +201,15 @@ function showCooldownTimer(remainingMs) {
         });
         return;
     }
-    
+
     actionButtons.forEach(btn => {
         btn.disabled = true;
     });
-    
+
     const updateTimer = () => {
         const now = new Date();
         const remaining = Math.max(0, new Date(gameState.combat.cooldownUntil) - now);
-        
+
         if (remaining <= 0) {
             actionButtons.forEach(btn => {
                 btn.disabled = false;
@@ -217,16 +217,16 @@ function showCooldownTimer(remainingMs) {
             });
             return;
         }
-        
+
         const seconds = (remaining / 1000).toFixed(1);
         actionButtons.forEach(btn => {
             const baseText = btn.textContent.replace(/ \(\d+\.\d+s\)/, '');
             btn.textContent = `${baseText} (${seconds}s)`;
         });
-        
+
         setTimeout(updateTimer, 100);
     };
-    
+
     updateTimer();
 }
 
@@ -234,9 +234,9 @@ function displayCombatAction(action) {
     const gameText = document.getElementById('game-text');
     const actionDiv = document.createElement('div');
     actionDiv.className = 'combat-action';
-    
+
     let actionText = '';
-    
+
     switch(action.action_type) {
         case 'attack':
             actionText = `<p class="game-text combat-text">${action.attacker_name} attacks ${action.defender_name}!</p>`;
@@ -246,16 +246,16 @@ function displayCombatAction(action) {
                 actionText += `<p class="game-text miss-text">Attack missed!</p>`;
             }
             break;
-        
+
         case 'spell':
             actionText = `<p class="game-text spell-text">${action.attacker_name} casts a spell at ${action.defender_name}!</p>`;
             actionText += `<p class="game-text damage-text">Spell deals ${action.result.damage} damage!</p>`;
             break;
-        
+
         case 'defend':
             actionText = `<p class="game-text defend-text">${action.attacker_name} takes a defensive stance!</p>`;
             break;
-        
+
         case 'flee':
             if (action.result.success) {
                 actionText = `<p class="game-text flee-text">${action.attacker_name} fled from combat!</p>`;
@@ -263,31 +263,31 @@ function displayCombatAction(action) {
                 actionText = `<p class="game-text flee-text">${action.attacker_name} couldn't escape!</p>`;
             }
             break;
-        
+
         case 'victory':
             actionText = `<p class="game-text victory-text">Victory! You have defeated ${action.defender_name}!</p>`;
             if (action.result.rewards) {
                 actionText += `<p class="game-text loot-text">Gained ${action.result.rewards.experience} experience and ${action.result.rewards.gold} gold!</p>`;
             }
             break;
-        
+
         case 'defeat':
             actionText = `<p class="game-text defeat-text">You have been defeated by ${action.attacker_name}!</p>`;
             break;
     }
-    
+
     actionDiv.innerHTML = actionText;
     gameText.appendChild(actionDiv);
-    
+
     // Scroll to bottom
     gameText.scrollTop = gameText.scrollHeight;
 }
 
 function updateCombatDisplay() {
     if (!gameState.combat.session) return;
-    
+
     const session = gameState.combat.session;
-    
+
     // Update combat info in game text
     const gameText = document.getElementById('game-text');
     gameText.innerHTML = `
@@ -299,14 +299,14 @@ function updateCombatDisplay() {
             </div>
         </div>
     `;
-    
+
     // Add combat log
     if (gameState.combat.combatLog && gameState.combat.combatLog.length > 0) {
         gameState.combat.combatLog.forEach(action => {
             displayCombatAction(action);
         });
     }
-    
+
     // Update action buttons for combat
     const actionPanel = document.querySelector('.combat-actions');
     if (actionPanel) {
@@ -330,21 +330,21 @@ function switchTab(tabName) {
                 tab.classList.remove('active');
             }
         });
-        
+
         // Remove active class from all tab buttons
         document.querySelectorAll('.tab-button').forEach(button => {
             if (button && button.classList) {
                 button.classList.remove('active');
             }
         });
-        
+
         // Show the selected tab
         const selectedTab = document.getElementById(tabName);
         if (selectedTab) {
             selectedTab.style.display = 'block';
             selectedTab.classList.add('active');
         }
-        
+
         // Add active class to the clicked button by finding button containing the tabName
         const buttons = document.querySelectorAll('.tab-button');
         buttons.forEach(button => {
@@ -354,7 +354,7 @@ function switchTab(tabName) {
                 }
             }
         });
-        
+
     } catch (error) {
         console.error('Tab switching error:', error);
     }
@@ -378,9 +378,9 @@ setInterval(updateServerTime, 1000);
 
 function move(direction) {
     if (isCooldownActive('movement')) return;
-    
+
     setCooldown('movement', 1000); // 1 second movement cooldown
-    
+
     fetch(`/api/game/move`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -409,30 +409,30 @@ function performAction(action) {
         performCombatAction(action);
         return;
     }
-    
+
     // If action is 'fight', check for monsters and start combat
     if (action === 'fight') {
         checkCombatStatus();
         return;
     }
-    
+
     // Handle 'cast' action differently based on combat state
     if (action === 'cast' && !gameState.combat.inCombat) {
         updateGameText('You attempt to cast a spell, but there is no target.');
         return;
     }
-    
+
     if (isCooldownActive(action)) return;
-    
+
     const cooldownTimes = {
         fight: 2000,
         cast: 3000,
         rest: 5000,
         map: 1000
     };
-    
+
     setCooldown(action, cooldownTimes[action] || 2000);
-    
+
     fetch(`/api/game/action`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -462,12 +462,12 @@ function performAction(action) {
 
 function setCooldown(action, duration) {
     gameState.cooldowns[action] = Date.now() + duration;
-    
+
     const button = document.querySelector(`[onclick*="${action}"]`);
     if (button) {
         button.disabled = true;
         button.classList.add('cooldown');
-        
+
         setTimeout(() => {
             button.disabled = false;
             button.classList.remove('cooldown');
@@ -488,10 +488,10 @@ function updateGameText(message) {
         const timestamp = new Date().toLocaleTimeString();
         const messageElement = document.createElement('div');
         messageElement.innerHTML = `<span class="timestamp">[${timestamp}]</span> ${message}`;
-        
+
         gameText.appendChild(messageElement);
         gameText.scrollTop = gameText.scrollHeight;
-        
+
         // Keep only last 100 messages for performance
         while (gameText.children.length > 100) {
             gameText.removeChild(gameText.firstChild);
@@ -505,24 +505,43 @@ function updateGameText(message) {
 let optimizedUpdateCharacterStats;
 let lastCharacterStatsUpdate = 0;
 
+let lastCharacterData = null;
+let updateCharacterStatsThrottled = null;
+
 function updateCharacterStats(character) {
     if (!character) return;
-    
-    // Throttle updates to prevent excessive DOM manipulation (max 10fps)
-    const now = performance.now();
-    if (now - lastCharacterStatsUpdate < 100) {
-        return;
+
+    // Skip update if data hasn't changed (deep comparison for key fields)
+    if (lastCharacterData && 
+        lastCharacterData.level === character.level &&
+        lastCharacterData.experience === character.experience &&
+        lastCharacterData.health_current === character.health_current &&
+        lastCharacterData.mana_current === character.mana_current &&
+        lastCharacterData.gold === character.gold) {
+        return; // No significant changes, skip update
     }
-    lastCharacterStatsUpdate = now;
-    
-    // Use performance-optimized updates if available
-    if (window.PerformanceUtils && window.PerformanceUtils.DOMOptimizer) {
-        if (!optimizedUpdateCharacterStats) {
-            const domOptimizer = new window.PerformanceUtils.DOMOptimizer();
-            optimizedUpdateCharacterStats = domOptimizer.batchUpdate.bind(domOptimizer);
-        }
-        
-        optimizedUpdateCharacterStats(() => {
+
+    // Initialize throttled function if not available
+    if (!updateCharacterStatsThrottled && window.PerformanceUtils) {
+        updateCharacterStatsThrottled = window.PerformanceUtils.throttleTrailing(() => {
+            executeCharacterStatsUpdate(character);
+        }, 100); // Update at most every 100ms
+    }
+
+    if (updateCharacterStatsThrottled) {
+        updateCharacterStatsThrottled();
+    } else {
+        executeCharacterStatsUpdate(character);
+    }
+
+    lastCharacterData = { ...character };
+}
+
+function executeCharacterStatsUpdate(character) {
+    console.log('updateCharacterStats called with:', character);
+
+    if (window.domBatchUpdater) {
+        window.domBatchUpdater.batchUpdate(() => {
             performCharacterStatsUpdate(character);
         });
     } else {
@@ -531,33 +550,49 @@ function updateCharacterStats(character) {
 }
 
 function performCharacterStatsUpdate(character) {
-    // Update individual stat displays
-    const statMappings = {
-        'stat-str': character.str_total || character.str_base || 10,
-        'stat-int': character.int_total || character.int_base || 10,
-        'stat-vit': character.vit_total || character.vit_base || 10,
-        'stat-dex': character.dex_total || character.dex_base || 10,
-        'stat-wis': character.wis_total || character.wis_base || 10
-    };
-    
-    Object.entries(statMappings).forEach(([elementId, value]) => {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.textContent = value;
+    // Update character name
+    const nameEl = document.getElementById('character-name');
+    if (nameEl && nameEl.textContent !== character.name) {
+        nameEl.textContent = character.name;
+    }
+
+    // Update level
+    const levelEl = document.getElementById('character-level');
+    if (levelEl && levelEl.textContent !== character.level.toString()) {
+        levelEl.textContent = character.level;
+    }
+
+    // Update stats with change detection
+    ['str', 'int', 'vit', 'dex', 'wis'].forEach(stat => {
+        const statEl = document.getElementById(`${stat}-value`);
+        const newValue = character[`${stat}_total`] || character[`${stat}_base`] || 0;
+        if (statEl && statEl.textContent !== newValue.toString()) {
+            statEl.textContent = newValue;
         }
     });
-    
-    // Update total stats
-    const totalElement = document.getElementById('stat-total');
-    if (totalElement) {
-        const str = character.str_total || character.str_base || 10;
-        const int = character.int_total || character.int_base || 10;
-        const vit = character.vit_total || character.vit_base || 10;
-        const dex = character.dex_total || character.dex_base || 10;
-        const wis = character.wis_total || character.wis_base || 10;
-        const total = str + int + vit + dex + wis;
-        totalElement.textContent = total;
+
+    // Update health
+    const healthEl = document.getElementById('health-value');
+    const healthText = `${character.health_current}/${character.health_max}`;
+    if (healthEl && healthEl.textContent !== healthText) {
+        healthEl.textContent = healthText;
     }
+
+    // Update mana
+    const manaEl = document.getElementById('mana-value');
+    const manaText = `${character.mana_current}/${character.mana_max}`;
+    if (manaEl && manaEl.textContent !== manaText) {
+        manaEl.textContent = manaText;
+    }
+
+    // Update gold
+    const goldEl = document.getElementById('gold-value');
+    if (goldEl && goldEl.textContent !== character.gold.toString()) {
+        goldEl.textContent = character.gold;
+    }
+
+    // Update experience bar
+    updateExperienceBar(character);
 }
 
 function updateHealthMana(health, mana) {
@@ -567,39 +602,39 @@ function updateHealthMana(health, mana) {
     const manaText = document.getElementById('mana-text');
     const healthDisplay = document.getElementById('health-display');
     const manaDisplay = document.getElementById('mana-display');
-    
+
     if (health.current !== undefined && health.max !== undefined) {
         const healthPercent = (health.current / health.max) * 100;
-        
+
         // Update progress bar
         if (healthBar) {
             healthBar.style.width = `${healthPercent}%`;
         }
-        
+
         // Update percentage text on bar
         if (healthText) {
             healthText.textContent = `${Math.round(healthPercent)}%`;
         }
-        
+
         // Update current/max display
         if (healthDisplay) {
             healthDisplay.textContent = `${health.current}/${health.max}`;
         }
     }
-    
+
     if (mana.current !== undefined && mana.max !== undefined) {
         const manaPercent = (mana.current / mana.max) * 100;
-        
+
         // Update progress bar
         if (manaBar) {
             manaBar.style.width = `${manaPercent}%`;
         }
-        
+
         // Update percentage text on bar
         if (manaText) {
             manaText.textContent = `${Math.round(manaPercent)}%`;
         }
-        
+
         // Update current/max display
         if (manaDisplay) {
             manaDisplay.textContent = `${mana.current}/${mana.max}`;
@@ -620,12 +655,12 @@ function updateExperience(expData) {
     if (expData.gained) {
         updateGameText(`<span class="exp-gain">+${expData.gained} experience!</span>`);
     }
-    
+
     if (expData.levelUp) {
         updateGameText(`<span class="level-up">Level up! You are now level ${expData.newLevel}!</span>`);
         updateCharacterLevel(expData.newLevel);
     }
-    
+
     updateExperienceBar(expData);
 }
 
@@ -633,54 +668,40 @@ function updateExperience(expData) {
 let lastExpUpdate = 0;
 let lastExpData = null;
 
-function updateExperienceBar(expData) {
-    if (!expData || expData.current === undefined || expData.required === undefined) return;
-    
-    // Skip update if data hasn't changed
-    if (lastExpData && 
-        lastExpData.current === expData.current && 
-        lastExpData.required === expData.required) {
-        return;
-    }
-    
-    // Throttle updates to prevent excessive DOM manipulation
-    const now = performance.now();
-    if (now - lastExpUpdate < 100) {
-        return;
-    }
-    
-    lastExpUpdate = now;
-    lastExpData = { ...expData };
-    
-    // Use performance-optimized DOM updates
-    if (window.PerformanceUtils && window.PerformanceUtils.DOMOptimizer) {
-        const domOptimizer = new window.PerformanceUtils.DOMOptimizer();
-        domOptimizer.batchUpdate(() => {
-            performExperienceBarUpdate(expData);
-        });
-    } else {
-        performExperienceBarUpdate(expData);
-    }
-}
+let lastExperienceData = null;
 
-function performExperienceBarUpdate(expData) {
-    const expBar = document.getElementById('exp-bar');
+function updateExperienceBar(character) {
+    // Skip if experience data hasn't changed
+    if (lastExperienceData && 
+        lastExperienceData.experience_progress === character.experience_progress &&
+        lastExperienceData.experience_to_next === character.experience_to_next) {
+        return;
+    }
+
+    const expBar = document.getElementById('exp-progress');
     const expText = document.getElementById('exp-text');
-    const expLabel = document.querySelector('#exp-bar')?.closest('.stat-bar')?.querySelector('.stat-label span:last-child');
-    
-    const expPercent = Math.floor((expData.current / expData.required) * 100);
-    
-    if (expBar) {
-        expBar.style.width = `${expPercent}%`;
+
+    if (expBar && character.experience_to_next && character.experience_progress !== undefined) {
+        const percentage = Math.min(100, (character.experience_progress / character.experience_to_next) * 100);
+
+        // Only update if percentage changed significantly (avoid micro-updates)
+        const currentWidth = parseFloat(expBar.style.width) || 0;
+        if (Math.abs(percentage - currentWidth) > 0.1) {
+            expBar.style.width = percentage + '%';
+        }
+
+        if (expText) {
+            const newText = `${character.experience_progress.toLocaleString()} / ${character.experience_to_next.toLocaleString()}`;
+            if (expText.textContent !== newText) {
+                expText.textContent = newText;
+            }
+        }
     }
-    
-    if (expText) {
-        expText.textContent = `${formatNumber(expData.current)}/${formatNumber(expData.required)}`;
-    }
-    
-    if (expLabel) {
-        expLabel.textContent = `${expPercent}% to next`;
-    }
+
+    lastExperienceData = {
+        experience_progress: character.experience_progress,
+        experience_to_next: character.experience_to_next
+    };
 }
 
 function updateCharacterLevel(level) {
@@ -697,7 +718,7 @@ function updateAffinityDisplay(affinityData) {
         updateWeaponAffinity(affinityData.weapon.type, affinityData.weapon.level);
         updateGameText(`<span class="affinity-gain">${affinityData.weapon.type} affinity increased!</span>`);
     }
-    
+
     if (affinityData && affinityData.magic) {
         updateMagicAffinity(affinityData.magic.school, affinityData.magic.level);
         updateGameText(`<span class="affinity-gain">${affinityData.magic.school} magic affinity increased!</span>`);
@@ -729,10 +750,10 @@ function updateMagicAffinity(school, level) {
 function sendChatMessage() {
     const chatInput = document.getElementById('chat-input');
     const activeChannel = document.querySelector('.chat-tab.active')?.dataset.channel || 'all';
-    
+
     if (chatInput && chatInput.value.trim()) {
         const message = chatInput.value.trim();
-        
+
         fetch('/api/game/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -757,7 +778,7 @@ function switchChatChannel(channel) {
     document.querySelectorAll('.chat-tab').forEach(tab => {
         tab.classList.remove('active');
     });
-    
+
     const activeTab = document.querySelector(`[data-channel="${channel}"]`);
     if (activeTab) {
         activeTab.classList.add('active');
@@ -774,7 +795,7 @@ document.addEventListener('keydown', function(event) {
         }
         return;
     }
-    
+
     switch(event.key.toLowerCase()) {
         case 'w':
             move('north');
@@ -809,7 +830,7 @@ document.addEventListener('keydown', function(event) {
 function gainExperience(amount) {
     console.log('gainExperience called with amount:', amount);
     console.log('Making API request to /api/progression/award-experience');
-    
+
     fetch('/api/progression/award-experience', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -827,11 +848,11 @@ function gainExperience(amount) {
         if (data.success) {
             const expGained = parseInt(data.data?.experienceGained || amount);
             addProgressionMessage(`Gained ${formatNumber(expGained)} experience!`, 'success');
-            
+
             if (data.data?.leveledUp) {
                 addProgressionMessage(`Level up! Now level ${data.data.newLevel}!`, 'level-up');
             }
-            
+
             refreshGameState();
         } else {
             addProgressionMessage(data.error || 'Failed to award experience', 'error');
@@ -852,7 +873,7 @@ function addProgressionMessage(message, type = 'info') {
         messageElement.textContent = message;
         messagesDiv.appendChild(messageElement);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        
+
         // Keep only last 10 messages
         while (messagesDiv.children.length > 10) {
             messagesDiv.removeChild(messagesDiv.firstChild);
@@ -874,7 +895,7 @@ function refreshGameState() {
     if (!debouncedRefreshGameState && window.PerformanceUtils) {
         debouncedRefreshGameState = window.PerformanceUtils.debounce(executeGameStateRefresh, 500);
     }
-    
+
     if (debouncedRefreshGameState) {
         debouncedRefreshGameState();
     } else {
@@ -894,29 +915,30 @@ function executeGameStateRefresh() {
     .then(data => {
         if (data.success) {
             gameState.character = data.character;
-            
+
             // Update character display
             if (data.character) {
                 updateCharacterStats(data.character);
-                
+
                 updateHealthMana(
                     { current: data.character.health_current, max: data.character.health_max },
+                    { current: data.character.health_max },
                     { current: data.character.mana_current, max: data.character.mana_max }
                 );
-                
+
                 updateCharacterLevel(data.character.level);
-                
+
                 if (data.character.experience !== undefined) {
                     // Use experience_progress (current level progress) instead of total experience
                     const currentProgress = data.character.experience_progress || 0;
                     const required = data.character.experience_to_next || 1000;
-                    
+
                     updateExperienceBar({
                         current: currentProgress,
                         required: required
                     });
                 }
-                
+
                 // Force update character level display
                 if (data.character.level) {
                     updateCharacterLevel(data.character.level);
@@ -935,7 +957,7 @@ function executeGameStateRefresh() {
 
 function formatNumber(num) {
     if (num === undefined || num === null) return '0';
-    
+
     if (num >= 1000000000) {
         return (num / 1000000000).toFixed(1) + 'B';
     } else if (num >= 1000000) {
@@ -952,10 +974,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize performance monitoring with memory management
     if (window.PerformanceUtils) {
         window.PerformanceUtils.initPerformanceOptimizations();
-        
+
         // Monitor and optimize memory usage
         const memoryManager = new window.PerformanceUtils.MemoryManager();
-        
+
         // Add cleanup for game state refreshes
         memoryManager.addInterval(() => {
             // Clear old combat logs to prevent memory buildup
@@ -963,34 +985,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 gameState.combat.combatLog = gameState.combat.combatLog.slice(-25);
             }
         }, 30000); // Clean every 30 seconds
-        
+
         // Performance monitoring disabled for better performance
         // const performanceMonitor = new window.PerformanceUtils.PerformanceMonitor();
         // performanceMonitor.startMonitoring();
     }
-    
+
     // Initialize UI components
     updateServerTime();
     initializeProgressionButtons();
-    
+
     // Use performance-optimized interval with reduced frequency
-    const refreshInterval = window.PerformanceUtils?.throttle(refreshGameState, 120000) || refreshGameState;
+    const refreshInterval = window.PerformanceUtils?.throttle(`refreshGameState, 120000) || refreshGameState;
     setInterval(refreshInterval, 120000); // Refresh every 2 minutes to reduce load
-    
+
     // Initial game state load
     refreshGameState();
-    
+
     // Focus chat input when page loads
     const chatInput = document.getElementById('chat-input');
     if (chatInput) {
         chatInput.focus();
     }
-    
+
     // Set default tab
     switchTab('equipment');
-    
+
     // Check combat status on load
     checkCombatStatus();
-    
+
     console.log('Aeturnis Online client initialized');
 });

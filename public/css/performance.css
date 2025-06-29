@@ -121,4 +121,94 @@ img.loaded {
         backdrop-filter: none !important;
         box-shadow: none !important;
     }
+    
+    /* Disable text shadows and gradients */
+    .gradient-text,
+    .text-glow {
+        background: unset !important;
+        -webkit-background-clip: unset !important;
+        text-shadow: none !important;
+        color: var(--text-primary) !important;
+    }
+    
+    /* Simplify borders */
+    .glass-panel,
+    .game-panel {
+        border: 1px solid var(--glass-border) !important;
+        background: var(--bg-darker) !important;
+    }
+}
+
+/* Memory-efficient scrolling */
+.game-output,
+.chat-messages,
+.progression-messages {
+    /* Use transform instead of changing scroll position for better performance */
+    transform: translateZ(0);
+    
+    /* Limit repaints during scrolling */
+    contain: layout style paint;
+    
+    /* Optimize scroll behavior */
+    scroll-behavior: auto; /* Disable smooth scrolling on low-end devices */
+}
+
+@media (max-width: 480px) {
+    .game-output,
+    .chat-messages,
+    .progression-messages {
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Performance-optimized animations */
+@keyframes optimized-fade-in {
+    from { opacity: 0; transform: translateZ(0); }
+    to { opacity: 1; transform: translateZ(0); }
+}
+
+@keyframes optimized-slide-up {
+    from { transform: translate3d(0, 20px, 0); opacity: 0; }
+    to { transform: translate3d(0, 0, 0); opacity: 1; }
+}
+
+.progression-message {
+    animation: optimized-fade-in 0.2s ease-out;
+    transform: translateZ(0); /* Force hardware acceleration */
+}
+
+/* Efficient state changes */
+.btn:active,
+.action-btn:active {
+    transform: scale3d(0.95, 0.95, 1); /* Use 3D transform for better performance */
+}
+
+/* Optimize frequent updates */
+.character-stat-value,
+.experience-text,
+.health-value,
+.mana-value {
+    font-variant-numeric: tabular-nums; /* Prevent layout shifts with number changes */
+    contain: layout; /* Isolate layout changes */
+}
+
+/* Battery optimization */
+@media (prefers-reduced-motion: reduce) {
+    .progression-message {
+        animation: none !important;
+    }
+    
+    .character-stat-value,
+    .experience-bar {
+        transition: none !important;
+    }
+}
+
+/* Connection-aware optimizations */
+@media (connection: slow) {
+    .decorative-bg,
+    .particle-effect,
+    .ambient-animation {
+        display: none !important;
+    }
 }
