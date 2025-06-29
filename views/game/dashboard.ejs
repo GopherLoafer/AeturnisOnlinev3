@@ -57,6 +57,8 @@
             box-shadow: 
                 0 8px 32px rgba(0, 0, 0, 0.4),
                 0 0 0 1px rgba(255, 255, 255, 0.05);
+            z-index: 1000;
+            position: relative;
         }
 
         .game-title {
@@ -1177,14 +1179,14 @@
         }
 
         .dropdown-menu {
-            position: fixed;
-            top: 70px;
-            right: 20px;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
             background: linear-gradient(145deg, rgba(15, 20, 25, 0.95) 0%, rgba(20, 25, 35, 0.95) 100%);
             border: 1px solid rgba(59, 130, 246, 0.3);
             border-radius: 8px;
             min-width: 120px;
-            z-index: 99999;
+            z-index: 10;
             display: none;
             backdrop-filter: blur(20px);
             box-shadow: 
