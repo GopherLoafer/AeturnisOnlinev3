@@ -266,7 +266,9 @@
         @media (hover: none) {
             button:active,
             .btn:active,
-            .action-btn:active {
+            .action-btn:active,
+            .inventory-slot:active,
+            .equipment-slot:active {
                 transform: scale(0.95);
                 opacity: 0.8;
             }
@@ -700,19 +702,34 @@
             font-weight: 600;
         }
 
+        /* Responsive equipment grid */
         .equipment-grid {
             display: grid;
             grid-template-areas:
-                ". helmet ."
-                "gloves chest shield"
-                ". legs weapon"
-                ". boots ."
-                "ring1 necklace ring2";
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
+                "helmet helmet"
+                "gloves chest"
+                "shield legs"
+                "boots weapon"
+                "ring1 ring2"
+                "necklace necklace";
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-xs);
             margin-bottom: 12px;
             justify-items: center;
-            padding: 10px;
+            padding: var(--spacing-sm);
+        }
+
+        @media (min-width: 480px) {
+            .equipment-grid {
+                grid-template-areas:
+                    ". helmet ."
+                    "gloves chest shield"
+                    ". legs weapon"
+                    ". boots ."
+                    "ring1 necklace ring2";
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: var(--spacing-sm);
+            }
         }
 
         .equipment-slot.helmet { grid-area: helmet; }
@@ -739,9 +756,11 @@
             transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
             position: relative;
             overflow: hidden;
-            font-size: 20px;
+            font-size: clamp(16px, 4vw, 24px);
             color: #cbd5e1;
             backdrop-filter: blur(10px);
+            min-height: 44px;
+            min-width: 44px;
             box-shadow: 
                 0 4px 16px rgba(0, 0, 0, 0.2),
                 0 0 0 1px rgba(255, 255, 255, 0.05),
@@ -1100,26 +1119,44 @@
             display: block;
         }
 
-        /* Inventory Grid */
+        /* Responsive inventory grid */
         .inventory-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 6px;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: var(--spacing-xs);
+            padding: var(--spacing-sm);
             margin-bottom: 20px;
+        }
+
+        @media (min-width: 480px) {
+            .inventory-grid {
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            }
+        }
+
+        @media (min-width: 768px) {
+            .inventory-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
         }
 
         .inventory-slot {
             aspect-ratio: 1;
-            background: #2a2a2a;
-            border: 1px solid #444;
-            border-radius: 4px;
+            background: 
+                linear-gradient(145deg, rgba(30, 35, 50, 0.8) 0%, rgba(25, 30, 45, 0.8) 100%);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 14px;
+            font-size: clamp(14px, 3vw, 20px);
             position: relative;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            color: #cbd5e1;
+            backdrop-filter: blur(10px);
+            min-height: 44px;
+            min-width: 44px;
         }
 
         .inventory-slot:hover {
@@ -1136,12 +1173,25 @@
             position: absolute;
             bottom: 2px;
             right: 2px;
-            font-size: 10px;
+            font-size: clamp(8px, 2vw, 12px);
             color: #FFD700;
             font-weight: bold;
-            background: rgba(0,0,0,0.7);
-            padding: 1px 3px;
-            border-radius: 2px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1px 4px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            min-width: 16px;
+            text-align: center;
+            line-height: 1.2;
+            z-index: 2;
+        }
+        
+        @media (max-width: 479px) {
+            .item-count {
+                font-size: 8px;
+                padding: 1px 2px;
+                border-radius: 2px;
+            }
         }
 
         /* Progress Section */
