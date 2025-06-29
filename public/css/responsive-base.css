@@ -130,3 +130,119 @@ img[data-src].loaded {
     border-radius: 50%;
     object-fit: cover;
 }
+
+/* === CSS Performance Optimizations === */
+
+/* Reduce motion for accessibility and performance */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Optimize animations on mobile */
+@media (max-width: 768px) {
+    /* Simplify animations */
+    * {
+        animation-duration: 0.2s !important;
+    }
+    
+    /* Remove complex effects */
+    .game-container,
+    .hero-content,
+    .wizard-header,
+    .creation-step,
+    .left-panel,
+    .main-panel {
+        backdrop-filter: none !important;
+    }
+    
+    /* Use transform for better performance */
+    .panel,
+    .left-panel,
+    .main-panel,
+    .mobile-panel {
+        will-change: transform;
+    }
+    
+    /* Simplify shadows for performance */
+    .equipment-slot,
+    .action-btn,
+    .btn {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    /* Reduce complex gradients */
+    .bar-fill::after {
+        display: none;
+    }
+}
+
+/* Performance optimizations for low-end devices */
+@media (max-width: 480px) {
+    /* Disable non-essential animations */
+    .shimmer,
+    .loading-shimmer,
+    .glow {
+        animation: none !important;
+    }
+    
+    /* Simplify text effects */
+    .game-title,
+    .character-name,
+    .prestige-marker {
+        text-shadow: none !important;
+    }
+    
+    /* Reduce opacity transitions */
+    .tab-content,
+    .step-content {
+        transition: none !important;
+    }
+}
+
+/* Font loading optimization */
+@font-face {
+    font-family: 'Inter';
+    src: url('/fonts/inter.woff2') format('woff2');
+    font-display: swap;
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('/fonts/inter-bold.woff2') format('woff2');
+    font-display: swap;
+    font-weight: 700;
+}
+
+/* GPU acceleration for better performance */
+.equipment-slot,
+.action-btn,
+.mobile-panel,
+.chat-panel {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* Optimize scroll performance */
+.game-output,
+.chat-messages,
+.left-panel {
+    transform: translateZ(0);
+    overflow-scrolling: touch;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Performance-optimized hover states */
+@media (hover: hover) {
+    .equipment-slot:hover,
+    .action-btn:hover,
+    .btn:hover {
+        transform: translateZ(0) translateY(-2px);
+    }
+}
