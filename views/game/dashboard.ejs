@@ -58,6 +58,41 @@
             }
         }
 
+        /* Touch-Optimized Interactive Elements */
+        button, 
+        .btn,
+        .action-btn,
+        .move-btn,
+        .tab-button,
+        .inventory-slot,
+        .equipment-slot,
+        a[role="button"] {
+            min-height: 44px;
+            min-width: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Increase tap area without visual change */
+        button::before, 
+        .btn::before,
+        .action-btn::before,
+        .move-btn::before,
+        .tab-button::before,
+        .inventory-slot::before,
+        .equipment-slot::before,
+        a[role="button"]::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            bottom: -8px;
+            left: -8px;
+            z-index: -1;
+        }
+
         /* Main Layout - Mobile-first responsive */
         .game-container {
             display: grid;
@@ -224,6 +259,16 @@
             
             .mobile-nav-buttons, .mobile-overlay {
                 display: none !important;
+            }
+        }
+
+        /* Touch feedback for devices without hover support */
+        @media (hover: none) {
+            button:active,
+            .btn:active,
+            .action-btn:active {
+                transform: scale(0.95);
+                opacity: 0.8;
             }
         }
 
@@ -841,11 +886,37 @@
             padding: 15px;
         }
 
+        /* Responsive action buttons */
         .quick-actions {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
             margin-bottom: 15px;
+        }
+
+        @media (max-width: 480px) {
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--spacing-xs);
+            }
+            
+            .action-btn {
+                font-size: var(--font-xs);
+                padding: 8px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .quick-actions {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .quick-actions {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
 
         .action-btn {
