@@ -164,7 +164,7 @@ function initializeStats() {
   };
   
   // Load existing allocation if any
-  const sessionStats = <%= JSON.stringify((sessionData || {}).statAllocation || {}) %>;
+  const sessionStats = <%- JSON.stringify((sessionData || {}).statAllocation || {}) %>;
   if (Object.keys(sessionStats).length > 0) {
     allocatedStats = sessionStats;
     usedPoints = Object.values(allocatedStats).reduce((sum, val) => sum + val, 0);
@@ -173,7 +173,7 @@ function initializeStats() {
   updateDisplay();
 }
 
-function adjustStat(stat, amount) {
+window.adjustStat = function(stat, amount) {
   const newValue = allocatedStats[stat] + amount;
   const newUsedPoints = usedPoints + amount;
   
@@ -188,7 +188,7 @@ function adjustStat(stat, amount) {
   updateDisplay();
 }
 
-function applyPreset(presetType) {
+window.applyPreset = function(presetType) {
   resetAllocation();
   
   switch (presetType) {
@@ -210,7 +210,7 @@ function applyPreset(presetType) {
   updateDisplay();
 }
 
-function resetAllocation() {
+window.resetAllocation = function() {
   allocatedStats = { str: 0, int: 0, vit: 0, dex: 0, wis: 0 };
   usedPoints = 0;
   updateDisplay();
@@ -276,7 +276,7 @@ function updatePreview() {
     '<div class="base-stat">WIS: ' + baseStats.wis + '</div>';
 }
 
-function proceedWithStats() {
+window.proceedWithStats = function() {
   proceedToNextStep({ statAllocation: allocatedStats });
 }
 
